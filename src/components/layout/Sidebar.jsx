@@ -7,7 +7,7 @@ const MENU = [
     icon: '📋',
     children: [
       { label: '계약 조회', to: '/contracts' },
-      { label: '만기 계약 관리', to: '/expiring-contracts', disabled: true },
+      { label: '만기 계약 관리', to: '/expiring-contracts' },
       { label: '계약 통계', to: '/contract-statistics', disabled: true },
     ],
   },

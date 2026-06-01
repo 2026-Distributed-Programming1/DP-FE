@@ -7,6 +7,7 @@ import EducationPlanListPage from './pages/educationPlans/EducationPlanListPage'
 import InquiryListPage from './pages/inquiries/InquiryListPage';
 import ChannelScreeningListPage from './pages/channelScreenings/ChannelScreeningListPage';
 import SalesOrgEvaluationListPage from './pages/salesOrgEvaluations/SalesOrgEvaluationListPage';
+import ExpiringContractListPage from './pages/expiringContracts/ExpiringContractListPage';
 import LoginPage from './pages/auth/LoginPage';
 
 function PrivateRoute({ user, children }) {
@@ -49,6 +50,10 @@ export default function App() {
         <Route
           path="/sales-org-evaluations"
           element={<PrivateRoute user={user}><SalesOrgEvaluationListPage /></PrivateRoute>}
+        />
+        <Route
+          path="/expiring-contracts"
+          element={<PrivateRoute user={user}><ExpiringContractListPage /></PrivateRoute>}
         />
       </Routes>
     </BrowserRouter>

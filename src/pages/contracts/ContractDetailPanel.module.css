@@ -1,0 +1,163 @@
+.panel {
+  width: 360px;
+  min-width: 360px;
+  background: #fff;
+  border-left: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 56px);
+  position: sticky;
+  top: 56px;
+  overflow-y: auto;
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.panelTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  line-height: 1;
+}
+
+.closeBtn:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.panelBody {
+  padding: 16px 20px;
+  flex: 1;
+}
+
+.msg {
+  text-align: center;
+  color: #6b7280;
+  font-size: 13px;
+  padding: 24px 0;
+}
+
+.error {
+  color: #dc2626;
+}
+
+.section {
+  margin-bottom: 24px;
+}
+
+.contractNo {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 8px;
+  font-family: monospace;
+}
+
+.dday {
+  display: inline-block;
+  margin-left: 8px;
+  font-size: 12px;
+  background: #fef9c3;
+  color: #854d0e;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.sectionTitle {
+  font-size: 12px;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 10px;
+}
+
+.dl {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 8px 12px;
+  font-size: 13px;
+}
+
+.dl dt {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.dl dd {
+  color: #111827;
+  margin: 0;
+  word-break: break-all;
+}
+
+.overdue {
+  color: #dc2626;
+  font-weight: 700;
+}
+
+.normal {
+  color: #16a34a;
+  font-weight: 600;
+}
+
+.clauseList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.clauseItem {
+  font-size: 13px;
+  color: #374151;
+  background: #f3f4f6;
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.actionBtn {
+  flex: 1;
+  padding: 8px 0;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #f9fafb;
+  font-size: 13px;
+  color: #374151;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.actionNote {
+  font-size: 11px;
+  color: #9ca3af;
+  margin: 0;
+}

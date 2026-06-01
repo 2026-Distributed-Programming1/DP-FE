@@ -35,8 +35,10 @@ VITE_API_TARGET=http://localhost:8080
 **EC2 서버 테스트**
 
 ```
-VITE_API_TARGET=http://3.19.29.29:8080
+VITE_API_TARGET=<BACKEND_API_URL>
 ```
+
+EC2 서버 주소는 팀에서 공유받은 백엔드 API 주소를 입력하세요.
 
 > `.env`는 gitignore 대상입니다. 팀원 간 설정 공유는 `.env.example`을 사용하세요.
 

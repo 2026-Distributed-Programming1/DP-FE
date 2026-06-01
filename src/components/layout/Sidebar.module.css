@@ -1,0 +1,86 @@
+.sidebar {
+  width: 220px;
+  min-width: 220px;
+  height: 100vh;
+  background: #1e293b;
+  color: #cbd5e1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  position: sticky;
+  top: 0;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 16px 18px;
+  border-bottom: 1px solid #334155;
+}
+
+.brandIcon {
+  font-size: 20px;
+}
+
+.brandName {
+  font-size: 14px;
+  font-weight: 700;
+  color: #f1f5f9;
+  letter-spacing: -0.2px;
+}
+
+.nav {
+  flex: 1;
+  padding: 8px 0;
+}
+
+.group {
+  margin-bottom: 4px;
+}
+
+.groupLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0 8px;
+}
+
+.link {
+  display: block;
+  padding: 7px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #94a3b8;
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+  cursor: pointer;
+}
+
+.link:hover:not(.disabled):not(.active) {
+  background: #334155;
+  color: #e2e8f0;
+}
+
+.active {
+  background: #2563eb;
+  color: #fff !important;
+  font-weight: 600;
+}
+
+.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  font-size: 13px;
+}

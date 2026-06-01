@@ -10,7 +10,7 @@
 - 현재 배포 파이프라인은 GitHub Actions -> Docker Hub -> EC2 Docker Compose 흐름으로 구성되어 있다.
 - EC2는 Linux이며, 현재 기준은 Amazon Linux 계열 사용자 홈 디렉토리 `/home/ec2-user`이다.
 - 배포 확인은 완료되었다.
-  - EC2 내부에서 `curl -i http://localhost:8080/api/contracts` 호출 시 200 응답 확인.
+  - EC2 내부에서 `curl -i http://3.19.29.29:8080/api/contracts` 호출 시 200 응답 확인.
   - 외부 접속 문제는 EC2 public IPv4와 security group 8080 inbound 설정으로 해결했다.
 - `.env` 파일 내용은 직접 열람하거나 문서에 복사하지 않는다.
   - GitHub Secret `ENV_FILE`에 `.env` 파일 내용이 들어간다.

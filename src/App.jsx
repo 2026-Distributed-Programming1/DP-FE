@@ -5,6 +5,7 @@ import ClaimListPage from './pages/claims/ClaimListPage';
 import SalesActivityListPage from './pages/salesActivities/SalesActivityListPage';
 import EducationPlanListPage from './pages/educationPlans/EducationPlanListPage';
 import InquiryListPage from './pages/inquiries/InquiryListPage';
+import ChannelScreeningListPage from './pages/channelScreenings/ChannelScreeningListPage';
 import LoginPage from './pages/auth/LoginPage';
 
 function PrivateRoute({ user, children }) {
@@ -39,6 +40,10 @@ export default function App() {
         <Route
           path="/inquiries"
           element={<PrivateRoute user={user}><InquiryListPage /></PrivateRoute>}
+        />
+        <Route
+          path="/channel-screenings"
+          element={<PrivateRoute user={user}><ChannelScreeningListPage /></PrivateRoute>}
         />
       </Routes>
     </BrowserRouter>

@@ -43,8 +43,8 @@ const MENU = [
     icon: '📈',
     children: [
       { label: '영업활동 관리', to: '/sales-activities' },
-      { label: '채널 심사', to: '/channel-screenings', disabled: true },
-      { label: '영업조직 평가', to: '/sales-org-evaluations', disabled: true },
+      { label: '채널 심사', to: '/channel-screenings' },
+      { label: '영업조직 평가', to: '/sales-org-evaluations' },
     ],
   },
   {

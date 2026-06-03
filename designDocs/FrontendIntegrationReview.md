@@ -10,7 +10,7 @@
 - 현재 배포 파이프라인은 GitHub Actions -> Docker Hub -> EC2 Docker Compose 흐름으로 구성되어 있다.
 - EC2는 Linux이며, 현재 기준은 Amazon Linux 계열 사용자 홈 디렉토리 `/home/ec2-user`이다.
 - 배포 확인은 완료되었다.
-  - EC2 내부에서 `curl -i http://3.19.29.29:8080/api/contracts` 호출 시 200 응답 확인.
+  - EC2 내부에서 `curl -i http://localhost:8080/api/contracts` 호출 시 200 응답 확인.
   - 외부 접속 문제는 EC2 public IPv4와 security group 8080 inbound 설정으로 해결했다.
 - `.env` 파일 내용은 직접 열람하거나 문서에 복사하지 않는다.
   - GitHub Secret `ENV_FILE`에 `.env` 파일 내용이 들어간다.
@@ -22,7 +22,7 @@
   - 한 번에 전체를 수정하지 않는다.
   - 각 도메인마다 “현재 API로 화면 구성이 가능한가”, “프론트가 하드코딩해야 하는 값은 무엇인가”, “추가 endpoint가 필요한가”를 본다.
 - 추가 기능 후보는 바로 구현하지 않는다.
-  - 로그인/권한, 고객 CRUD, enum 옵션 API, API 문서화, 목록 응답 통일은 백로그로만 둔다.
+  - 로그인/권한, 고객 CRUD, enum 값 명세, API 문서화, 목록 응답 통일은 백로그로 관리하되, 완료된 항목은 상태를 갱신한다.
 - 기존 버그 가능성 중심 검토는 `DomainReviewFindings.md`에 있다.
   - 이 문서는 프론트 연동 관점만 다룬다.
 
@@ -45,12 +45,33 @@
   - sales
   - education
   - inquiry
+- 도메인별 role 기반 권한 보강 1차 적용 완료:
+  - contract: 통계/만기계약 관리는 `CONTRACT_STAFF`, `ADMIN`으로 제한. 계약/해지는 고객 본인 소유권 검증 유지.
+  - payment/refund: 납입 기록 관리는 `FINANCE_STAFF`, `ADMIN`, 환급 업무는 `FINANCE_STAFF`, `ADMIN`으로 제한. 고객 조회는 본인 계약 기준으로 제한.
+  - claim: 손해조사/보험금 산출은 `CLAIM_STAFF`, `ADMIN`, 보험금 지급은 `FINANCE_STAFF`, `CLAIM_STAFF`, `ADMIN`, 출동 기록은 `DISPATCH_STAFF`, `CLAIM_STAFF`, `ADMIN`으로 제한.
+  - consultation: 상담/제안/면담은 `SALES_STAFF`, `UNDERWRITING_STAFF`, `ADMIN`, 인수심사는 `UNDERWRITING_STAFF`, `ADMIN`으로 제한.
+  - sales: 영업 운영 API는 `SALES_STAFF`, `ADMIN`, 성과급 요청 생성은 `ADMIN`으로 제한.
+  - education: 교육 계획/제반/진행은 `EDUCATION_STAFF`, `ADMIN`으로 제한.
+  - inquiry: 고객은 본인 문의만 조회하고, 답변은 직원/관리자만 수행하도록 제한.
+  - customer: 검색은 직원/관리자 전용, 상세는 직원/관리자 또는 고객 본인 접근 허용.
+- 주요 테이블 목록 응답 통일 및 DB pagination 1차 적용 완료:
+  - `page/size/total/items` 응답 형태로 통일.
+  - customer, contract, payment/refund, claim, consultation, sales, education, inquiry 주요 목록은 DB `COUNT` + `LIMIT/OFFSET` 기준으로 조회.
+  - 고객 소유권이 필요한 목록은 SQL 조건에 고객 식별자를 포함해 `total`과 `items` 범위를 일치시킴.
 
 ### 다음에 이어서 할 일
 
-1. Batch A 변경 예정 설계 작성
-2. 고객 검색/상세 API, enum/options API, 공통 에러 응답 보강 diff 초안 작성
-3. 사용자 승인 후 Batch A부터 코드 수정
+1. ~~도메인별 상태 전이 규칙 문서화~~ ✅ (`design/StateTransitionRules.md`)
+2. ~~상태 전이 검증 엔터티 위임 리팩터링~~ ✅ (`design/StateTransitionRefactorProgress.md`)
+3. ~~`ApiSpec.md` 전 도메인 명세 확장~~ ✅ (전 컨트롤러 34개 커버, 2026-06-04)
+4. ~~청약신청/청약서/부활신청/성과급요청 목록·단건 GET 미구현~~ ✅ (2026-06-04 구현 완료)
+5. 소규모 로직 보강
+   - `applicationType` 한글 문자열 → enum 코드 전환 (인수심사 pending 목록)
+   - 교육 제반 등록 시 계획 `APPROVED` 상태 검증 추가
+   - 인수심사 결과 저장 시 원본 청약/보험신청 `status` 갱신 연결
+6. 목록 필터 확장 (상담/청구/교육 등 기간·상태 필터)
+7. 파일/S3 저장 정책 설계
+8. ~~미사용 DTO/유틸 정리~~ ✅
 
 ## 검토 순서
 
@@ -63,18 +84,31 @@
 
 ## 전체 추가 기능 후보
 
-아직 구현하지 않고 할 일 목록으로만 둔다.
+인증/Flyway의 1차 구현은 완료됐고, 나머지는 할 일 목록으로 둔다.
 
 - **AUTH-01 / 로그인·권한**
-  - 사용자 로그인, 로그아웃, 세션 확인, 역할 기반 접근 제어가 필요하다.
-  - 현재 API는 인증 없이 호출 가능하므로 프론트 작업용으로는 편하지만, 운영 관점에서는 보호가 필요하다.
-  - 후보 역할: 계약 담당자, 보상 담당자, 영업 담당자, 교육 담당자, 관리자.
-  - 1차 방침:
-    - DB 스키마 변경 관리는 Flyway로 도입한다.
-    - HTTP 환경에서 세션 기반 로그인을 먼저 구현한다.
+  - 1차 구현 완료:
+    - DB 스키마 변경 관리는 Flyway로 도입했다.
+    - HTTP 환경에서 세션 기반 로그인을 구현했다.
     - 브라우저 쿠키에는 세션 ID만 저장하고, 실제 로그인 상태는 서버/DB 세션 저장소에서 관리한다.
-    - 세션 저장소는 Spring Session JDBC + MySQL을 우선 검토한다.
-    - Spring Session JDBC 테이블과 사용자/역할 테이블은 Flyway migration으로 추가한다.
+    - 세션 저장소는 Spring Session JDBC + MySQL을 사용한다.
+    - Spring Session JDBC 테이블과 사용자/역할 테이블은 Flyway migration으로 추가했다.
+    - 인증 API는 `POST /api/auth/signup/customer`, `POST /api/auth/login`, `POST /api/auth/logout`, `GET /api/auth/me`, `POST /api/auth/password`이다.
+    - 고객 직접 회원가입은 `POST /api/auth/signup/customer`로 처리한다.
+    - 고객 직접 회원가입 필수 입력값은 로그인 아이디, 비밀번호, 이름, 주민등록번호, 연락처, 주소, 생년월일이다.
+    - 이메일은 선택값이다.
+    - 회원가입 시 `customers`와 `auth_users`를 같은 트랜잭션에서 생성한다.
+    - 고객번호는 서버가 `CUS00001` 형식으로 생성한다.
+    - 직접 회원가입 계정은 `role=CUSTOMER`, `password_change_required=false`로 생성되며 자동 로그인은 하지 않는다.
+    - 회원가입 요청 검증은 Bean Validation(`@Valid`)으로 처리하고, 검증 실패는 400 응답을 반환한다.
+    - 관리자 계정 발급 API는 `POST /api/auth/customer-accounts`이다.
+    - 관리자는 기존 고객번호와 로그인 아이디만 입력하고, 서버가 임시 비밀번호를 생성한다.
+    - 관리자 발급 고객 계정은 `password_change_required=true`로 생성되며 최초 로그인 후 비밀번호 변경이 필요하다.
+    - 직원 계정 발급 API는 `POST /api/auth/staff-accounts`이다.
+    - 직원 계정은 관리자만 발급한다.
+    - 직원 계정 발급 시 서버가 임시 비밀번호를 생성한다.
+    - 직원 계정은 `password_change_required=true`, `linked_customer_id=null`로 생성한다.
+    - `/api/auth/**`를 제외한 `/api/**`는 로그인 세션이 필요하다.
     - 프론트와 백엔드는 다른 origin으로 동작하므로 CORS credentials 설정이 필요하다.
     - 프론트 요청은 `credentials: "include"` 또는 `withCredentials: true`를 사용해야 한다.
     - HTTP 환경이므로 쿠키 `Secure=true`는 사용할 수 없다.
@@ -88,44 +122,101 @@
   - fallback:
     - HTTP + 다른 origin 환경에서 세션 쿠키가 안정적으로 동작하지 않으면 JWT 기반 로그인으로 전환한다.
     - JWT 전환 시 `Authorization: Bearer <token>` 헤더 기반으로 인증하고, CORS 쿠키 의존도를 줄인다.
-  - 1차 구현 후보:
-    - `POST /api/auth/login`
-    - `POST /api/auth/logout`
-    - `GET /api/auth/me`
-    - Flyway 도입
-    - Spring Session JDBC 테이블 마이그레이션
-    - 사용자/역할 테이블 마이그레이션
-  - 프론트 연결 초기에는 인증 없이 진행할 수 있지만, 운영 배포 전에는 최소한 관리자/직원 API 보호가 필요하다.
+  - 역할/소유권 적용 방침:
+    - role은 도메인 엔터티가 아니라 `auth_users.role`에서 관리한다.
+    - `Customer`는 보험 업무의 고객 master이고, `AuthUser`는 로그인 계정이므로 합치지 않는다.
+    - 고객뿐 아니라 직원/관리자 계정도 필요하므로 인증 계정은 고객 테이블과 분리한다.
+    - 고객 계정은 `auth_users.linked_customer_id`로 `customers.id`에 연결한다.
+    - 현재 구현된 기본 역할은 `CUSTOMER`, `STAFF`, `ADMIN`이다.
+    - 직원 세부 역할로 `CONTRACT_STAFF`, `CLAIM_STAFF`, `UNDERWRITING_STAFF`, `SALES_STAFF`, `EDUCATION_STAFF`, `FINANCE_STAFF`, `DISPATCH_STAFF`를 추가했다.
+    - 공통 interceptor는 로그인 여부만 검사한다.
+    - 고객 데이터 소유권은 서비스 계층에서 현재 로그인 사용자와 요청 데이터의 고객을 비교해 검증한다.
+    - `CUSTOMER`는 `linked_customer_id`로 연결된 본인 고객 데이터만 접근한다.
+    - `STAFF`, `ADMIN`은 업무 처리 목적상 전체 데이터 접근을 허용한다.
+    - 1차 권한 보강은 role 기반으로 적용했다.
+    - 고객 검색은 직원/관리자 전용이고, 고객 상세는 직원/관리자 또는 고객 본인 접근을 허용한다.
+    - 내부 업무 API는 도메인별 담당 직원 role과 `ADMIN` 중심으로 제한한다.
+  - 직원 역할 세분화 결정:
+    - 직원 역할은 세분화했다.
+    - 1차 역할은 `CONTRACT_STAFF`, `CLAIM_STAFF`, `UNDERWRITING_STAFF`, `SALES_STAFF`, `EDUCATION_STAFF`, `FINANCE_STAFF`, `DISPATCH_STAFF`이다.
+    - 기존 `STAFF`는 과도기 호환용 또는 일반 직원 역할로 유지할 수 있다.
+    - 직원 계정은 고객처럼 직접 회원가입하지 않고, 관리자가 발급한다.
+    - 직원 계정 발급 시 서버가 임시 비밀번호를 생성하고 `password_change_required=true`로 둔다.
+    - 1차 직원 계정은 `auth_users.role`만으로 API 접근 권한을 판단한다.
+    - 직원 actor 테이블(`ClaimsHandler`, `FinanceManager`, `EducationTrainer`, `SalesManager`, `InsuranceReviewer`, `DispatchAgent` 등)과의 연결은 2차 확장으로 미룬다.
+    - actor 연결이 필요한 시점은 “누가 처리했는지”, “누구에게 배정됐는지”, “담당자별 실적/한도/지역/교육 이력”을 DB에 남겨야 할 때다.
+    - 후속 확장 시 `auth_users`에 `linked_actor_type`, `linked_actor_id` 같은 다형 참조를 추가하는 방식을 검토한다.
+  - 직원 역할별 접근 정책 초안:
+    - 계약 통계/만기계약 관리: `CONTRACT_STAFF`, `ADMIN`
+    - 계약/해지 조회: 직원/관리자는 전체, 고객은 본인 계약만
+    - 사고/청구/손해조사/보험금 산출: `CLAIM_STAFF`, `ADMIN`
+    - 출동/출동 기록: `DISPATCH_STAFF`, `CLAIM_STAFF`, `ADMIN`
+    - 보험금 지급: `FINANCE_STAFF`, `CLAIM_STAFF`, `ADMIN`
+    - 납입 기록/환급: `FINANCE_STAFF`, `ADMIN`
+    - 상담/청약/인수심사: `UNDERWRITING_STAFF`, `SALES_STAFF`, `ADMIN`
+    - 영업/채널: `SALES_STAFF`, `ADMIN`
+    - 성과급 요청 생성: `ADMIN`
+    - 교육: `EDUCATION_STAFF`, `ADMIN`
+    - 문의 답변: 직원 또는 관리자
+  - 권한 검증 추상화 원칙:
+    - `AuthAccessService.currentUser()`는 현재 세션 사용자를 읽는 저수준 조회 메서드로 둔다.
+    - 도메인 서비스에서 `currentUser()`를 꺼내 role을 직접 비교하는 코드는 지양한다.
+    - 서비스 코드는 가능하면 `requireRefundOperationAccess()`, `requireClaimInvestigationAccess()`처럼 업무 권한 메서드를 호출한다.
+    - role 조합은 `AuthAccessService` 내부의 그룹 메서드와 업무 메서드에 숨긴다.
+    - 그룹 메서드는 사용자 역할 묶음을 표현한다. 예: `requireFinanceStaff()`, `requireClaimStaff()`, `requireDispatchStaff()`.
+    - 업무 메서드는 유스케이스 수행 권한을 표현한다. 예: `requirePaymentRecordManageAccess()`, `requireRefundOperationAccess()`, `requireClaimPaymentAccess()`.
+    - 업무 메서드는 필요하면 그룹 메서드를 호출한다. 정책 변경 시 서비스 코드를 수정하지 않고 `AuthAccessService`만 수정하는 것을 목표로 한다.
+    - 고객 소유권 검증은 `requireCustomerAccess()`, `requireCustomerNoAccess()`, `requireContractAccess()`, `canAccessContract()` 같은 데이터 접근 메서드를 우선 사용한다.
+    - `currentUser()` 직접 사용은 인증 응답 구성, audit/logging, 또는 업무 메서드 내부처럼 현재 사용자 정보 자체가 필요한 경우로 제한한다.
+  - 남은 작업:
+    - 전체 API smoke test로 role별 403/200 동작을 확인한다.
+    - 직원 actor 연결 schema와 연결 API는 담당자 배정/처리자 기록 기능을 시작할 때 설계한다.
+    - 비밀번호 찾기/초기화 정책을 결정한다.
+  - 검증 완료:
+    - fresh MySQL volume 기준으로 Flyway `V1__init_schema.sql` 자동 실행을 확인했다.
+    - `POST /api/auth/signup/customer` 고객 직접 회원가입 200 응답을 확인했다.
+    - `POST /api/auth/login` 고객 로그인 및 `DPBE_SESSION` 발급을 확인했다.
+    - `GET /api/auth/me` 고객 세션 조회 200 응답을 확인했다.
+    - 관리자 로그인 후 `POST /api/auth/staff-accounts` 직원 계정 발급 200 응답을 확인했다.
+    - 직원 계정 발급 시 `CUSTOMER` role 요청은 400으로 거부되는 것을 확인했다.
+    - `./gradlew build -x test` 성공을 확인했다.
+  - 수정된 운영 이슈:
+    - Spring Boot 4에서는 Flyway auto-configuration을 위해 `spring-boot-starter-flyway`가 필요하다.
+    - 신규 고객 저장 시 임시 `customer_id`는 `VARCHAR(20)`을 넘지 않도록 제한한다.
 
-- **CUSTOMER-01 / 고객 CRUD**
-  - 고객 목록, 상세, 생성, 수정, 검색 API가 필요하다.
-  - 현재 일부 API가 `customerId`를 path로 받지만, 프론트가 고객을 검색/선택할 진입 API가 부족하다.
-  - 1차 구현 후보:
+- **CUSTOMER-01 / 고객 검색·상세 API**
+  - 상태: 1차 완료
+  - 완료:
     - `GET /api/customers?keyword=&page=&size=`
     - `GET /api/customers/{customerId}`
-    - `POST /api/customers`
-    - `PUT /api/customers/{customerId}`
-  - 우선순위는 높다. 납입, 청구, 상담, 영업 고객 등록 화면이 모두 고객 선택에 의존한다.
+    - 직원/관리자 권한 제한
+    - 고객 본인 상세 조회 허용
+    - DB pagination
+    - 전화번호 keyword 검색
+    - `size` 최대 100 제한
+  - 남은 작업:
+    - 고객 생성/수정 API는 별도 정책 결정 후 진행
 
-- **COMMON-API-01 / enum 옵션 API**
-  - 프론트가 `PaymentMethod`, `ContractStatus`, `ClaimType`, `ChannelType` 같은 enum 값을 하드코딩하지 않도록 옵션 API 또는 상수 문서가 필요하다.
-  - 예: `GET /api/options/payment-methods`, `GET /api/options/contract-statuses`.
-  - 1차 구현 후보:
-    - `GET /api/options`
-    - 또는 `GET /api/options/{group}`
-  - 응답은 code/label 형태가 좋다.
-  - 예: `{ "code": "IMMEDIATE_TRANSFER", "label": "즉시이체" }`
-  - 특히 한글 상태 문자열과 enum name이 섞여 있는 도메인은 code/label 분리가 필요하다.
+- **COMMON-API-01 / enum 값 명세**
+  - 상태: 1차 완료
+  - 프론트는 메뉴/화면 구성을 직접 관리한다.
+  - `PaymentMethod`, `ContractStatus`, `ClaimType`, `ChannelType` 같은 enum 입력값은 `ApiSpec.md`에 명시한다.
+  - 현재 단계에서는 별도 option API를 두지 않고, 프론트가 `ApiSpec.md`의 enum 값을 기준으로 select/radio/filter 값을 구성한다.
+  - `src/main/resources/design/ApiSpec.md`에 주요 enum 값을 정리했다.
+  - 코드 점검 결과 별도 option/options API 컨트롤러는 발견되지 않았다.
+  - enum이 많아지고 여러 화면에서 반복되거나 서버 기준 동기화가 필요해지면 option API를 다시 검토한다.
 
 - **COMMON-API-02 / 에러 응답 확장**
-  - 현재 에러 응답은 `status`, `error`, `message`, `timestamp` 중심이다.
-  - 프론트에서 화면별 분기를 안정적으로 하려면 `code`, `path`, `fieldErrors` 같은 구조를 검토한다.
-  - 1차 구현 후보:
+  - 상태: 1차 완료
+  - 기존 에러 응답은 `status`, `error`, `message`, `timestamp` 중심이었다.
+  - 프론트에서 화면별 분기를 안정적으로 할 수 있도록 아래 구조를 추가했다.
+  - 1차 구현:
     - `code`: 프론트 분기용 안정 코드
     - `path`: 요청 path
     - `fieldErrors`: 필드 단위 검증 오류
-  - `HttpMessageNotReadableException`은 잘못된 JSON/enum 값이므로 400으로 처리한다.
-  - 현재 일반 예외가 500으로 묶이기 때문에 프론트 개발 중 입력 오류와 서버 오류 구분이 어렵다.
+  - `MethodArgumentNotValidException`은 `VALIDATION_ERROR`와 `fieldErrors[]`로 처리한다.
+  - `HttpMessageNotReadableException`은 `REQUEST_BODY_ERROR`로 처리한다.
+  - `AuthInterceptor`의 미인증/비밀번호 변경 필요 응답도 공통 JSON 에러 포맷으로 맞췄다.
 
 - **COMMON-API-03 / API 문서화**
   - 프론트 연동 전 OpenAPI/Swagger 또는 별도 API 명세 문서가 있으면 화면 작업 속도가 빨라진다.
@@ -136,12 +227,71 @@
   - 프론트와 동시에 작업하려면 request/response 예시가 필수에 가깝다.
 
 - **COMMON-API-04 / 목록 응답 형태 통일**
-  - 일부 목록은 `page/size/total/items`, 일부 목록은 배열을 직접 반환한다.
+  - 상태: 1차 완료
+  - 주요 테이블 목록은 `page/size/total/items`로 통일했다.
+  - 주요 도메인 목록은 DB `COUNT` + `LIMIT/OFFSET` 기반 pagination으로 전환했다.
+  - 고객 본인 데이터만 조회해야 하는 목록은 SQL 조건에 고객 식별자를 포함해 `total`과 `items`가 같은 범위를 보도록 했다.
   - 프론트 공통 테이블/페이지네이션 컴포넌트를 생각하면 목록 응답 정책을 정해야 한다.
-  - 1차 정책 후보:
-    - 테이블 화면에 쓰는 목록은 `page`, `size`, `total`, `items`로 통일
-    - select option용 작은 목록은 배열 반환 허용
-  - 기존 배열 응답을 바로 바꾸면 프론트 호환에 영향이 있으므로, 프론트 본격 연결 전에 정하는 편이 좋다.
+  - `List<ResponseDto>`를 Controller에서 직접 반환하는 API는 확장성이 낮다.
+    - 응답에 `total`, `page`, `size`, `hasNext`, 집계값 같은 메타데이터를 추가하기 어렵다.
+    - 나중에 페이지네이션이나 정렬을 붙이면 응답 형태가 깨진다.
+    - 프론트가 목록 API마다 배열 응답과 wrapper 응답을 따로 처리해야 한다.
+  - 확정 정책:
+    - 테이블 화면에 쓰는 목록은 `page`, `size`, `total`, `items`로 통일한다.
+    - `page`는 1부터 시작한다.
+    - `size`는 요청 크기이며 기본값은 20, 최대값은 100을 기본 정책으로 둔다.
+    - `total`은 필터 적용 후 전체 건수다.
+    - `items`는 현재 페이지 데이터다.
+    - 페이지네이션이 필요 없는 참조용 소량 목록은 `{ "items": [] }` wrapper를 사용한다.
+    - 배열 직접 반환은 신규 API에서 사용하지 않는다.
+    - select option용 API는 현재 두지 않기로 했으므로 배열 반환 예외도 만들지 않는다.
+  - 예외 기준:
+    - 단건 조회, 생성/수정/상태변경 응답은 wrapper를 강제하지 않는다.
+    - 프론트가 화면 테이블로 쓰지 않는 “현재 요청의 하위 리소스 소량 목록”은 `{ "items": [] }`를 허용한다.
+    - 예: 특정 고객의 납입 가능 계약 목록은 테이블 페이지보다 선택용 목록에 가까우므로 `{ "items": [] }` 후보.
+  - 적용 완료 범위:
+    - customer 검색
+    - contract: 계약, 해지, 만기계약, 만기 안내, 통계 이력
+    - payment/refund: 납입 기록, 환급 산출, 환급 지급
+    - claim: 사고, 청구, 출동
+    - consultation: 상담, 면담 일정, 면담 기록, 제안, 인수심사 대기
+    - sales: 활동계획, 채널 모집, 채널 심사, 고객 등록, 영업활동, 조직평가
+    - education: 교육 계획, 교육 제반, 교육 실행
+    - inquiry: 문의 목록
+  - 정리 완료:
+    - `global/util/PageResponses.java` 삭제 — DB pagination 전환 후 참조 없음
+    - `domain/customer/dto/CustomerListResponse.java` 삭제 — `PageResponse<CustomerSummary>` 전환 후 참조 없음
+    - `domain/contract/dto/ContractListResponse.java` 삭제 — `PageResponse<ContractSummaryResponse>` 전환 후 참조 없음
+    - 도메인별 상세 API 명세에 page query와 응답 예시 반영
+
+- **AUTH-02 / 인증 API 권한 최종 점검**
+  - 상태: 1차 점검 완료
+  - 확인 위치:
+    - `AuthController`
+    - `AuthService`
+    - `AuthInterceptor`
+    - `CorsConfig`
+  - 현재 동작:
+    - `/api/auth/**`는 interceptor에서 제외되어 로그인 전에도 controller까지 도달한다.
+    - `POST /api/auth/login`은 공개 API이며 성공 시 세션에 `AUTHENTICATED_USER`를 저장한다.
+    - `POST /api/auth/signup/customer`는 공개 API이며 고객 직접 회원가입만 수행한다.
+    - `POST /api/auth/customer-accounts`는 controller는 공개 경로지만 service에서 `requireAdmin()`으로 관리자만 허용한다.
+    - `POST /api/auth/staff-accounts`도 service에서 `requireAdmin()`으로 관리자만 허용한다.
+    - `POST /api/auth/password`, `POST /api/auth/logout`, `GET /api/auth/me`는 service에서 세션 사용자 조회를 수행하므로 로그인하지 않으면 401이다.
+    - 비밀번호 변경 필요 계정은 `/api/auth/**` 외 API 호출 시 interceptor에서 403으로 차단된다.
+  - 권한 관점 결론:
+    - 회원가입, 로그인은 공개 API로 의도와 일치한다.
+    - 고객 계정 발급과 직원 계정 발급은 관리자 전용으로 의도와 일치한다.
+    - 로그아웃, me, 비밀번호 변경은 로그인 사용자 전용으로 의도와 일치한다.
+  - 개선 후보:
+    - `LoginRequest`, `PasswordChangeRequest`, `CustomerAccountCreateRequest`에도 Bean Validation을 추가하고 controller에 `@Valid`를 붙이면 검증 응답이 더 일관된다.
+    - 현재도 service 내부에서 기본 검증은 수행하므로 당장 권한 우회 문제는 아니다.
+    - `/api/auth/customer-accounts`, `/api/auth/staff-accounts`는 interceptor 제외 경로지만 service에서 관리자 검증을 수행한다. 향후 유지보수자가 놓치지 않도록 Auth 계정 발급 API는 반드시 service 권한 검증을 유지해야 한다.
+    - `GET /api/dispatches`
+    - `GET /api/claims`
+  - 권장 응답 형태:
+    - 페이지네이션 목록: `{ "page": 1, "size": 20, "total": 0, "items": [] }`
+    - 단순 목록: `{ "items": [] }`
 
 - **COMMON-API-05 / 상태 전이 규칙 문서화**
   - 여러 도메인에서 `status`만 내려주고, 프론트가 버튼 가능 여부를 직접 해석해야 한다.
@@ -151,7 +301,7 @@
   - 1차 보완 후보:
     - 상태값별 가능한 전이 표 문서화
     - 잘못된 상태 전이 요청은 400 또는 409로 명확히 응답
-    - enum/options API 또는 API 명세로 허용 상태값 제공
+    - enum 값 또는 API 명세로 허용 상태값 제공
 
 - **COMMON-API-06 / 첨부파일·이미지 업로드 정책**
   - claim 출동 사진과 inquiry 첨부 파일에서 파일 접근 정책이 필요하다.
@@ -239,17 +389,16 @@
   - 없는 고객 ID를 넣어도 계약 목록 조회 결과가 빈 배열이면, 프론트는 “고객 없음”과 “납입 가능한 계약 없음”을 구분하기 어렵다.
   - 후보 작업: 고객 존재 확인 후 없는 고객은 404, 계약이 없는 고객은 빈 배열로 구분.
 
-- **FE-CONTRACT-03 / 목록 응답 형태 불일치**
+- **FE-CONTRACT-03 / 목록 응답 형태 불일치** ✅ 완료
   - 확인 위치: `ContractController.list()`, `CancellationController.list()`, `PaymentRecordController.list()`, `RefundController`
-  - 계약 목록은 페이지 객체를 반환하지만, 해지/납입내역/환급 목록은 배열을 직접 반환한다.
-  - 작은 데이터에서는 괜찮지만 프론트 공통 테이블 컴포넌트와 서버 페이지네이션을 생각하면 통일이 필요하다.
-  - 후보 정책: 조회량이 많아질 수 있는 목록은 `page/size/total/items`로 통일.
+  - 계약/해지/납입내역/환급 목록은 `page/size/total/items` 응답으로 통일했다.
+  - 주요 목록은 DB `COUNT` + `LIMIT/OFFSET` 기반으로 전환했다.
 
-- **FE-CONTRACT-04 / enum 옵션 출처 없음**
+- **FE-CONTRACT-04 / enum 값 출처 없음**
   - 확인 위치: `PaymentSubmitRequest.paymentMethod`, `PaymentRecordRejectRequest.rejectCategory`, `NoticeResponseRequest.customerResponse`
   - 프론트가 select/radio 옵션을 만들려면 enum 값을 알아야 한다.
   - 현재는 서버가 허용하는 값 목록을 제공하지 않으므로 프론트가 Java enum 이름을 하드코딩해야 한다.
-  - 후보 작업: enum 옵션 API 또는 API 명세 문서 추가.
+  - 후보 작업: API 명세 문서에 허용 enum 값 추가.
 
 - **FE-CONTRACT-05 / 납입 preview와 submit의 중복 항목 정책 필요**
   - 확인 위치: `PaymentService.preview()`, `PaymentService.submit()`
@@ -274,13 +423,67 @@
   - 프론트 연결은 가능하지만 운영 기능처럼 보이게 만들려면 계좌 선택/검증/OTP 발송 흐름이 더 필요하다.
   - 후보 작업: 환급 계좌 정보 응답/입력, OTP 발송 API, OTP 재시도 정책 노출.
 
+- **FE-PAYMENT-01 / 납입 가능 계약 목록이 배열을 직접 반환함**
+  - 확인 위치: `PaymentController.customerContracts()`
+  - `GET /api/customers/{customerId}/contracts`는 `List<PaymentContractResponse>`를 직접 반환한다.
+  - 현재는 계약 선택용 작은 목록이라 동작은 가능하지만, 프론트에서 선택 가능 계약 수, 고객 정보, 납입 가능 여부 메시지를 함께 표시하려면 응답 wrapper가 필요해진다.
+  - 후보 작업: `PaymentContractListResponse` 또는 공통 `{ "items": [] }` wrapper 적용 검토.
+
+- **FE-PAYMENT-02 / 납입 내역 목록 권한 검증 보강 완료**
+  - 확인 위치: `PaymentRecordController.list()`, `PaymentRecordService.getAll()`
+  - 고객 세션은 본인 계약의 납입 내역만 조회하도록 제한했다.
+  - 직원/관리자 계정은 업무 목적상 전체 조회를 허용한다.
+  - 남은 작업: 목록 필터와 페이지네이션 정책 결정.
+
+- **FE-PAYMENT-03 / 수납 확정·반려 API role 검증 완료**
+  - 확인 위치: `PaymentRecordController.confirm()`, `PaymentRecordController.reject()`, `PaymentRecordService`
+  - `POST /api/payment-records/{recordNo}/confirm`, `POST /api/payment-records/{recordNo}/reject`는 수납 담당 업무로 보인다.
+  - 현재는 `FINANCE_STAFF`, `ADMIN`만 수행하도록 제한했다.
+  - 남은 작업: 상태 전이 표 문서화.
+
+- **FE-PAYMENT-04 / 납입 submit에서 customerId와 계약 목록의 관계 검증이 명확하지 않음**
+  - 확인 위치: `PaymentService.submit()`, `Payment.selectContracts()`
+  - 고객 계정은 `customerId` 접근과 각 계약 접근이 모두 검증되어 큰 문제는 줄어든다.
+  - 다만 직원/관리자 호출에서는 요청의 `customerId`와 `items[].contractNo`가 같은 고객의 계약인지 명시적으로 검증하는 코드가 보이지 않는다.
+  - 프론트가 잘못된 조합을 보내면 납입 신청의 고객과 납입 대상 계약 고객이 달라질 가능성을 확인해야 한다.
+  - 후보 작업: submit 시 모든 계약의 customer id가 요청 `customerId`와 같은지 서버에서 400으로 검증.
+
+- **FE-PAYMENT-05 / preview와 submit의 중복 계약 처리 정책이 명확하지 않음**
+  - 확인 위치: `PaymentService.preview()`, `PaymentService.submit()`
+  - `preview`는 요청 항목 순서대로 금액을 합산한다.
+  - `submit`은 `PaymentItem`별로 첫 번째 matching request count를 찾기 때문에 같은 `contractNo`가 중복되면 preview와 submit 결과가 어긋날 수 있다.
+  - 후보 작업: 동일 요청 내 중복 `contractNo`는 400으로 거부하거나, preview/submit 양쪽에서 같은 방식으로 병합.
+
+- **FE-REFUND-01 / 환급 목록·상세·실행 권한 검증 완료**
+  - 확인 위치: `RefundController`, `RefundService`
+  - 고객은 본인 계약/해지와 연결된 환급 건만 조회하도록 제한했다.
+  - 환급 산출/확정/지급 실행은 `FINANCE_STAFF`, `ADMIN`으로 제한했다.
+  - 남은 작업: 환급 목록 필터와 페이지네이션 정책 결정.
+
+- **FE-REFUND-02 / 환급 목록 API 페이지네이션** ✅ 1차 완료
+  - 확인 위치: `RefundController.getAllCalculations()`, `RefundController.getAllPayments()`
+  - 환급 산출 목록과 지급 목록은 `page/size/total/items` 응답으로 통일했다.
+  - 고객 조회 시 SQL 조건에 고객 식별자를 포함해 본인 환급 데이터만 count/list 한다.
+  - 남은 작업: `status`, `customerId`, `contractNo`, 기간 조건 같은 추가 필터 지원 검토.
+
+- **FE-REFUND-03 / 환급 지급 실행의 OTP는 검증용 stub임**
+  - 확인 위치: `RefundPayment.verifyOTP()`, `RefundService.execute()`
+  - OTP는 6자리 입력이면 성공으로 간주되고, 실제 발송/검증 API가 없다.
+  - 프론트에서 운영 기능처럼 구현하면 사용자가 실제 OTP 발송을 기대할 수 있다.
+  - 후보 작업: 1차 화면에서는 데모 인증으로 명시하거나, OTP 발송/재발송/검증 실패 정책을 별도 API로 설계.
+
+- **FE-REFUND-04 / 환급금 확정 시 산출 엔터티의 확정 상태가 저장되지 않을 수 있음**
+  - 확인 위치: `RefundService.confirm()`, `RefundCalculation.confirm()`
+  - `RefundService.confirm()`은 `new RefundPayment(refund)`를 생성해 저장하지만, `RefundCalculation.confirm()`을 호출하거나 산출 건의 `confirmedAt`을 저장하는 흐름은 보이지 않는다.
+  - 프론트에서 환급 산출 상세를 다시 조회했을 때 “확정 완료” 이력이 명확히 보이지 않을 수 있다.
+  - 후보 작업: 환급 확정 시 산출 건의 상태/확정일시를 함께 갱신하고, 응답에 확정 여부를 노출.
+
 ### 우선순위 제안
 
-1. 고객 검색/상세 API 추가
-2. enum 옵션 제공 방식 결정
-3. 목록 응답 페이지네이션 정책 결정
-4. 납입 중복 항목 정책 확정
-5. 해지/환급 상태 전이 규칙 문서화
+1. 목록 응답 페이지네이션 정책 결정
+2. 납입 submit의 고객-계약 관계 검증
+3. 납입 중복 항목 정책 확정
+4. 해지/환급 상태 전이 규칙 문서화
 
 ---
 
@@ -352,11 +555,11 @@
   - 산출 생성 가능 여부, 산출 승인 가능 여부, 지급 생성 가능 여부, 지급 실행 가능 여부를 프론트가 상태값으로 직접 해석해야 한다.
   - 후보 작업: 화면 버튼 판단은 프론트 책임으로 두고, 상태 전이 표를 문서화.
 
-- **FE-CLAIM-03 / claim 목록 API에 필터와 페이지네이션이 없음**
+- **FE-CLAIM-03 / claim 목록 API 페이지네이션** ✅ 1차 완료
   - 확인 위치: `ClaimController.list()`, `AccidentController.list()`, `DispatchController.list()`
-  - 사고/청구/출동 목록이 배열 전체를 반환한다.
-  - 프론트 테이블에서 상태별 필터, 고객명 검색, 페이지네이션을 구현하려면 클라이언트 메모리 필터에 의존하게 된다.
-  - 후보 작업: `status`, `customerId`, `contractNo`, `page`, `size` query 지원 검토.
+  - 사고/청구/출동 목록은 `page/size/total/items` 응답으로 통일했다.
+  - 고객 조회가 필요한 사고/청구 목록은 DB pagination에서 고객 조건을 적용한다.
+  - 남은 작업: `status`, `customerId`, `contractNo` 같은 추가 필터 query 지원 검토.
 
 - **FE-CLAIM-04 / 사고 접수와 보험금 청구의 연결 관계가 약함**
   - 확인 위치: `AccidentCreateRequest`, `ClaimCreateRequest`
@@ -396,18 +599,49 @@
   - 프론트에서 예약 지급을 만들고 바로 실행 버튼을 누르면 예약 의미가 약해진다.
   - 후보 작업: 예약 지급은 scheduledAt 이후에만 실행 허용하거나, 수동 실행 버튼을 숨기고 배치/관리자 전용으로 분리.
 
-- **FE-CLAIM-10 / enum 옵션 출처 없음**
+- **FE-CLAIM-10 / enum 값 출처 없음**
   - 확인 위치: `AccidentCreateRequest.accidentType`, `ClaimCreateRequest.claimType/authMethod`, `InvestigationCreateRequest.result`, `PaymentCreateRequest.paymentType`
   - 프론트가 select/radio 옵션을 만들려면 enum 값을 하드코딩해야 한다.
-  - 후보 작업: 공통 enum 옵션 API 또는 도메인별 API 명세에 허용값 정리.
+  - 후보 작업: 도메인별 API 명세에 허용값 정리.
+
+- **FE-CLAIM-11 / 출동 목록·기록 API 직원 role 검증 완료**
+  - 확인 위치: `DispatchRecordService.listDispatches()`, `DispatchRecordService.create()`, `DispatchRecordService.findByDispatchNo()`
+  - 출동 목록/기록 등록/상세는 `DISPATCH_STAFF`, `CLAIM_STAFF`, `ADMIN`으로 제한했다.
+  - 남은 작업: 고객에게 출동 처리 현황을 보여줄 별도 요약 API 필요 여부 검토.
+
+- **FE-CLAIM-12 / 조사·산출·지급 API 업무 role 검증 완료**
+  - 확인 위치: `DamageInvestigationService`, `ClaimCalculationService`, `ClaimPaymentService`
+  - 손해조사/보험금 산출은 `CLAIM_STAFF`, `ADMIN`으로 제한했다.
+  - 보험금 지급 생성/실행은 `FINANCE_STAFF`, `CLAIM_STAFF`, `ADMIN`으로 제한했다.
+  - 남은 작업: 고객용 청구 진행 상태 조회 API 필요 여부 검토.
+
+- **FE-CLAIM-13 / 조사 담당자 입력이 로그인 사용자와 연결되지 않음**
+  - 확인 위치: `InvestigationCreateRequest.handlerEmpId`, `InvestigationCreateRequest.handlerName`, `DamageInvestigationService.create()`
+  - 조사 담당자는 request body의 `handlerEmpId`, `handlerName`으로 만들어진 `ClaimsHandler` 셸 객체에 의존한다.
+  - 프론트가 담당자 값을 임의로 보내면 실제 로그인 직원과 처리자가 달라질 수 있다.
+  - 후보 작업: 1차는 로그인 사용자 displayName을 처리자로 사용하거나, 직원 actor 연결이 생긴 뒤 서버에서 담당자를 결정.
+
+- **FE-CLAIM-14 / claim 지급 실행 경로가 보험료 납입 경로와 실제로 충돌함**
+  - 확인 위치: `ClaimPaymentController.execute()`, `PaymentController`
+  - 보험금 지급 실행은 `POST /api/payments/{paymentNo}/execute`이고, 보험료 납입 생성은 `POST /api/payments`이다.
+  - 현재는 메서드/경로가 달라 라우팅 충돌은 없지만, 프론트 API 모듈에서는 premium payment와 claim payment가 같은 namespace로 묶여 혼동될 수 있다.
+  - 후보 작업: API 명세에서 두 payment 개념을 분리해 적고, 장기적으로 `/api/claim-payments/{paymentNo}/execute`로 변경 검토.
+
+- **FE-CLAIM-15 / 출동 사진 저장 실패 시 DB와 파일의 원자성이 보장되지 않음**
+  - 확인 위치: `DispatchRecordService.create()`, `DispatchRecordService.storePhotos()`
+  - 출동 기록을 먼저 DB에 저장한 뒤 파일을 로컬 디스크에 저장하고, 이후 사진 메타를 저장한다.
+  - 파일 저장 중 예외가 나면 DB 트랜잭션은 롤백될 수 있지만 이미 저장된 파일 정리는 별도로 수행되지 않는다.
+  - S3로 전환해도 DB와 object storage는 같은 트랜잭션으로 묶이지 않으므로 실패 보상 정책이 필요하다.
+  - 후보 작업: 저장 파일명 UUID화, 실패 시 업로드된 파일 삭제, S3 전환 시 object key/상태값 기반 보상 로직 설계.
 
 ### 우선순위 제안
 
-1. 청구 상태 전이 규칙과 단계 계산 방식 문서화
-2. 출동 사진 조회 URL 또는 S3 전환 후 파일 접근 정책 결정
-3. claim 목록 필터/페이지네이션 추가 여부 결정
-4. 사고 접수와 청구를 연결할지 업무 정책 결정
-5. claim payment endpoint namespace 정리 여부 결정
+1. 출동/조사/산출/지급 API role 검증 보강
+2. 청구 상태 전이 규칙과 단계 계산 방식 문서화
+3. 출동 사진 조회 URL 또는 S3 전환 후 파일 접근 정책 결정
+4. claim 목록 필터/페이지네이션 추가 여부 결정
+5. 사고 접수와 청구를 연결할지 업무 정책 결정
+6. claim payment endpoint namespace 정리 여부 결정
 
 ---
 
@@ -507,11 +741,11 @@
   - 프론트에서 select box를 만들 수는 있지만, 이름 중복이나 이름 변경에 취약하다.
   - 후보 작업: 상품에는 `productNo` 같은 안정 식별자를 제공하고, 제안/청약/보험신청은 가능한 ID 기반으로 연결.
 
-- **FE-CONSULT-06 / 상담·면담 목록에 필터와 페이지네이션이 없음**
+- **FE-CONSULT-06 / 상담·면담 목록 페이지네이션** ✅ 1차 완료
   - 확인 위치: `ConsultationController.findAll()`, `InterviewScheduleController.findAll()`, `InterviewRecordController.findAll()`
-  - 상담, 면담 일정, 면담 기록 목록이 배열 전체를 반환한다.
-  - 프론트 캘린더/테이블에서는 기간, 상태, 고객명, 담당자 필터가 필요할 가능성이 높다.
-  - 후보 작업: `status`, `from`, `to`, `customerName`, `designerName`, `page`, `size` query 지원 검토.
+  - 상담, 면담 일정, 면담 기록, 제안, 인수심사 대기 목록은 `page/size/total/items` 응답으로 통일했다.
+  - 인수심사 대기 목록은 `policy_applications`와 `insurance_applications`를 `UNION ALL`로 합쳐 DB pagination 한다.
+  - 남은 작업: `status`, `from`, `to`, `customerName`, `designerName` 같은 추가 필터 query 지원 검토.
 
 - **FE-CONSULT-07 / 면담 일정과 면담 기록이 직접 연결되지 않음**
   - 확인 위치: `InterviewScheduleCreateRequest`, `InterviewRecordCreateRequest`
@@ -531,13 +765,51 @@
   - 프론트는 신청 완료 후 “심사 대기 목록으로 이동” 같은 UX를 별도 지식으로 처리해야 한다.
   - 후보 작업: 화면 이동 안내는 프론트 책임으로 두고, 명세 문서에 workflow 표 추가.
 
+- **FE-CONSULT-10 / 상담·제안·면담 API 권한 검증 완료**
+  - 확인 위치: `ConsultationService`, `ProposalService`, `InterviewScheduleService`, `InterviewRecordService`
+  - 상담 목록/상세/수락은 `SALES_STAFF`, `UNDERWRITING_STAFF`, `ADMIN`으로 제한했다.
+  - 제안/면담 관리는 `SALES_STAFF`, `UNDERWRITING_STAFF`, `ADMIN`으로 제한했다.
+  - 상담 생성은 로그인 사용자가 요청할 수 있는 흐름으로 유지했다.
+  - 남은 작업: 상담 신청과 고객 master 연결 여부 결정.
+
+- **FE-CONSULT-11 / 상담 신청이 고객 master와 연결되지 않음**
+  - 확인 위치: `ConsultationCreateRequest`, `ConsultationService.create()`, `ConsultationRequest`
+  - 상담 신청은 연락처와 내용 중심으로 저장되고, 로그인 고객 또는 `customers.id`와 연결되는 흐름이 보이지 않는다.
+  - 프론트에서 “내 상담 내역” 화면을 만들려면 고객 소유권 기준으로 필터링할 수 있는 식별자가 필요하다.
+  - 후보 작업: 상담 요청에 `customer_id`를 추가하거나, 로그인 고객이 상담 신청 시 서버가 현재 세션의 linked customer를 저장.
+
+- **FE-CONSULT-12 / 제안서가 customerName/productName 기반이라 안정 식별자가 부족함**
+  - 확인 위치: `ProposalCreateRequest`, `ProposalService.create()`
+  - 제안서는 고객명과 상품명으로 생성된다.
+  - 고객명/상품명이 중복되거나 변경되면 프론트가 정확한 대상을 선택하기 어렵다.
+  - 후보 작업: 제안서 생성은 `customerId`, `productNo` 또는 상품 `id` 기반으로 받고, 응답에는 표시용 이름을 함께 제공.
+
+- **FE-CONSULT-13 / 인수심사 API 심사 담당 role 검증 완료**
+  - 확인 위치: `UnderwritingService.findPending()`, `UnderwritingService.complete()`
+  - pending 목록 조회와 심사 완료는 `UNDERWRITING_STAFF`, `ADMIN`으로 제한했다.
+  - 남은 작업: `SALES_STAFF`에게 pending 조회만 허용할지 정책 검토.
+
+- **FE-CONSULT-14 / 심사 요청 값이 한글 문자열 중심이라 프론트 분기 안정성이 낮음**
+  - 확인 위치: `UnderwritingRequest.applicationType`, `UnderwritingRequest.result`, `UnderwritingRequest.reviewType`
+  - 인수심사 완료 요청은 `"청약"`, `"보험신청"`, `"조건부승인"`, `"거절"` 같은 한글 문자열에 의존한다.
+  - 화면 표시에는 자연스럽지만, 프론트 request 값과 서버 분기값으로는 오타와 다국어 변경에 취약하다.
+  - 후보 작업: request code는 `POLICY_APPLICATION`, `INSURANCE_APPLICATION`, `APPROVED`, `CONDITIONAL_APPROVED`, `REJECTED`처럼 고정하고 label은 프론트 표시값으로 분리.
+
+- **FE-CONSULT-15 / 청약·보험신청·부활 생성에는 소유권 검증이 있지만 조회 API가 없음**
+  - 확인 위치: `PolicyApplicationService`, `InsuranceApplicationService`, `RevivalService`
+  - 생성 단계에는 `AuthAccessService.requireCustomerAccess()` 또는 계약 접근 검증이 들어가 있다.
+  - 그러나 생성 이후 고객이 본인 신청 내역을 다시 조회할 목록/상세 API가 없다.
+  - 후보 작업: 고객 본인 신청 목록/상세와 직원 전체 신청 목록/상세를 role/소유권 기준으로 분리해 추가.
+
 ### 우선순위 제안
 
-1. 청약·보험신청·부활 목록/상세 조회 API 추가 여부 결정
-2. 인수심사 pending의 `applicationType` code/label 분리
-3. 인수심사 완료 시 원본 신청 존재 검증 및 상태 갱신 보장
-4. 상담/면담 목록 필터와 페이지네이션 추가 여부 결정
-5. 면담 일정과 면담 기록 연결 정책 결정
+1. 상담·제안·면담·인수심사 API role/소유권 검증 보강
+2. 상담 요청과 고객 master 연결 여부 결정
+3. 청약·보험신청·부활 목록/상세 조회 API 추가 여부 결정
+4. 인수심사 pending의 `applicationType` code/label 분리
+5. 인수심사 완료 시 원본 신청 존재 검증 및 상태 갱신 보장
+6. 상담/면담 목록 필터와 페이지네이션 추가 여부 결정
+7. 면담 일정과 면담 기록 연결 정책 결정
 
 ## 4. sales
 
@@ -618,17 +890,15 @@
   - `ActivityPlanResponse`에는 `schedules` 필드가 있으므로 목록 화면에서 빈 배열로 보일 수 있다.
   - 후보 작업: 목록 응답을 요약 DTO로 분리하거나, 목록에도 schedule 요약을 포함할지 정책 결정.
 
-- **FE-SALES-05 / 활동계획 목록에 필터와 페이지네이션이 없음**
+- **FE-SALES-05 / 활동계획 목록 페이지네이션** ✅ 1차 완료
   - 확인 위치: `ActivityPlanController.findAll()`
-  - 활동계획 목록은 배열 전체를 반환한다.
-  - 프론트에서 상태, 작성자, 기간, 제안 보험종류 기준 필터와 페이지네이션이 필요할 수 있다.
-  - 후보 작업: `status`, `author`, `from`, `to`, `page`, `size` query 지원 검토.
+  - 활동계획 목록은 `page/size/total/items` 응답으로 통일했고 DB pagination을 적용했다.
+  - 남은 작업: `status`, `author`, `from`, `to` 같은 추가 필터 query 지원 검토.
 
-- **FE-SALES-06 / 채널모집·채널심사·고객등록 목록은 배열 반환**
+- **FE-SALES-06 / 채널모집·채널심사·고객등록 목록 응답** ✅ 완료
   - 확인 위치: `ChannelRecruitmentController.findAll()`, `ChannelScreeningController.findAll()`, `CustomerRegistrationController.findAll()`
-  - 영업활동/평가 목록은 페이지 객체인데, 모집/심사/고객등록은 배열 전체를 반환한다.
-  - 프론트 공통 테이블 컴포넌트를 쓰려면 응답 형태가 갈라진다.
-  - 후보 작업: 조회량이 늘 수 있는 목록은 `page/size/total/items`로 통일 검토.
+  - 활동계획, 채널모집, 채널심사, 고객등록, 영업활동, 조직평가 목록은 모두 `page/size/total/items` 응답으로 통일했다.
+  - DB pagination을 적용해 sales 테이블 컴포넌트 공통화가 쉬워졌다.
 
 - **FE-SALES-07 / 채널심사 버튼 가능 여부가 응답에 없음**
   - 확인 위치: `ChannelScreeningResponse.status`, `ChannelScreeningService.approve/reject()`
@@ -655,11 +925,22 @@
   - 프론트 입장에서는 “고객 등록”이 실제 고객 master 생성인지, 영업 등록 이력인지 구분이 필요하다.
   - 후보 작업: 화면명을 “영업 고객 등록 이력”처럼 분리하거나, 공통 고객 CRUD와 연결 정책 정의.
 
-- **FE-SALES-11 / enum 옵션 출처 없음**
+- **FE-SALES-11 / enum 값 출처 없음**
   - 확인 위치: `ChannelType`, `InsuranceType`, `PlanStatus`, `ActivityType`, `EvaluationGrade`, `ScreeningStatus`
   - sales 도메인은 선택 옵션이 많다.
   - 프론트가 하드코딩하면 오타나 상태값 변경에 취약하다.
-  - 후보 작업: 공통 enum 옵션 API 또는 sales 옵션 API 추가.
+  - 후보 작업: API 명세에 sales 관련 허용값 정리.
+
+- **FE-SALES-12 / sales 도메인 전반 업무 role 검증 완료**
+  - 확인 위치: `domain/sales/service/*`, `domain/sales/controller/*`
+  - 활동계획, 영업활동, 채널 모집/심사, 고객등록, 조직평가는 `SALES_STAFF`, `ADMIN`으로 제한했다.
+  - 성과급 요청 생성은 `ADMIN`으로 제한했다.
+  - 남은 작업: 성과급 요청 목록/상세 조회 API 추가 여부 결정.
+
+- **FE-SALES-13 / 생성 API와 목록 응답 정책** ✅ 목록 정책 완료
+  - 확인 위치: `SalesActivityManagementController`, `SalesOrgEvaluationController`, 나머지 sales controller
+  - sales 목록 응답은 `page/size/total/items`로 통일했다.
+  - 생성 API 201 응답 사용 여부는 목록 정책과 별개로 유지한다.
 
 ### 우선순위 제안
 
@@ -667,7 +948,7 @@
 2. 성과급 요청을 evaluationNo 기반으로 서버에서 평가 정보 조회하도록 정리
 3. 활동계획 목록 DTO와 schedule 포함 정책 결정
 4. sales 목록 응답 페이지네이션 통일 여부 결정
-5. 채널심사 버튼 가능 여부와 enum 옵션 제공 방식 결정
+5. 채널심사 버튼 가능 여부와 enum 값 제공 방식 결정
 
 ## 5. education + inquiry
 
@@ -737,11 +1018,11 @@
   - 프론트에서 action 오타가 나도 성공 응답이 내려와 디버깅이 어렵다.
   - 후보 작업: 허용값을 `TEMP_SAVE`, `REQUEST_APPROVAL`로 명시 검증하고 알 수 없는 action은 400 반환.
 
-- **FE-EDU-04 / 교육 목록 응답이 배열 반환이고 페이지네이션이 없음**
+- **FE-EDU-04 / 교육 목록 페이지네이션** ✅ 1차 완료
   - 확인 위치: `EducationPlanController`, `EducationPreparationController`, `EducationExecutionController`
-  - 교육 계획/제반/실행 목록이 배열 전체를 반환한다.
-  - 프론트 테이블에서 기간, 상태, 강사, 채널 유형, 페이지네이션이 필요할 수 있다.
-  - 후보 작업: `page/size/total/items` 형태와 필터 query 추가 검토.
+  - 교육 계획/제반/실행 목록은 `page/size/total/items` 응답으로 통일했고 DB pagination을 적용했다.
+  - 계획 status, 제반 planNo, 실행 prepNo 조건은 SQL에서 처리한다.
+  - 남은 작업: 기간, 강사, 채널 유형 같은 추가 필터 query 검토.
 
 - **FE-EDU-05 / 다음 단계 버튼 가능 여부가 응답에 없음**
   - 확인 위치: `EducationPlanResponse`, `EducationPreparationResponse`, `EducationExecutionResponse`
@@ -767,11 +1048,11 @@
   - 잘못된 status 값은 에러가 아니라 빈 목록으로 보일 수 있어 프론트 옵션 불일치를 찾기 어렵다.
   - 후보 작업: `InquiryStatus`로 선검증하거나 알 수 없는 status는 400 반환.
 
-- **FE-INQ-03 / 문의 목록 페이지네이션이 없음**
+- **FE-INQ-03 / 문의 목록 페이지네이션** ✅ 1차 완료
   - 확인 위치: `InquiryController.list()`
-  - 고객센터 문의는 데이터가 늘기 쉬운데 배열 전체를 반환한다.
-  - 프론트 테이블에서는 상태, 고객명, 기간, 문의유형, 페이지네이션이 필요할 가능성이 높다.
-  - 후보 작업: `inquiryType`, `from`, `to`, `page`, `size` query 추가 검토.
+  - 문의 목록은 `page/size/total/items` 응답으로 통일했고 DB pagination을 적용했다.
+  - 고객 role은 `customer_id`, 직원/관리자는 `customerName`, `status` 조건으로 SQL filtering 한다.
+  - 남은 작업: `inquiryType`, `from`, `to` query 추가 검토.
 
 - **FE-INQ-04 / 답변 버튼 가능 여부가 응답에 없음**
   - 확인 위치: `InquiryResponse.status`, `InquiryService.answer()`
@@ -791,13 +1072,25 @@
   - 교육 상태는 한글 문자열, 문의 상태/유형은 enum name이라 형식도 섞여 있다.
   - 후보 작업: code/label 기반 옵션 API 또는 도메인별 상수 문서화.
 
+- **FE-EDU-INQ-02 / 교육·문의 도메인 role/소유권 검증 완료**
+  - 확인 위치: `domain/education/service/*`, `InquiryService`
+  - 교육 계획/제반/실행은 `EDUCATION_STAFF`, `ADMIN`으로 제한했다.
+  - 문의는 `customer_id`를 연결했고, 고객은 본인 문의만 조회하도록 제한했다.
+  - 문의 답변은 직원 또는 관리자만 수행하도록 제한했다.
+  - 남은 작업: 문의 목록 페이지네이션과 첨부 파일 정책 결정.
+
+- **FE-INQ-06 / 문의 customer_id 연결 완료**
+  - 확인 위치: `InquiryRequest`, `Inquiry`, `InquiryRepository`
+  - `inquiries.customer_id` migration을 추가했다.
+  - 로그인 고객 문의 생성 시 서버가 현재 세션의 linked customer를 저장한다.
+  - 프론트는 고객 세션에서 별도 customerName 필터 없이 내 문의 목록을 구성할 수 있다.
+
 ### 우선순위 제안
 
 1. 교육 제반 생성 시 승인 상태 검증 추가 여부 결정
 2. 교육 action 허용값 검증과 상태 전이 표 정리
-3. 문의 enum JSON 오류를 400으로 처리하는 공통 예외 보강
-4. 교육/문의 목록 페이지네이션과 필터 확장 여부 결정
-5. 문의 첨부 파일 업로드/S3 정책 결정
+3. 교육/문의 목록 페이지네이션과 필터 확장 여부 결정
+4. 문의 첨부 파일 업로드/S3 정책 결정
 
 ---
 
@@ -808,7 +1101,7 @@
 중점 확인:
 
 - 지금까지 모든 도메인에서 반복되는 공통 개선 항목을 묶는다.
-- 로그인/권한, 고객 CRUD, enum 옵션 API, 에러 응답 확장, API 문서화 우선순위를 정한다.
+- 로그인/권한, 고객 CRUD, enum 값 명세, 에러 응답 확장, API 문서화 우선순위를 정한다.
 - 프론트가 먼저 붙을 화면 기준으로 1차 수정 범위를 선정한다.
 
 ---
@@ -821,7 +1114,7 @@
 
 - 고객 선택이 필요한 화면은 많은데 공통 고객 검색/상세 API가 부족하다.
 - enum/status/action 값을 프론트가 하드코딩해야 하는 구간이 많다.
-- 목록 응답이 페이지 객체와 배열로 섞여 있다.
+- 목록 응답은 주요 테이블 API 기준 `page/size/total/items`로 통일됐다.
 - 업무 단계 버튼 가능 여부를 프론트가 상태 문자열로 직접 해석해야 한다.
 - 일부 잘못된 입력은 400이 아니라 500 또는 빈 목록으로 보일 수 있다.
 - 생성 API만 있고 목록/상세 조회가 없어 새로고침 이후 화면 복원이 어려운 도메인이 있다.
@@ -831,19 +1124,18 @@
 
 프론트 연결을 빠르게 시작하기 위한 최소 수정 순서다.
 
-1. **고객 검색/상세 API 추가**
+1. **고객 검색/상세 API 추가** ✅ 완료
    - 영향 도메인: contract/payment/claim/consultation/sales
    - 이유: 프론트 대부분의 업무 시작점이 고객 선택이다.
    - 후보 endpoint:
      - `GET /api/customers?keyword=&page=&size=`
      - `GET /api/customers/{customerId}`
 
-2. **enum/options API 추가**
+2. **enum 값 명세 추가** ✅ 완료
    - 영향 도메인: 전체
-   - 이유: 프론트 하드코딩을 줄이고 select/radio 옵션을 안정화한다.
-   - 후보 endpoint:
-     - `GET /api/options`
-     - 또는 `GET /api/options/{group}`
+   - 이유: 프론트가 API에 보낼 enum code와 화면 label을 확인해야 한다.
+   - 결과:
+     - `src/main/resources/design/ApiSpec.md`에 주요 enum 입력값을 정리한다.
 
 3. **공통 에러 응답 보강**
    - 영향 도메인: 전체
@@ -852,12 +1144,13 @@
      - `HttpMessageNotReadableException` 400 처리
      - `code`, `path`, `fieldErrors` 도입 검토
 
-4. **프론트 첫 화면 기준 목록 페이지네이션 정리**
+4. **프론트 첫 화면 기준 목록 페이지네이션 정리** ✅ 완료
    - 영향 도메인: claim, consultation, sales 일부, education, inquiry
    - 이유: 테이블 화면이 배열 전체 응답에 의존하지 않게 한다.
-   - 정책 후보:
+   - 결과:
      - 테이블 목록: `page/size/total/items`
-     - 옵션 목록: 배열 허용
+     - 주요 테이블 목록은 DB pagination으로 전환
+     - 참조성 소량 목록은 `{ "items": [] }` wrapper 유지
 
 5. **상태 전이 규칙 문서화**
    - 영향 도메인: claim, contract/payment/refund, education, inquiry, sales screening
@@ -865,7 +1158,7 @@
    - 후보:
      - 상태값별 허용 action 표
      - 잘못된 상태 전이의 공통 에러 응답
-     - 프론트에서 참조할 enum/options 또는 API 명세
+     - 프론트에서 참조할 enum 값 또는 API 명세
 
 6. **claim 파일 접근 정책 정리**
    - 영향 도메인: claim, inquiry
@@ -894,38 +1187,35 @@
      - `GET /api/revivals`
      - `GET /api/bonus-requests`
 
-9. **로그인/권한 도입**
+9. **로그인/권한 확장**
    - 영향 도메인: 전체
-   - 이유: 운영 전에는 필요하지만, 프론트 초기 연결보다 뒤로 미룰 수 있다.
-   - 1차 방침:
-     - Flyway로 DB schema migration을 관리한다.
-     - HTTP + 다른 origin 환경에서 세션 기반 로그인을 먼저 시도한다.
-     - CORS credentials와 Spring Session JDBC를 사용한다.
-     - 쿠키가 브라우저 정책 때문에 안정적으로 동작하지 않으면 JWT로 전환한다.
-   - 후보:
-     - `POST /api/auth/login`
-     - `POST /api/auth/logout`
-     - `GET /api/auth/me`
-     - 역할 기반 접근 제어
+   - 현재 상태:
+     - Flyway, HTTP 세션 로그인, Spring Session JDBC, 세부 직원 role, 주요 고객 데이터 소유권 검증은 구현 완료.
+     - contract, payment/refund, claim, consultation, sales, education, inquiry, customer에 role 기반 접근 제한 1차 적용 완료.
+   - 남은 후보:
+     - role별 API smoke test 시나리오 작성
+     - 직원 actor 연결
+     - 쿠키가 브라우저 정책 때문에 안정적으로 동작하지 않을 경우 JWT 전환
 
 10. **OpenAPI/Swagger 또는 API 명세 정리**
     - 영향 도메인: 전체
     - 이유: 프론트와 병렬 작업하려면 endpoint와 DTO 예시가 필요하다.
-    - enum/options API가 늦어질 경우 문서라도 먼저 필요하다.
+    - enum 값은 option API가 아니라 문서 명세로 먼저 제공한다.
 
 ### 1차 구현 묶음 제안
 
 한 번에 모든 문제를 고치지 않고 아래 묶음으로 나누는 것이 좋다.
 
 - **Batch A / 프론트 시작 기반**
-  - 고객 검색/상세 API
-  - enum/options API
-  - 공통 에러 응답 400 처리
+  - 고객 검색/상세 API ✅ 완료
+  - enum 값 명세 ✅ 완료
+  - 공통 에러 응답 400 처리 ✅ 완료
 
-- **Batch B / 첫 화면 테이블 안정화**
-  - claim 목록 필터/페이지네이션
-  - inquiry 목록 필터/페이지네이션
-  - education 목록 필터/페이지네이션
+- **Batch B / 첫 화면 테이블 안정화** ✅ 완료
+  - claim 목록 DB 페이지네이션
+  - inquiry 목록 DB 페이지네이션
+  - education 목록 DB 페이지네이션
+  - contract/payment/refund/consultation/sales 주요 목록 DB 페이지네이션
   - 배열 목록과 페이지 목록 정책 확정
 
 - **Batch C / 업무 workflow 안정화**
@@ -940,23 +1230,23 @@
   - S3 저장 구조 설계
 
 - **Batch E / 운영 보강**
-  - Flyway 도입
-  - 로그인/권한
-  - HTTP 세션 로그인 검증
+  - role별 API smoke test 시나리오 문서화 ✅ 완료
+  - role별 API smoke test 수행
+  - 직원 actor 연결
   - 세션 쿠키 불안정 시 JWT 전환
-  - API 문서화
+  - API 문서화 확장
   - audit/logging 필요 여부 검토
 
 ### 다음 작업 제안
 
-수정으로 넘어가기 전에 Batch A의 변경 예정 diff를 먼저 설계한다.
+다음 작업은 상태 전이 문서화 또는 상세 API 명세 확장 중 하나를 선택한다.
 
 우선 검토할 파일:
 
-- `domain/customer`
-- `domain/common/enums`
-- `global/exception`
-- 새 options controller/service 위치
+- `domain/*/controller`
+- `domain/*/dto`
+- `src/main/resources/design/ApiSpec.md`
+- 상태 전이를 수행하는 `domain/*/service`
 
 진행 원칙:
 

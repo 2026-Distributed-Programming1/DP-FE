@@ -7,28 +7,33 @@ import {
 import Layout from '../../components/layout/Layout';
 import styles from './ChannelScreeningListPage.module.css';
 
-// FE-SALES-11: ChannelType enum 하드코딩 (UC 기준: 설계사/대리점)
 const CHANNEL_TYPES = [
-  { value: '',       label: '전체' },
-  { value: 'AGENT',  label: '설계사' },
-  { value: 'AGENCY', label: '대리점' },
+  { value: '', label: '전체' },
+  { value: 'AGENT', label: 'Agent (전속)' },
+  { value: 'AGENCY', label: 'Agency (대리점)' },
 ];
 
 const STATUS_OPTIONS = [
-  { value: '',         label: '전체' },
-  { value: 'PENDING',  label: '대기' },
-  { value: 'APPROVED', label: '승인' },
-  { value: 'REJECTED', label: '거절' },
+  { value: '', label: '전체' },
+  { value: 'PENDING', label: 'Pending (대기)' },
+  { value: 'APPROVED', label: 'Approved (승인)' },
+  { value: 'REJECTED', label: 'Rejected (거절)' },
 ];
 
 const STATUS_MAP = {
-  PENDING:  { label: '대기', cls: styles.badgeYellow },
-  APPROVED: { label: '승인', cls: styles.badgeGreen  },
-  REJECTED: { label: '거절', cls: styles.badgeRed    },
+  PENDING:  { label: 'Pending',  cls: styles.badgePending },
+  APPROVED: { label: 'Approved', cls: styles.badgeApproved },
+  REJECTED: { label: 'Rejected', cls: styles.badgeRejected },
 };
 
-function ScreeningBadge({ status }) {
-  const cfg = STATUS_MAP[status] ?? { label: status, cls: styles.badgeGray };
+const AVATAR_CLS = {
+  PENDING:  styles.avatarPending,
+  APPROVED: styles.avatarApproved,
+  REJECTED: styles.avatarRejected,
+};
+
+function StatusBadge({ status }) {
+  const cfg = STATUS_MAP[status] ?? { label: status, cls: styles.badgePending };
   return <span className={`${styles.badge} ${cfg.cls}`}>{cfg.label}</span>;
 }
 
@@ -36,30 +41,28 @@ function channelLabel(type) {
   return CHANNEL_TYPES.find((t) => t.value === type)?.label ?? type ?? '-';
 }
 
-/* ── 확인 팝업 ── */
+/* ── 확인 모달 ── */
 function ConfirmModal({ message, onConfirm, onCancel, loading }) {
   return (
-    <div className={styles.overlay}>
+    <div className={styles.modalOverlay}>
       <div className={styles.modal}>
         <p className={styles.modalMsg}>{message}</p>
         <div className={styles.modalBtns}>
           <button className={styles.modalConfirmBtn} onClick={onConfirm} disabled={loading}>
             {loading ? '처리 중…' : '확인'}
           </button>
-          <button className={styles.modalCancelBtn} onClick={onCancel} disabled={loading}>
-            취소
-          </button>
+          <button className={styles.modalCancelBtn} onClick={onCancel} disabled={loading}>취소</button>
         </div>
       </div>
     </div>
   );
 }
 
-/* ── 거절 사유 입력 팝업 ── */
+/* ── 거절 모달 ── */
 function RejectModal({ onConfirm, onCancel, loading, error }) {
   const [reason, setReason] = useState('');
   return (
-    <div className={styles.overlay}>
+    <div className={styles.modalOverlay}>
       <div className={styles.modal}>
         <h3 className={styles.modalTitle}>거절 사유 입력</h3>
         {error && <p className={styles.modalError}>{error}</p>}
@@ -71,31 +74,25 @@ function RejectModal({ onConfirm, onCancel, loading, error }) {
           onChange={(e) => setReason(e.target.value)}
         />
         <div className={styles.modalBtns}>
-          <button
-            className={styles.modalRejectBtn}
-            onClick={() => onConfirm(reason)}
-            disabled={loading}
-          >
+          <button className={styles.modalRejectBtn} onClick={() => onConfirm(reason)} disabled={loading}>
             {loading ? '처리 중…' : '확인'}
           </button>
-          <button className={styles.modalCancelBtn} onClick={onCancel} disabled={loading}>
-            취소
-          </button>
+          <button className={styles.modalCancelBtn} onClick={onCancel} disabled={loading}>취소</button>
         </div>
       </div>
     </div>
   );
 }
 
-/* ── 승인 완료 결과 팝업 ── */
+/* ── 승인 결과 모달 ── */
 function ApproveResultModal({ result, applicantName, onClose }) {
   return (
-    <div className={styles.overlay}>
+    <div className={styles.modalOverlay}>
       <div className={styles.modal}>
         <h3 className={styles.modalTitle}>승인 완료</h3>
         <dl className={styles.resultDl}>
           <dt>승인번호</dt>
-          <dd className={styles.mono}>{result?.screeningNo ?? result?.approvalNo ?? '-'}</dd>
+          <dd>{result?.screeningNo ?? result?.approvalNo ?? '-'}</dd>
           <dt>지원자명</dt>
           <dd>{applicantName ?? '-'}</dd>
           <dt>승인일시</dt>
@@ -109,7 +106,7 @@ function ApproveResultModal({ result, applicantName, onClose }) {
   );
 }
 
-/* ── 상세 패널 ── */
+/* ── 슬라이드 오버 상세 패널 ── */
 function DetailPanel({ item, onClose, onReload }) {
   const [modal, setModal] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
@@ -124,93 +121,55 @@ function DetailPanel({ item, onClose, onReload }) {
 
   function handleApproveConfirm() {
     setActionLoading(true);
-    setActionError(null);
     approveChannelScreening(item.screeningNo)
-      .then((result) => {
-        onReload();
-        setModal({ type: 'approve-result', data: result });
-      })
-      .catch((e) => {
-        setActionError(e.message);
-        setModal(null);
-      })
+      .then((result) => { onReload(); setModal({ type: 'approve-result', data: result }); })
+      .catch((e) => { setActionError(e.message); setModal(null); })
       .finally(() => setActionLoading(false));
   }
 
   function handleRejectConfirm(reason) {
-    if (!reason.trim()) {
-      setActionError('거절 사유를 입력해주세요.');
-      return;
-    }
+    if (!reason.trim()) { setActionError('거절 사유를 입력해주세요.'); return; }
     setActionLoading(true);
-    setActionError(null);
     rejectChannelScreening(item.screeningNo, reason.trim())
-      .then(() => {
-        onReload();
-        setModal(null);
-        setRejectSuccess(true);
-      })
+      .then(() => { onReload(); setModal(null); setRejectSuccess(true); })
       .catch((e) => setActionError(e.message))
       .finally(() => setActionLoading(false));
   }
 
   const isPending = item.status === 'PENDING';
-  const applicantName = item.applicantName ?? item.channelName;
+  const applicantName = item.applicantName ?? item.channelName ?? '-';
   const certs = Array.isArray(item.certifications)
     ? item.certifications
     : item.certifications ? [item.certifications] : [];
 
   return (
     <>
-      <aside className={styles.panel}>
-        <div className={styles.panelHeader}>
-          <span className={styles.panelTitle}>지원자 상세 정보</span>
-          <button className={styles.closeBtn} onClick={onClose}>닫기</button>
-        </div>
-        <div className={styles.panelBody}>
-          {rejectSuccess && (
-            <div className={styles.rejectSuccessMsg}>
-              해당 지원자가 거절 처리되었습니다.
+      <div className={styles.overlay} onClick={onClose} />
+      <aside className={styles.slidePanel}>
+        <div className={styles.panelInner}>
+          {/* Panel Header */}
+          <div className={styles.panelHeader}>
+            <div>
+              <span className={styles.panelLabel}>Applicant Review</span>
+              <h2 className={styles.panelName}>{applicantName}</h2>
+              <p className={styles.panelDesc}>심사 대기중인 지원자 상세 정보입니다.</p>
             </div>
-          )}
-          {actionError && !modal && (
-            <div className={styles.actionError}>{actionError}</div>
-          )}
+            <button className={styles.closeBtn} onClick={onClose}>✕</button>
+          </div>
 
-          <dl className={styles.dl}>
-            <dt>지원자명</dt><dd>{applicantName ?? '-'}</dd>
-            <dt>채널유형</dt><dd>{channelLabel(item.channelType)}</dd>
-            <dt>지원일</dt>  <dd>{item.applicationDate ?? item.createdAt ?? '-'}</dd>
-            <dt>심사상태</dt><dd><ScreeningBadge status={item.status} /></dd>
-          </dl>
-
-          <section className={styles.section}>
-            <h3 className={styles.sectionTitle}>경력 사항</h3>
-            <p className={styles.textBlock}>{item.experience ?? '-'}</p>
-          </section>
-
-          <section className={styles.section}>
-            <h3 className={styles.sectionTitle}>자격증 목록</h3>
-            {certs.length > 0 ? (
-              <ul className={styles.certList}>
-                {certs.map((c, i) => <li key={i}>{c}</li>)}
-              </ul>
-            ) : (
-              <p className={styles.textBlock}>-</p>
-            )}
-          </section>
-
+          {/* Sticky Action Bar */}
           {isPending && !rejectSuccess && (
-            <div className={styles.actionRow}>
+            <div className={styles.actionBar}>
+              {actionError && <p className={styles.actionError}>{actionError}</p>}
               <button
-                className={styles.approveBtn}
+                className={styles.btnApprove}
                 onClick={() => setModal('confirm-approve')}
                 disabled={actionLoading}
               >
                 심사 승인
               </button>
               <button
-                className={styles.rejectOpenBtn}
+                className={styles.btnReject}
                 onClick={() => { setModal('reject'); setActionError(null); }}
                 disabled={actionLoading}
               >
@@ -218,6 +177,62 @@ function DetailPanel({ item, onClose, onReload }) {
               </button>
             </div>
           )}
+
+          {rejectSuccess && (
+            <div className={styles.rejectSuccessMsg}>해당 지원자가 거절 처리되었습니다.</div>
+          )}
+
+          {/* Basic Info */}
+          <div className={styles.infoGrid}>
+            <div className={styles.infoCard}>
+              <p className={styles.infoLabel}>채널 유형</p>
+              <p className={styles.infoValue}>{channelLabel(item.channelType)}</p>
+            </div>
+            <div className={styles.infoCard}>
+              <p className={styles.infoLabel}>신청 일자</p>
+              <p className={styles.infoValue}>{(item.applicationDate ?? item.createdAt ?? '-').slice(0, 10)}</p>
+            </div>
+          </div>
+
+          {/* Experience */}
+          <section className={styles.section}>
+            <h3 className={styles.sectionTitle}>📋 상세 경력 사항</h3>
+            <div className={styles.expBlock}>
+              <p className={styles.expText}>{item.experience ?? '-'}</p>
+            </div>
+          </section>
+
+          {/* Certifications */}
+          <section className={styles.section}>
+            <h3 className={styles.sectionTitle}>🏅 보유 전문 자격증</h3>
+            {certs.length > 0 ? (
+              <div className={styles.certList}>
+                {certs.map((c, i) => (
+                  <div key={i} className={styles.certCard}>
+                    <span className={styles.certIcon}>✓</span>
+                    <span className={styles.certName}>{c}</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className={styles.emptyText}>-</p>
+            )}
+          </section>
+
+          {/* Documents */}
+          <section className={styles.section}>
+            <h3 className={styles.sectionTitle}>📎 첨부 서류 확인</h3>
+            <div className={styles.docList}>
+              <div className={styles.docItem}>
+                <span>📄 경력증명서_{applicantName}.pdf</span>
+                <span className={styles.docDownload}>⬇</span>
+              </div>
+              <div className={styles.docItem}>
+                <span>📁 자격증_증빙파일.zip</span>
+                <span className={styles.docDownload}>⬇</span>
+              </div>
+            </div>
+          </section>
         </div>
       </aside>
 
@@ -273,13 +288,12 @@ export default function ChannelScreeningListPage() {
     setSelectedNo(null);
   }
 
-  // FE-SALES-06: 서버 필터 미지원 — 클라이언트 필터
   const items = allItems.filter((item) => {
     const date = (item.applicationDate ?? item.createdAt ?? '').slice(0, 10);
     if (applied.startDate && date < applied.startDate) return false;
-    if (applied.endDate   && date > applied.endDate)   return false;
+    if (applied.endDate && date > applied.endDate) return false;
     if (applied.channelType && item.channelType !== applied.channelType) return false;
-    if (applied.status      && item.status      !== applied.status)      return false;
+    if (applied.status && item.status !== applied.status) return false;
     return true;
   });
 
@@ -287,73 +301,129 @@ export default function ChannelScreeningListPage() {
 
   return (
     <Layout title="채널 심사">
-      <div className={styles.root}>
-        <div className={styles.tableArea}>
-          <div className={styles.toolbar}>
-            <div className={styles.filters}>
-              <input
-                type="date" className={styles.dateInput}
-                value={filters.startDate}
-                onChange={(e) => setFilters((f) => ({ ...f, startDate: e.target.value }))}
-              />
-              <span className={styles.dateSep}>~</span>
-              <input
-                type="date" className={styles.dateInput}
-                value={filters.endDate}
-                onChange={(e) => setFilters((f) => ({ ...f, endDate: e.target.value }))}
-              />
-              <select className={styles.select} value={filters.channelType}
-                onChange={(e) => setFilters((f) => ({ ...f, channelType: e.target.value }))}>
+      <div className={styles.page}>
+        {/* Hero */}
+        <div className={styles.hero}>
+          <div>
+            <h1 className={styles.title}>판매채널 채용 심사</h1>
+            <p className={styles.subtitle}>새로운 판매 채널 파트너의 역량을 심사하고 승인 프로세스를 관리합니다.</p>
+          </div>
+        </div>
+
+        {/* Filters */}
+        <div className={styles.filterPanel}>
+          <div className={styles.filterGrid}>
+            <div className={styles.fieldGroup}>
+              <label className={styles.label}>모집 기간 (시작 ~ 종료)</label>
+              <div className={styles.dateRange}>
+                <input
+                  className={styles.inputRound}
+                  type="date"
+                  value={filters.startDate}
+                  onChange={(e) => setFilters((f) => ({ ...f, startDate: e.target.value }))}
+                />
+                <span className={styles.dateSep}>~</span>
+                <input
+                  className={styles.inputRound}
+                  type="date"
+                  value={filters.endDate}
+                  onChange={(e) => setFilters((f) => ({ ...f, endDate: e.target.value }))}
+                />
+              </div>
+            </div>
+            <div className={styles.fieldGroup}>
+              <label className={styles.label}>채널 유형</label>
+              <select
+                className={styles.selectRound}
+                value={filters.channelType}
+                onChange={(e) => setFilters((f) => ({ ...f, channelType: e.target.value }))}
+              >
                 {CHANNEL_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
               </select>
-              <select className={styles.select} value={filters.status}
-                onChange={(e) => setFilters((f) => ({ ...f, status: e.target.value }))}>
+            </div>
+            <div className={styles.fieldGroup}>
+              <label className={styles.label}>심사 상태</label>
+              <select
+                className={styles.selectRound}
+                value={filters.status}
+                onChange={(e) => setFilters((f) => ({ ...f, status: e.target.value }))}
+              >
                 {STATUS_OPTIONS.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
               </select>
-              <button className={styles.searchBtn} onClick={handleSearch}>조회</button>
             </div>
-            <span className={styles.totalCount}>{items.length > 0 ? `${items.length}건` : ''}</span>
+            <div className={styles.searchBtnWrap}>
+              <button className={styles.searchBtn} onClick={handleSearch}>🔍 조회하기</button>
+            </div>
           </div>
+        </div>
 
-          {error && <div className={styles.errorBox}><strong>오류:</strong> {error}</div>}
-
-          <div className={styles.tableWrap}>
+        {/* Table */}
+        <div className={styles.tablePanel}>
+          {error && <div className={styles.errorBox}>{error}</div>}
+          <div className={styles.tableWrapper}>
             <table className={styles.table}>
               <thead>
                 <tr>
                   <th>지원자명</th>
-                  <th>채널유형</th>
-                  <th>지원일</th>
-                  <th>경력</th>
-                  <th>자격증</th>
-                  <th>심사상태</th>
+                  <th>채널 유형</th>
+                  <th>신청 일자</th>
+                  <th>경력사항</th>
+                  <th>보유 자격증</th>
+                  <th className={styles.thCenter}>심사 상태</th>
                 </tr>
               </thead>
               <tbody>
-                {loading && <tr><td colSpan={6} className={styles.msgCell}>불러오는 중…</td></tr>}
+                {loading && <tr><td colSpan={6} className={styles.msg}>불러오는 중…</td></tr>}
                 {!loading && items.length === 0 && (
-                  <tr><td colSpan={6} className={styles.msgCell}>조회 가능한 지원자가 없습니다.</td></tr>
+                  <tr><td colSpan={6} className={styles.msg}>조회 가능한 지원자가 없습니다.</td></tr>
                 )}
-                {!loading && items.map((item) => (
-                  <tr
-                    key={item.screeningNo}
-                    className={`${styles.row} ${selectedNo === item.screeningNo ? styles.selectedRow : ''}`}
-                    onClick={() => setSelectedNo((p) => p === item.screeningNo ? null : item.screeningNo)}
-                  >
-                    <td>{item.applicantName ?? item.channelName ?? '-'}</td>
-                    <td>{channelLabel(item.channelType)}</td>
-                    <td>{(item.applicationDate ?? item.createdAt ?? '-').slice(0, 10)}</td>
-                    <td className={styles.truncate}>{item.experience ?? '-'}</td>
-                    <td className={styles.truncate}>
-                      {Array.isArray(item.certifications)
-                        ? item.certifications.join(', ')
-                        : (item.certifications ?? '-')}
-                    </td>
-                    <td><ScreeningBadge status={item.status} /></td>
-                  </tr>
-                ))}
+                {!loading && items.map((item) => {
+                  const name = item.applicantName ?? item.channelName ?? '-';
+                  const certs = Array.isArray(item.certifications)
+                    ? item.certifications
+                    : item.certifications ? [item.certifications] : [];
+                  return (
+                    <tr
+                      key={item.screeningNo}
+                      className={`${styles.tableRow} ${selectedNo === item.screeningNo ? styles.tableRowActive : ''}`}
+                      onClick={() => setSelectedNo((p) => p === item.screeningNo ? null : item.screeningNo)}
+                    >
+                      <td>
+                        <div className={styles.nameCell}>
+                          <div className={`${styles.avatar} ${AVATAR_CLS[item.status] ?? styles.avatarPending}`}>
+                            {name[0]}
+                          </div>
+                          <span className={styles.nameText}>{name}</span>
+                        </div>
+                      </td>
+                      <td className={styles.cell}>{channelLabel(item.channelType)}</td>
+                      <td className={styles.cell}>{(item.applicationDate ?? item.createdAt ?? '-').slice(0, 10)}</td>
+                      <td className={styles.cell}>{item.experience ?? '-'}</td>
+                      <td className={styles.cell}>
+                        <div className={styles.certTags}>
+                          {certs.length > 0
+                            ? certs.map((c, i) => <span key={i} className={styles.certTag}>{c}</span>)
+                            : <span className={styles.noCert}>해당없음</span>}
+                        </div>
+                      </td>
+                      <td className={styles.statusCell}>
+                        <StatusBadge status={item.status} />
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
+          </div>
+          <div className={styles.pagination}>
+            <p className={styles.paginationInfo}>총 {items.length}건</p>
+            <div className={styles.paginationBtns}>
+              <button className={styles.pageBtn}>‹</button>
+              <button className={`${styles.pageBtn} ${styles.pageBtnActive}`}>1</button>
+              <button className={styles.pageBtn}>2</button>
+              <button className={styles.pageBtn}>3</button>
+              <button className={styles.pageBtn}>›</button>
+            </div>
           </div>
         </div>
 

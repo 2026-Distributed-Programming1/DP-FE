@@ -1,0 +1,363 @@
+<!DOCTYPE html><html class="light" lang="ko"><head><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>사고 접수 및 현장 출동 관리 - Kindred Assurance</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#10b981", // Emerald Green
+                        "primary-container": "#dcfce7",
+                        "on-primary-container": "#064e3b",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-low": "#f7f9fb",
+                        "surface-container-high": "#e5e7eb",
+                        "surface-container-highest": "#d1d5db",
+                        "text-main": "#111827",
+                        "text-muted": "#6b7280",
+                        "border-soft": "rgba(0, 0, 0, 0.05)",
+                        "mint-glow": "rgba(16, 185, 129, 0.08)"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "0.75rem",
+                        "xl": "1rem",
+                        "2xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    fontFamily: {
+                        headline: ["Public Sans", "sans-serif"],
+                        display: ["Public Sans", "sans-serif"],
+                        body: ["Public Sans", "sans-serif"],
+                        label: ["Public Sans", "sans-serif"]
+                    },
+                    spacing: {
+                        'gutter': '1.5rem',
+                        'container-max': '1440px'
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Public Sans', sans-serif;
+            background-color: #f7f9fb;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .animate-pulse-slow {
+            animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+    </style>
+    <style>#sidebar { transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); } #sidebar.collapsed { width: 80px; } #sidebar.collapsed .sidebar-text, #sidebar.collapsed .sidebar-header-text, #sidebar.collapsed .sidebar-cta { display: none; } #main-content { transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1); }</style></head>
+<body class="text-text-main antialiased overflow-hidden">
+<!-- Top Navigation Bar -->
+<header class="bg-surface-container-lowest dark:bg-inverse-surface sticky top-0 z-50 shadow-[0_10px_30px_rgba(0,0,0,0.04)] h-20 flex items-center">
+    <div class="flex justify-between items-center w-full px-gutter max-w-container-max mx-auto h-20">
+        <div class="flex items-center gap-8">
+            <div class="text-headline-md font-headline-md font-bold text-primary dark:text-primary-fixed-dim">
+                Kindred Assurance
+            </div>
+            <nav class="hidden md:flex gap-6 items-center">
+                <a class="text-label-md font-label-md text-text-muted dark:text-on-surface-variant hover:text-primary transition-colors" href="#">Home</a>
+                <a class="text-label-md font-label-md text-text-muted dark:text-on-surface-variant hover:text-primary transition-colors" href="#">Policies</a>
+                <a class="text-label-md font-label-md text-primary dark:text-primary-fixed-dim border-b-2 border-primary dark:border-primary-fixed-dim pb-1" href="#">Claims</a>
+                <a class="text-label-md font-label-md text-text-muted dark:text-on-surface-variant hover:text-primary transition-colors" href="#">Sales</a>
+                <a class="text-label-md font-label-md text-text-muted dark:text-on-surface-variant hover:text-primary transition-colors" href="#">Support</a>
+            </nav>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="relative hidden lg:block">
+                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-muted">search</span>
+                <input class="pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-full text-sm w-64 focus:ring-2 focus:ring-primary/20 transition-all" placeholder="사고 번호 검색..." type="text">
+            </div>
+            <button class="p-2 text-text-muted hover:bg-mint-glow rounded-full transition-colors relative">
+                <span class="material-symbols-outlined">notifications</span>
+                <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+            </button>
+            <div class="flex items-center gap-3 pl-4 border-l border-border-soft">
+                <div class="text-right hidden sm:block">
+                    <p class="text-sm font-bold leading-none">김관리 팀장</p>
+                    <p class="text-[10px] text-text-muted">보상지원부</p>
+                </div>
+                <img alt="User profile avatar" class="w-10 h-10 rounded-full object-cover border-2 border-primary/20" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCSz4WNMIoqcFbUnnG83PxlxD1c94upBy42gV-iEbAz4VS2lIUxSgM_Pb8cpGZImkv76AqJJbD89isaaYNQjW9I6yPtbkr-oL_67sDPdeyaCleTR9gY-B3cX1jrQmSprwhZcGdr38znXa7Fl9jMAGT1Dd3R2cYhlSIPGgryYUwpnzf5kRJDKdWN3Abc-XYrBupIBCHwxU80IGysSoVMv9uhJdFYZ4BZyVhfiycEFcGuhb7i8dnYBdfn01VY0B_oyTwUBzT3j2DZpJQ">
+            </div>
+        </div>
+    </div>
+</header>
+<div class="flex h-[calc(100vh-80px)] overflow-hidden">
+    <!-- Side Navigation Bar -->
+    <aside class="h-screen w-64 fixed left-0 top-0 bg-surface border-r border-outline-variant shadow-md flex flex-col py-unit space-y-2 z-40 overflow-y-auto pt-24" id="sidebar"><div class="px-4 mb-4 flex items-center justify-between"><div class="sidebar-header-text"><h2 class="font-headline-md text-primary font-bold text-lg">Admin Portal</h2><p class="text-caption text-outline">Kindred Assurance</p></div><button class="p-2 hover:bg-surface-variant rounded-lg" onclick="toggleSidebar()"><span class="material-symbols-outlined">menu_open</span></button></div><div class="flex flex-col gap-1 flex-grow"><a class="flex items-center gap-3 p-3 mx-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-all duration-200" href="#"><span class="material-symbols-outlined">dashboard</span><span class="font-label-md sidebar-text">Dashboard</span></a><a class="flex items-center gap-3 p-3 mx-2 bg-primary-container text-on-primary-container rounded-lg transition-all duration-200" href="#"><span class="material-symbols-outlined">description</span><span class="font-label-md sidebar-text font-bold">Underwriting</span></a><a class="flex items-center gap-3 p-3 mx-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-all duration-200" href="#"><span class="material-symbols-outlined">trending_up</span><span class="font-label-md sidebar-text">Sales Management</span></a><a class="flex items-center gap-3 p-3 mx-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-all duration-200" href="#"><span class="material-symbols-outlined">security</span><span class="font-label-md sidebar-text">Risk Assessment</span></a><a class="flex items-center gap-3 p-3 mx-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-all duration-200" href="#"><span class="material-symbols-outlined">settings</span><span class="font-label-md sidebar-text">Settings</span></a></div><div class="px-4 sidebar-cta"><button class="w-full bg-primary text-on-primary py-3 rounded-lg font-label-md hover:opacity-90 transition-opacity flex items-center justify-center gap-2"><span class="material-symbols-outlined text-[20px]">analytics</span><span>Generate Report</span></button></div><div class="pt-4 mt-auto border-t border-outline-variant/50"><a class="flex items-center gap-3 p-3 mx-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-all duration-200" href="#"><span class="material-symbols-outlined text-error">logout</span><span class="font-label-md sidebar-text">Logout</span></a></div></aside>
+    <!-- Main Content Area -->
+    <main class="flex-1 ml-0 p-6 overflow-y-auto scrollbar-hide ml-64" id="main-content">
+        <!-- Page Title & Stats -->
+        <div class="max-w-container-max mx-auto mb-8">
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div>
+                    <nav class="flex gap-2 text-xs text-text-muted mb-2">
+                        <span>보상 관리</span>
+                        <span>/</span>
+                        <span class="text-primary font-medium">현장 관리</span>
+                    </nav>
+                    <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">사고 접수 및 현장 출동 관리</h1>
+                </div>
+                <div class="flex gap-3">
+                    <div class="glass-card px-4 py-2 rounded-xl flex items-center gap-3">
+                        <div class="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+                        <span class="text-sm font-medium">대기 중: 12건</span>
+                    </div>
+                    <div class="glass-card px-4 py-2 rounded-xl flex items-center gap-3">
+                        <div class="w-2 h-2 bg-primary rounded-full"></div>
+                        <span class="text-sm font-medium">출동 중: 4건</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Dashboard Grid -->
+        <div class="max-w-container-max mx-auto grid grid-cols-12 gap-6">
+            <!-- Accident Real-time List (4/12 width) -->
+            <section class="col-span-12 lg:col-span-4 flex flex-col gap-4">
+                <div class="glass-card rounded-2xl p-5 h-full overflow-hidden flex flex-col shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-bold flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary">list_alt</span>
+                            실시간 사고 목록
+                        </h2>
+                        <button class="text-xs text-primary font-bold hover:underline">전체보기</button>
+                    </div>
+                    <div class="flex flex-col gap-3 overflow-y-auto pr-1">
+                        <!-- Case Item Active -->
+                        <div class="p-4 rounded-xl border-2 border-primary bg-primary/5 cursor-pointer transition-all hover:shadow-md">
+                            <div class="flex justify-between items-start mb-2">
+                                <span class="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">CASE #240801-042</span>
+                                <span class="text-[10px] font-bold text-orange-600 bg-orange-100 px-2 py-0.5 rounded-full">접수완료</span>
+                            </div>
+                            <h3 class="font-bold text-slate-900">강지민 고객님</h3>
+                            <div class="mt-2 space-y-1">
+                                <div class="flex items-center gap-2 text-xs text-text-muted">
+                                    <span class="material-symbols-outlined text-[14px]">directions_car</span>
+                                    <span>123가 4567 (아이오닉 5)</span>
+                                </div>
+                                <div class="flex items-center gap-2 text-xs text-text-muted">
+                                    <span class="material-symbols-outlined text-[14px]">location_on</span>
+                                    <span>서울 강남구 테헤란로 427</span>
+                                </div>
+                            </div>
+                            <div class="mt-4 flex items-center gap-2">
+                                <img alt="car crash icon" class="w-8 h-8 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAzh1kFOlI5tl2HtCw_f5wDXDjDkQs0qi3mp0LeAPM5hvcJRpHyzTcUc6MYL6lGQ2zvPHfdpIrak8TuLWmsbtwMX653ZlzX3sD__Y1j4M7tWgsQ6HHNjSc1B8Y0L9UjZd4YA6phH7WbPv6KKS9v7JVJY8Y-FKAkOlLlMJl14KH9TJQcOo0Ya0WazCGuriKEuNajA-CLBQHkoozM7hBTUG507cOgskOR4ZFfyn772p4aG9ORH7klaw5oYrUypccvHuAfvcwsUpnv6DM">
+                                <p class="text-[11px] text-red-500 font-medium">차량 전면부 파손 및 자력 주행 불가</p>
+                            </div>
+                        </div>
+                        <!-- Case Item Pending -->
+                        <div class="p-4 rounded-xl bg-white border border-border-soft hover:border-primary/30 cursor-pointer transition-all">
+                            <div class="flex justify-between items-start mb-2">
+                                <span class="text-[10px] font-bold text-text-muted bg-slate-100 px-2 py-0.5 rounded-full">CASE #240801-041</span>
+                                <span class="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">출동중</span>
+                            </div>
+                            <h3 class="font-bold text-slate-900">이상철 고객님</h3>
+                            <div class="mt-2 space-y-1">
+                                <div class="flex items-center gap-2 text-xs text-text-muted">
+                                    <span class="material-symbols-outlined text-[14px]">directions_car</span>
+                                    <span>98나 1122 (제네시스 G80)</span>
+                                </div>
+                                <div class="flex items-center gap-2 text-xs text-text-muted">
+                                    <span class="material-symbols-outlined text-[14px]">location_on</span>
+                                    <span>경기 성남시 판교역로 166</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Case Item Arrived -->
+                        <div class="p-4 rounded-xl bg-white border border-border-soft hover:border-primary/30 cursor-pointer transition-all opacity-70">
+                            <div class="flex justify-between items-start mb-2">
+                                <span class="text-[10px] font-bold text-text-muted bg-slate-100 px-2 py-0.5 rounded-full">CASE #240801-040</span>
+                                <span class="text-[10px] font-bold text-slate-500 bg-slate-200 px-2 py-0.5 rounded-full">현장도착</span>
+                            </div>
+                            <h3 class="font-bold text-slate-900">박수연 고객님</h3>
+                            <div class="mt-2 space-y-1">
+                                <div class="flex items-center gap-2 text-xs text-text-muted">
+                                    <span class="material-symbols-outlined text-[14px]">directions_car</span>
+                                    <span>45다 7890 (BMW 520d)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- Map & Dispatch Panel (8/12 width) -->
+            <section class="col-span-12 lg:col-span-8 flex flex-col gap-6">
+                <!-- Main Map View Area -->
+                <div class="glass-card rounded-2xl overflow-hidden shadow-md flex flex-col min-h-[400px] relative group">
+                    <!-- Location Placeholder -->
+                    <div class="absolute inset-0 bg-slate-200">
+                        <img class="w-full h-full object-cover" data-alt="A detailed aerial satellite map view of an urban intersection in Seoul, South Korea with stylized emerald green traffic flow overlays and UI markers pointing to a specific accident site. The image has a clean, professional tech aesthetic with high contrast and soft daylighting." data-location="Seoul, South Korea" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA9T2iuU4cIGNLFCM60W1vhGe9ssC1anoDiq_k7g66wgLD0oWrrEM54NHCn6pUsa-PEKKRbf5Ry9QSoRq1E1PKCIfPSLw5d-sbhn0M3fzSP9P-_ETe7HYPgx-WqBGjMkiwpzS0Y2ICaCMO6i1EUBLA9GgGONuNdnVosBsDze-pew2giocY-GrYk6Xw947qdwd8EC5tsOUn7WqPu7bZIdmYw0AfVd92hRlaRDiBem4Ry7k4ag-2Yos_zozNsZCd3WwTUmcFOr-vKd8o">
+                        <!-- Map UI Overlays -->
+                        <div class="absolute top-4 right-4 flex flex-col gap-2">
+                            <button class="w-10 h-10 bg-white rounded-lg shadow-lg flex items-center justify-center hover:bg-slate-50 transition-colors">
+                                <span class="material-symbols-outlined">add</span>
+                            </button>
+                            <button class="w-10 h-10 bg-white rounded-lg shadow-lg flex items-center justify-center hover:bg-slate-50 transition-colors">
+                                <span class="material-symbols-outlined">remove</span>
+                            </button>
+                        </div>
+                        <!-- Accident Marker -->
+                        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+                            <div class="bg-red-500 text-white p-3 rounded-full shadow-2xl animate-bounce-slow border-4 border-white">
+                                <span class="material-symbols-outlined">emergency_share</span>
+                            </div>
+                            <div class="mt-2 bg-white/90 backdrop-blur-md px-4 py-2 rounded-lg shadow-xl text-xs font-bold whitespace-nowrap">
+                                서울 강남구 테헤란로 427 (사고지점)
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Dispatch Control Card -->
+                    <div class="absolute bottom-6 left-6 right-6 lg:left-auto lg:w-80">
+                        <div class="bg-white/95 backdrop-blur-xl p-5 rounded-2xl shadow-2xl border border-white/50">
+                            <div class="flex items-center gap-3 mb-4">
+                                <img alt="yellow shield icon" class="w-10 h-10" src="https://lh3.googleusercontent.com/aida/AP1WRLutXTv5Xggh00KBjZUqNZejUMV5fqxVW1oZE8wZ_FR1Au2M1S6Qs5YRBtdF-_5I-9w2FBGnfdE9q_8-4wpQUrrH9RdzAqmpg-L9PHBLpXWQRS4k2JICjZVWlVsJIBQYm4gQkQw440g0g2gVQ-575fvmXNrQ6lqgjUPsTMbiEDNfobWOtufwX9XB1k1tt2lK3QCzbzrmTRca6SuUGUR8iO6LzlprR89QDPpVtWpyjZFsw6G9gkNmMjbyLvI">
+                                <div>
+                                    <p class="text-[10px] text-text-muted font-bold uppercase">배정 관리</p>
+                                    <h4 class="font-bold text-slate-900 leading-tight">현장 출동 인원 배정</h4>
+                                </div>
+                            </div>
+                            <div class="space-y-3 mb-5">
+                                <div class="flex items-center justify-between text-xs">
+                                    <span class="text-text-muted">가장 가까운 요원:</span>
+                                    <span class="font-bold text-slate-900">이정재 (1.2km)</span>
+                                </div>
+                                <div class="flex items-center justify-between text-xs">
+                                    <span class="text-text-muted">예상 도착 시간:</span>
+                                    <span class="font-bold text-primary">7분 이내</span>
+                                </div>
+                            </div>
+                            <button class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 rounded-xl shadow-lg shadow-primary/20 flex items-center justify-center gap-2 transition-all active:scale-95">
+                                <span class="material-symbols-outlined text-[18px]">send</span>
+                                출동 명령 하달하기
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Details & Evidence Row -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Accident Photos -->
+                    <div class="glass-card rounded-2xl p-5 shadow-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-bold flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary">photo_library</span>
+                                사고 현장 사진 (3)
+                            </h3>
+                            <button class="p-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors">
+                                <span class="material-symbols-outlined text-[20px]">cloud_upload</span>
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-3 gap-3">
+                            <div class="aspect-square bg-slate-100 rounded-lg overflow-hidden group cursor-pointer relative">
+                                <img class="w-full h-full object-cover group-hover:scale-110 transition-transform" data-alt="A sharp close-up photo of a blue modern car's damaged front fender and shattered headlight in a daylight street setting. The image uses professional automotive photography lighting with high clarity and a focus on the texture of the damaged metal and plastic. The scene is clean with subtle reflections." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYHyi9-l7G8Q7ykHBUmQk23nzGErcGmO8JL7yUmr6eAskkpeHazMGyJWi4yHYbt_eBUCPYbgAkVvIBh5JA3ukWlZauunD5IH9_rYGWPJK_pX2weOideQzciXZsLPE5sR32uJ7TyuUfKDR4LUsI9wMn-TkXvy5mD4rMe2YrysGx3RKaEQYQVK1dVzS2jy6lw8V2FA8DJTv3_XEuFLBGeD3CCaACZJ7rsQXvrNqcbcLkDq5QjeoVQVHWhknUOjd0eRMi5Xzvc6eDW68">
+                                <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-white">fullscreen</span>
+                                </div>
+                            </div>
+                            <div class="aspect-square bg-slate-100 rounded-lg overflow-hidden group cursor-pointer relative">
+                                <img class="w-full h-full object-cover group-hover:scale-110 transition-transform" data-alt="A wide angle photograph of a car accident scene at an urban intersection during the day. The focus is on the positioning of two vehicles after a collision, with a light-mode aesthetic and clear, professional documentary-style lighting. Subtle emerald green accents are used in the UI framing around the image." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWP5JZA1IlTG9V4ysvOZ--vfyo466RHbCforujMZzJPQynR5C3GxcTgoomWDAVxVQb3K5XLv0jHam5PmSuH8DHN3qk3uJNGYjl0GPsCQa5p3khzwueagpWCCt94H4o0utm1IqJk2uNMG8oB-aowMYDbMjIdBRkhGW1BFpDQwCaDE0nUQgH_-iMP-H4DQY9s8Gk913MyTw0kBewoW01raw2YHr-4PVhspRn7CAN0sgR-ZWO8zjD7dZf4O_KOInkI6TAIT2-5zQ_y5k">
+                                <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-white">fullscreen</span>
+                                </div>
+                            </div>
+                            <div class="aspect-square bg-slate-50 border-2 border-dashed border-border-soft rounded-lg flex items-center justify-center text-text-muted hover:border-primary hover:text-primary transition-all cursor-pointer">
+                                <span class="material-symbols-outlined">add_photo_alternate</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Field Notes -->
+                    <div class="glass-card rounded-2xl p-5 shadow-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-bold flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary">edit_note</span>
+                                현장 특이사항
+                            </h3>
+                            <span class="text-[10px] text-text-muted">마지막 업데이트: 2분 전</span>
+                        </div>
+                        <div class="bg-white/50 p-3 rounded-xl border border-border-soft text-sm text-slate-700 leading-relaxed mb-4">
+                            가해 차량은 빗길 미끄러짐으로 인한 중앙선 침범 주장. 피해자는 신호 대기 중 충돌 보고함. 현장 주변 CCTV 2개 확인되었으나 경찰 협조 필요함. 경미한 대인 피해 의심되나 구급차 거부 상태.
+                        </div>
+                        <div class="flex gap-2">
+                            <button class="flex-1 text-xs font-bold py-2 border border-border-soft rounded-lg hover:bg-slate-50 transition-colors">전문화면 입력</button>
+                            <button class="flex-1 text-xs font-bold py-2 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors">메모 저장</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+</div>
+<!-- Mobile Bottom NavBar (Visible on small screens) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full bg-white border-t border-border-soft flex justify-around items-center h-16 z-50">
+    <button class="flex flex-col items-center gap-1 text-text-muted">
+        <span class="material-symbols-outlined">home</span>
+        <span class="text-[10px]">홈</span>
+    </button>
+    <button class="flex flex-col items-center gap-1 text-primary">
+        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">emergency_share</span>
+        <span class="text-[10px] font-bold">사고접수</span>
+    </button>
+    <button class="flex flex-col items-center gap-1 text-text-muted">
+        <span class="material-symbols-outlined">history</span>
+        <span class="text-[10px]">이력</span>
+    </button>
+    <button class="flex flex-col items-center gap-1 text-text-muted">
+        <span class="material-symbols-outlined">person</span>
+        <span class="text-[10px]">내정보</span>
+    </button>
+</nav>
+<!-- Global Footer -->
+<footer class="bg-surface-container-highest dark:bg-surface-dim border-t border-border-soft w-full py-12 px-gutter mt-auto">
+    <div class="max-w-container-max mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+        <div class="flex flex-col items-center md:items-start">
+            <span class="text-headline-sm font-headline-sm font-bold text-text-main mb-2">Kindred Assurance</span>
+            <p class="text-label-sm font-label-sm text-text-muted">© 2024 Kindred Assurance. All rights reserved.</p>
+        </div>
+        <div class="flex flex-wrap justify-center gap-6">
+            <a class="text-label-sm font-label-sm text-text-muted hover:text-primary transition-opacity hover:underline" href="#">Privacy Policy</a>
+            <a class="text-label-sm font-label-sm text-text-muted hover:text-primary transition-opacity hover:underline" href="#">Terms of Service</a>
+            <a class="text-label-sm font-label-sm text-text-muted hover:text-primary transition-opacity hover:underline" href="#">Cookie Settings</a>
+            <a class="text-label-sm font-label-sm text-text-muted hover:text-primary transition-opacity hover:underline" href="#">Contact Us</a>
+        </div>
+    </div>
+</footer>
+<script>
+    // Micro-interactions and effects
+    document.querySelectorAll('.glass-card').forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            card.style.transform = 'translateY(-2px)';
+            card.style.transition = 'all 0.3s ease';
+        });
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'translateY(0)';
+        });
+    });
+
+    // Simulating real-time update
+    setInterval(() => {
+        const timeSpan = document.querySelector('.text-[10px].text-text-muted:last-child');
+        if(timeSpan && timeSpan.innerText.includes('분 전')) {
+            // Dummy logic for atmospheric effect
+        }
+    }, 60000);
+</script>
+<script>function toggleSidebar() { const sidebar = document.getElementById('sidebar'); const mainContent = document.getElementById('main-content'); const menuIcon = document.querySelector('[onclick="toggleSidebar()"] span'); sidebar.classList.toggle('collapsed'); if (sidebar.classList.contains('collapsed')) { mainContent.style.marginLeft = '80px'; menuIcon.textContent = 'menu'; } else { mainContent.style.marginLeft = '256px'; menuIcon.textContent = 'menu_open'; } }</script></body></html>

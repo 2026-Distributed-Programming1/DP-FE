@@ -1,0 +1,514 @@
+<!DOCTYPE html><html lang="ko"><head><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Kindred Assurance - 리크루팅 관리</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Noto+Sans+KR:wght@400;500;700&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans KR', sans-serif;
+            background: radial-gradient(circle at top right, #D1FAE5 0%, #f7f9fb 50%);
+            min-height: 100vh;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        .glass-stroke {
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .emerald-glow {
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.1);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(0, 108, 73, 0.1);
+            border-radius: 10px;
+        }
+        #sidebar {
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #sidebar.collapsed {
+            width: 80px;
+        }
+        #sidebar.collapsed .sidebar-text,
+        #sidebar.collapsed .sidebar-header-text,
+        #sidebar.collapsed .sidebar-cta {
+            display: none;
+        }
+        #main-content {
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface": "#f7f9fb",
+                        "error": "#ba1a1a",
+                        "inverse-surface": "#2d3133",
+                        "inverse-on-surface": "#eff1f3",
+                        "tertiary-fixed": "#c3ecd7",
+                        "outline": "#6c7a71",
+                        "surface-container-high": "#e6e8ea",
+                        "secondary-fixed-dim": "#95d3ba",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed": "#002113",
+                        "secondary": "#2b6954",
+                        "error-container": "#ffdad6",
+                        "inverse-primary": "#4edea3",
+                        "tertiary-container": "#84ab98",
+                        "on-primary-container": "#00422b",
+                        "tertiary": "#416656",
+                        "surface-tint": "#006c49",
+                        "surface-container": "#eceef0",
+                        "on-tertiary-container": "#1b3f31",
+                        "surface-dim": "#d8dadc",
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed-variant": "#005236",
+                        "background": "#f7f9fb",
+                        "on-tertiary-fixed-variant": "#294e3f",
+                        "on-secondary-fixed-variant": "#0b513d",
+                        "primary-fixed-dim": "#4edea3",
+                        "on-tertiary-fixed": "#002115",
+                        "primary-container": "#10b981",
+                        "outline-variant": "#bbcabf",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-container": "#306d58",
+                        "surface-container-low": "#f2f4f6",
+                        "surface-container-highest": "#e0e3e5",
+                        "on-surface": "#191c1e",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed": "#002117",
+                        "surface-variant": "#e0e3e5",
+                        "on-error-container": "#93000a",
+                        "on-background": "#191c1e",
+                        "primary-fixed": "#6ffbbe",
+                        "primary": "#006c49",
+                        "on-surface-variant": "#3c4a42",
+                        "secondary-fixed": "#b0f0d6",
+                        "on-error": "#ffffff",
+                        "surface-bright": "#f7f9fb",
+                        "tertiary-fixed-dim": "#a8cfbc",
+                        "secondary-container": "#adedd3"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "8px",
+                        "margin-desktop": "40px",
+                        "container-max-width": "1280px",
+                        "margin-mobile": "16px",
+                        "gutter": "24px",
+                        "nav-height": "80px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Inter", "Noto Sans KR"],
+                        "headline-md": ["Inter", "Noto Sans KR"],
+                        "body-lg": ["Inter", "Noto Sans KR"],
+                        "body-md": ["Inter", "Noto Sans KR"],
+                        "label-md": ["Inter", "Noto Sans KR"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "0em", "fontWeight": "500"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "letterSpacing": "0.01em", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "letterSpacing": "0.01em", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-surface text-on-surface selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full h-[80px] bg-surface/80 backdrop-blur-xl border-b border-white/40 shadow-sm shadow-secondary/5 flex justify-between items-center px-margin-desktop z-50">
+    <div class="flex items-center gap-10">
+        <span class="font-headline-md text-headline-md font-bold text-primary">Kindred Assurance</span>
+        <div class="hidden md:flex gap-8">
+            <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">대시보드</a>
+            <a class="font-body-md text-body-md text-primary font-bold" href="#">리크루팅</a>
+            <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">상품관리</a>
+            <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">실적분석</a>
+        </div>
+    </div>
+    <div class="flex items-center gap-6">
+        <div class="relative hidden lg:block">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+            <input class="pl-10 pr-4 py-2 bg-white/40 border border-white/60 rounded-full focus:ring-2 focus:ring-primary focus:border-transparent outline-none w-64 transition-all" placeholder="통합 검색..." type="text">
+        </div>
+        <div class="flex items-center gap-4">
+            <button class="p-2 hover:bg-white/20 rounded-full transition-colors relative">
+                <span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+                <span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+            </button>
+            <button class="p-2 hover:bg-white/20 rounded-full transition-colors">
+                <span class="material-symbols-outlined text-on-surface-variant">settings</span>
+            </button>
+            <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-container">
+                <img alt="Profile" data-alt="A professional studio portrait of a modern office administrator with a friendly expression. High-key lighting, soft shadows, and a clean professional aesthetic suitable for a high-end SaaS platform. The style is minimalist and polished with a focus on human connection and digital efficiency." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYEguUv53Du2veug9B-n3Lym4fjoa2Ck9jXF5wQX-KsuiuCBykU2uRiRBJYQT6vJ_t4hTyg-QZa6U-lOWFBm6Jyki0WW4732hX4XNc1ylturm_xqq-deqe-2UIto2rSIk0qe2hrqxtzaxftpyBG7RY9KXwryyrRjIs-Gb2IwK4fxKa2kg38KjNMMkvOAgE3KfFuotQgUTgWgDCNM1EytOg3tfzTPapetFHVaq5fOd5HunHsJHYRagaqKRRzJJarwJFIw8PPTt8GvY">
+            </div>
+        </div>
+    </div>
+</nav>
+<aside class="h-screen w-64 fixed left-0 top-0 bg-surface border-r border-outline-variant shadow-md flex flex-col py-unit space-y-2 z-40 overflow-y-auto pt-24" id="sidebar">
+    <div class="px-4 mb-4 flex items-center justify-between">
+        <div class="sidebar-header-text">
+            <h2 class="font-headline-md text-primary font-bold text-lg">Admin Console</h2>
+            <p class="text-caption text-outline">Kindred Assurance</p>
+        </div>
+        <button class="p-2 hover:bg-surface-variant rounded-lg" onclick="toggleSidebar()">
+            <span class="material-symbols-outlined">menu_open</span>
+        </button>
+    </div>
+    <div class="flex flex-col gap-1 flex-grow">
+        <a class="flex items-center gap-3 p-3 mx-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-all duration-200" href="#">
+            <span class="material-symbols-outlined">dashboard</span>
+            <span class="font-label-md sidebar-text">Dashboard</span>
+        </a>
+        <a class="flex items-center gap-3 p-3 mx-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-all duration-200" href="#">
+            <span class="material-symbols-outlined">verified_user</span>
+            <span class="font-label-md sidebar-text">Underwriting</span>
+        </a>
+        <a class="flex items-center gap-3 p-3 mx-2 bg-primary-container text-on-primary-container rounded-lg transition-all duration-200" href="#">
+            <span class="material-symbols-outlined">payments</span>
+            <span class="font-label-md sidebar-text font-bold">Sales</span>
+        </a>
+        <a class="flex items-center gap-3 p-3 mx-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-all duration-200" href="#">
+            <span class="material-symbols-outlined">group_add</span>
+            <span class="font-label-md sidebar-text">Recruitment</span>
+        </a>
+        <a class="flex items-center gap-3 p-3 mx-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-all duration-200" href="#">
+            <span class="material-symbols-outlined">support_agent</span>
+            <span class="font-label-md sidebar-text">Support</span>
+        </a>
+        <a class="flex items-center gap-3 p-3 mx-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-all duration-200" href="#">
+            <span class="material-symbols-outlined">school</span>
+            <span class="font-label-md sidebar-text">Education</span>
+        </a>
+    </div>
+    <div class="px-4 sidebar-cta">
+        <button class="w-full bg-primary text-on-primary py-3 rounded-lg font-label-md hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined text-[20px]">analytics</span>
+            <span>Generate Report</span>
+        </button>
+    </div>
+    <div class="pt-4 mt-auto border-t border-outline-variant/50">
+        <a class="flex items-center gap-3 p-3 mx-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-all duration-200" href="#">
+            <span class="material-symbols-outlined text-error">logout</span>
+            <span class="font-label-md sidebar-text">Logout</span>
+        </a>
+    </div>
+</aside><main class="pt-[100px] pb-margin-desktop px-margin-desktop max-w-[1440px] mx-auto ml-64" id="main-content">
+    <!-- Header Section with 3D Icon -->
+    <header class="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-6">
+        <div class="flex items-center gap-6">
+            <div class="w-24 h-24 glass-panel rounded-lg flex items-center justify-center p-2">
+                <img alt="Recruitment Icon" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUcJrOzPDPeTWSwdbdwuhgOEfVwUmJRpkHSOHh8O6nMoCmu51SfoZNipUn4VuFMSbVl-Q1p066ms94uCcTR3HrKxMEW2Zupu2ed9cOO1gGoG1oWpWn3JHdo34kPwOseuqMFKY6O4otG4MtNTdgUeHRZm3IGdCeHCBKETKlDCUekueylWsjLpmiqv4FnsfVgMNmC55ADegzVX-9tp8EtQWycCX3WfAk-75OFiGNkXs-9-iahBPeSUVwLpcp-0IKdO35jss1NAVSmgA">
+            </div>
+            <div>
+                <h1 class="font-headline-lg text-headline-lg text-on-surface">리크루팅 관리 센터</h1>
+                <p class="font-body-lg text-body-lg text-on-surface-variant mt-1">새로운 보험 영업 채널 및 에이전트 모집 현황입니다.</p>
+            </div>
+        </div>
+        <button class="px-8 py-4 bg-primary text-on-primary rounded-full font-label-md text-label-md flex items-center gap-2 hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/20">
+            <span class="material-symbols-outlined">person_add</span>
+            공고 등록하기
+        </button>
+    </header>
+    <!-- Recruitment Status Bento Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-gutter mb-10">
+        <!-- Stats Card 1 -->
+        <div class="glass-panel p-8 rounded-lg flex flex-col justify-between h-48 group hover:border-primary/40 transition-all duration-300">
+            <div class="flex justify-between items-start">
+                <div class="p-3 rounded-full bg-secondary-container/50 text-primary">
+                    <span class="material-symbols-outlined">group</span>
+                </div>
+                <span class="text-primary font-bold">+12%</span>
+            </div>
+            <div>
+                <div class="font-display-lg text-[40px] font-bold text-on-surface">324</div>
+                <div class="font-label-md text-label-md text-on-surface-variant">전체 지원자</div>
+            </div>
+        </div>
+        <!-- Stats Card 2 -->
+        <div class="glass-panel p-8 rounded-lg flex flex-col justify-between h-48 hover:border-primary/40 transition-all duration-300">
+            <div class="flex justify-between items-start">
+                <div class="p-3 rounded-full bg-primary-container/20 text-primary">
+                    <span class="material-symbols-outlined">assignment_ind</span>
+                </div>
+                <span class="text-primary font-bold">진행중</span>
+            </div>
+            <div>
+                <div class="font-display-lg text-[40px] font-bold text-on-surface">48</div>
+                <div class="font-label-md text-label-md text-on-surface-variant">서류 심사중</div>
+            </div>
+        </div>
+        <!-- Stats Card 3 -->
+        <div class="glass-panel p-8 rounded-lg flex flex-col justify-between h-48 hover:border-primary/40 transition-all duration-300">
+            <div class="flex justify-between items-start">
+                <div class="p-3 rounded-full bg-tertiary-fixed text-on-tertiary-container">
+                    <span class="material-symbols-outlined">record_voice_over</span>
+                </div>
+                <span class="text-primary font-bold">HOT</span>
+            </div>
+            <div>
+                <div class="font-display-lg text-[40px] font-bold text-on-surface">15</div>
+                <div class="font-label-md text-label-md text-on-surface-variant">인터뷰 예정</div>
+            </div>
+        </div>
+        <!-- Stats Card 4 -->
+        <div class="glass-panel p-8 rounded-lg flex flex-col justify-between h-48 hover:border-primary/40 transition-all duration-300">
+            <div class="flex justify-between items-start">
+                <div class="p-3 rounded-full bg-secondary-container text-primary">
+                    <span class="material-symbols-outlined">verified</span>
+                </div>
+                <span class="text-secondary font-bold">최종</span>
+            </div>
+            <div>
+                <div class="font-display-lg text-[40px] font-bold text-on-surface">08</div>
+                <div class="font-label-md text-label-md text-on-surface-variant">채용 확정</div>
+            </div>
+        </div>
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start">
+        <!-- Left: Active Job Postings -->
+        <section class="lg:col-span-4 space-y-gutter">
+            <h2 class="font-headline-md text-headline-md text-on-surface mb-2">활성 공고</h2>
+            <div class="glass-panel p-6 rounded-lg space-y-4 relative overflow-hidden group hover:translate-y-[-4px] transition-transform">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-bl-full"></div>
+                <div class="flex justify-between items-start">
+                    <span class="px-3 py-1 bg-primary/10 text-primary rounded-full font-label-md text-[12px]">신입/경력</span>
+                    <span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary">more_vert</span>
+                </div>
+                <div>
+                    <h3 class="font-headline-md text-[20px] font-bold text-on-surface">수도권 거점 보험 설계사 모집</h3>
+                    <p class="font-body-md text-label-md text-on-surface-variant mt-1">마감: D-12 | 지원자: 86명</p>
+                </div>
+                <div class="w-full bg-white/50 h-2 rounded-full overflow-hidden">
+                    <div class="bg-primary h-full w-[65%] rounded-full shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+                </div>
+            </div>
+            <div class="glass-panel p-6 rounded-lg space-y-4 group hover:translate-y-[-4px] transition-transform">
+                <div class="flex justify-between items-start">
+                    <span class="px-3 py-1 bg-secondary-container/50 text-secondary rounded-full font-label-md text-[12px]">전략 영업</span>
+                    <span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary">more_vert</span>
+                </div>
+                <div>
+                    <h3 class="font-headline-md text-[20px] font-bold text-on-surface">기업 보험 전문 컨설턴트</h3>
+                    <p class="font-body-md text-label-md text-on-surface-variant mt-1">마감: D-05 | 지원자: 42명</p>
+                </div>
+                <div class="w-full bg-white/50 h-2 rounded-full overflow-hidden">
+                    <div class="bg-secondary h-full w-[88%] rounded-full"></div>
+                </div>
+            </div>
+            <div class="glass-panel p-6 rounded-lg space-y-4 group hover:translate-y-[-4px] transition-transform opacity-80">
+                <div class="flex justify-between items-start">
+                    <span class="px-3 py-1 bg-surface-container-high text-on-surface-variant rounded-full font-label-md text-[12px]">파트너사</span>
+                </div>
+                <div>
+                    <h3 class="font-headline-md text-[20px] font-bold text-on-surface">영업 대리점 지점장 리쿠루팅</h3>
+                    <p class="font-body-md text-label-md text-on-surface-variant mt-1">마감: D-21 | 지원자: 12명</p>
+                </div>
+                <div class="w-full bg-white/50 h-2 rounded-full overflow-hidden">
+                    <div class="bg-outline h-full w-[15%] rounded-full"></div>
+                </div>
+            </div>
+        </section>
+        <!-- Right: Applicant List with Evaluation Stages -->
+        <section class="lg:col-span-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="font-headline-md text-headline-md text-on-surface">최근 지원자 목록</h2>
+                <div class="flex gap-2">
+                    <button class="px-4 py-2 bg-white/50 glass-stroke rounded-lg font-label-md text-label-md hover:bg-white transition-colors">필터</button>
+                    <button class="px-4 py-2 bg-white/50 glass-stroke rounded-lg font-label-md text-label-md hover:bg-white transition-colors">내보내기</button>
+                </div>
+            </div>
+            <div class="glass-panel rounded-lg overflow-hidden">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                    <tr class="bg-white/40 border-b border-white/60">
+                        <th class="p-6 font-label-md text-label-md text-on-surface-variant">지원자 정보</th>
+                        <th class="p-6 font-label-md text-label-md text-on-surface-variant">희망 채널</th>
+                        <th class="p-6 font-label-md text-label-md text-on-surface-variant">평가 단계</th>
+                        <th class="p-6 font-label-md text-label-md text-on-surface-variant">점수</th>
+                        <th class="p-6 font-label-md text-label-md text-on-surface-variant"></th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/20">
+                    <!-- Applicant Row 1 -->
+                    <tr class="hover:bg-white/20 transition-colors cursor-pointer group">
+                        <td class="p-6">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary">김</div>
+                                <div>
+                                    <div class="font-label-md text-on-surface">김지수</div>
+                                    <div class="text-[12px] text-on-surface-variant">경력 5년 | 서울</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="p-6 font-body-md text-label-md">개인 영업</td>
+                        <td class="p-6">
+                            <span class="px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full text-[12px] font-bold">2차 인터뷰</span>
+                        </td>
+                        <td class="p-6">
+                            <div class="flex items-center gap-1 text-primary">
+                                <span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+                                <span class="font-bold">4.8</span>
+                            </div>
+                        </td>
+                        <td class="p-6 text-right">
+                            <button class="px-4 py-2 text-primary font-bold hover:underline transition-all">상세보기</button>
+                        </td>
+                    </tr>
+                    <!-- Applicant Row 2 -->
+                    <tr class="hover:bg-white/20 transition-colors cursor-pointer group">
+                        <td class="p-6">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-secondary-container/50 flex items-center justify-center font-bold text-secondary">박</div>
+                                <div>
+                                    <div class="font-label-md text-on-surface">박민호</div>
+                                    <div class="text-[12px] text-on-surface-variant">신입 | 부산</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="p-6 font-body-md text-label-md">법인 컨설팅</td>
+                        <td class="p-6">
+                            <span class="px-3 py-1 bg-primary-container/20 text-primary rounded-full text-[12px] font-bold">서류 검토</span>
+                        </td>
+                        <td class="p-6">
+                            <div class="flex items-center gap-1 text-on-surface-variant">
+                                <span class="material-symbols-outlined text-[18px]">star</span>
+                                <span class="font-bold">3.2</span>
+                            </div>
+                        </td>
+                        <td class="p-6 text-right">
+                            <button class="px-4 py-2 text-primary font-bold hover:underline transition-all">상세보기</button>
+                        </td>
+                    </tr>
+                    <!-- Applicant Row 3 -->
+                    <tr class="hover:bg-white/20 transition-colors cursor-pointer group">
+                        <td class="p-6">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-tertiary-fixed flex items-center justify-center font-bold text-on-tertiary-container">이</div>
+                                <div>
+                                    <div class="font-label-md text-on-surface">이은영</div>
+                                    <div class="text-[12px] text-on-surface-variant">경력 12년 | 인천</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="p-6 font-body-md text-label-md">영업 관리자</td>
+                        <td class="p-6">
+                            <span class="px-3 py-1 bg-error-container text-on-error-container rounded-full text-[12px] font-bold">레퍼런스 체크</span>
+                        </td>
+                        <td class="p-6">
+                            <div class="flex items-center gap-1 text-primary">
+                                <span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+                                <span class="font-bold">4.9</span>
+                            </div>
+                        </td>
+                        <td class="p-6 text-right">
+                            <button class="px-4 py-2 text-primary font-bold hover:underline transition-all">상세보기</button>
+                        </td>
+                    </tr>
+                    <!-- Applicant Row 4 -->
+                    <tr class="hover:bg-white/20 transition-colors cursor-pointer group">
+                        <td class="p-6">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center font-bold text-on-surface-variant">최</div>
+                                <div>
+                                    <div class="font-label-md text-on-surface">최준혁</div>
+                                    <div class="text-[12px] text-on-surface-variant">경력 3년 | 대전</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="p-6 font-body-md text-label-md">개인 영업</td>
+                        <td class="p-6">
+                            <span class="px-3 py-1 bg-white/60 border border-white/80 rounded-full text-[12px] font-bold">1차 면접 완료</span>
+                        </td>
+                        <td class="p-6">
+                            <div class="flex items-center gap-1 text-primary">
+                                <span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+                                <span class="font-bold">4.1</span>
+                            </div>
+                        </td>
+                        <td class="p-6 text-right">
+                            <button class="px-4 py-2 text-primary font-bold hover:underline transition-all">상세보기</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div class="p-6 bg-white/20 flex justify-center">
+                    <button class="text-on-surface-variant font-label-md hover:text-primary transition-colors flex items-center gap-1">
+                        더 많은 지원자 보기
+                        <span class="material-symbols-outlined text-[18px]">keyboard_arrow_down</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+<!-- Visual Polish Particles -->
+<div class="fixed top-0 left-0 w-full h-full pointer-events-none -z-10 overflow-hidden">
+    <div class="absolute top-[10%] left-[5%] w-64 h-64 bg-primary/5 rounded-full blur-[100px]"></div>
+    <div class="absolute bottom-[20%] right-[10%] w-96 h-96 bg-secondary/5 rounded-full blur-[120px]"></div>
+</div>
+<script>
+    // Micro-interaction for hover effects
+    document.querySelectorAll('.glass-panel').forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            card.style.setProperty('--mouse-x', `${x}px`);
+            card.style.setProperty('--mouse-y', `${y}px`);
+        });
+    });
+
+    // Search Bar Focus Effect
+    const searchInput = document.querySelector('input[type="text"]');
+    searchInput.addEventListener('focus', () => {
+        searchInput.parentElement.classList.add('scale-105');
+    });
+    searchInput.addEventListener('blur', () => {
+        searchInput.parentElement.classList.remove('scale-105');
+    });
+</script>
+<script>
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        const menuIcon = document.querySelector('[onclick="toggleSidebar()"] span');
+
+        sidebar.classList.toggle('collapsed');
+
+        if (sidebar.classList.contains('collapsed')) {
+            mainContent.style.marginLeft = '80px';
+            menuIcon.textContent = 'menu';
+        } else {
+            mainContent.style.marginLeft = '256px';
+            menuIcon.textContent = 'menu_open';
+        }
+    }
+</script></body></html>

@@ -1,0 +1,450 @@
+<!DOCTYPE html><html class="light" lang="ko"><head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>심사 대기열 | Kindred Assurance</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#006c49",
+                        "on-primary": "#ffffff",
+                        "primary-container": "#10b981",
+                        "on-primary-container": "#00422b",
+                        "secondary": "#2b6954",
+                        "on-secondary": "#ffffff",
+                        "secondary-container": "#adedd3",
+                        "on-secondary-container": "#306d58",
+                        "tertiary": "#416656",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#84ab98",
+                        "on-tertiary-container": "#1b3f31",
+                        "error": "#ba1a1a",
+                        "on-error": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#93000a",
+                        "background": "#f7f9fb",
+                        "on-background": "#191c1e",
+                        "surface": "#ffffff",
+                        "on-surface": "#191c1e",
+                        "surface-variant": "#e0e3e5",
+                        "on-surface-variant": "#3c4a42",
+                        "outline": "#6c7a71",
+                        "outline-variant": "#bbcabf",
+                        "glass-bg": "rgba(255, 255, 255, 0.75)",
+                        "glass-border": "rgba(0, 108, 73, 0.08)"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "nav-height": "80px",
+                        "margin-desktop": "40px",
+                        "container-max-width": "1280px",
+                        "margin-mobile": "16px",
+                        "gutter": "24px",
+                        "unit": "8px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "caption": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "letterSpacing": "0.01em", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "0em", "fontWeight": "500"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "caption": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "letterSpacing": "0.01em", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        #sidebar {
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #sidebar.collapsed {
+            width: 80px;
+        }
+        #sidebar.collapsed .sidebar-text,
+        #sidebar.collapsed .sidebar-header-text,
+        #sidebar.collapsed .sidebar-cta {
+            display: none;
+        }
+        #main-content {
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(0, 108, 73, 0.1);
+            border-radius: 10px;
+        }
+        body {
+            background-color: #f7f9fb;
+        }
+    </style>
+</head>
+<body class="font-body-md text-on-surface">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 w-full z-50 bg-glass-bg border-b border-glass-border backdrop-blur-md shadow-sm h-nav-height">
+    <div class="flex justify-between items-center px-margin-desktop h-nav-height w-full max-w-container-max-width mx-auto">
+        <div class="flex items-center gap-8">
+            <span class="font-headline-md text-headline-md text-primary font-bold">Kindred Assurance</span>
+            <nav class="hidden md:flex gap-6 items-center h-full font-body-md text-body-md">
+                <a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Home</a>
+                <a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Policies</a>
+                <a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Claims</a>
+                <a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Sales</a>
+                <a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Support</a>
+            </nav>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="relative hidden lg:block">
+                <input class="bg-surface-variant/50 border-none rounded-full py-2 px-10 focus:ring-2 focus:ring-primary w-64 text-label-md" placeholder="검색..." type="text">
+                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+            </div>
+            <button class="p-2 hover:bg-surface-variant/50 rounded-full transition-all duration-300 relative">
+                <span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+                <span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+            </button>
+            <button class="p-2 hover:bg-surface-variant/50 rounded-full transition-all duration-300">
+                <span class="material-symbols-outlined text-on-surface-variant">settings</span>
+            </button>
+            <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center overflow-hidden border border-primary/10">
+                <span class="material-symbols-outlined text-primary">account_circle</span>
+            </div>
+        </div>
+    </div>
+</header>
+<!-- Side Navigation Bar -->
+<aside class="h-screen w-64 fixed left-0 top-0 bg-white border-r border-outline-variant shadow-md flex flex-col py-unit space-y-2 z-40 overflow-y-auto pt-24" id="sidebar">
+    <div class="px-4 mb-4 flex items-center justify-between">
+        <div class="sidebar-header-text">
+            <h2 class="font-headline-md text-primary font-bold text-lg leading-tight">Admin Portal</h2>
+            <p class="text-caption text-outline">Enterprise View</p>
+        </div>
+        <button class="p-2 hover:bg-surface-variant rounded-lg" onclick="toggleSidebar()">
+            <span class="material-symbols-outlined">menu_open</span>
+        </button>
+    </div>
+    <div class="flex flex-col gap-1 flex-grow">
+        <a class="flex items-center gap-3 p-3 mx-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-all duration-200" href="#">
+            <span class="material-symbols-outlined">dashboard</span>
+            <span class="font-label-md sidebar-text">Dashboard</span>
+        </a>
+        <a class="flex items-center gap-3 p-3 mx-2 bg-primary-container text-on-primary-container rounded-lg transition-all duration-200" href="#">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">description</span>
+            <span class="font-label-md sidebar-text font-bold">Underwriting</span>
+        </a>
+        <a class="flex items-center gap-3 p-3 mx-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-all duration-200" href="#">
+            <span class="material-symbols-outlined">trending_up</span>
+            <span class="font-label-md sidebar-text">Sales Management</span>
+        </a>
+        <a class="flex items-center gap-3 p-3 mx-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-all duration-200" href="#">
+            <span class="material-symbols-outlined">security</span>
+            <span class="font-label-md sidebar-text">Risk Assessment</span>
+        </a>
+        <a class="flex items-center gap-3 p-3 mx-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-all duration-200" href="#">
+            <span class="material-symbols-outlined">settings</span>
+            <span class="font-label-md sidebar-text">Settings</span>
+        </a>
+    </div>
+    <div class="px-4 sidebar-cta">
+        <button class="w-full bg-primary text-on-primary py-3 rounded-lg font-label-md hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined text-[20px]">add</span>
+            <span>신규 심사 등록</span>
+        </button>
+    </div>
+    <div class="pt-4 mt-auto border-t border-outline-variant/50">
+        <a class="flex items-center gap-3 p-3 mx-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-all duration-200" href="#">
+            <span class="material-symbols-outlined">help</span>
+            <span class="font-label-md sidebar-text">Help Center</span>
+        </a>
+        <a class="flex items-center gap-3 p-3 mx-2 text-error hover:bg-error-container/20 rounded-lg transition-all duration-200" href="#">
+            <span class="material-symbols-outlined">logout</span>
+            <span class="font-label-md sidebar-text">Sign Out</span>
+        </a>
+    </div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-64 pt-nav-height min-h-screen" id="main-content">
+    <div class="p-margin-desktop max-w-container-max-width mx-auto space-y-gutter">
+        <!-- Page Header -->
+        <div class="flex justify-between items-end">
+            <div>
+                <h2 class="font-headline-lg text-headline-lg text-on-surface">심사 대기열</h2>
+                <p class="text-body-md text-on-surface-variant mt-1">현재 대기 중인 신규 청약 건을 관리합니다.</p>
+            </div>
+            <div class="flex gap-4">
+                <button class="px-6 py-2 border border-primary text-primary hover:bg-primary/5 transition-all rounded-full font-label-md">
+                    보고서 다운로드
+                </button>
+                <button class="px-6 py-2 bg-primary text-white hover:opacity-90 shadow-lg shadow-primary/20 transition-all rounded-full font-label-md flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[18px]">add</span>
+                    신규 심사 등록
+                </button>
+            </div>
+        </div>
+        <!-- Stats Bento Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+            <!-- Wait Queue Card -->
+            <div class="glass-panel p-8 rounded-xl flex items-center justify-between relative overflow-hidden group shadow-sm">
+                <div class="relative z-10">
+                    <p class="text-on-surface-variant font-label-md">심사 대기</p>
+                    <p class="text-display-lg font-display-lg text-primary mt-2">128<span class="text-body-lg ml-1">건</span></p>
+                    <div class="flex items-center gap-1 text-primary mt-4 font-label-md">
+                        <span class="material-symbols-outlined text-[16px]">trending_up</span>
+                        <span>어제보다 +5건</span>
+                    </div>
+                </div>
+                <div class="w-24 h-24 relative z-10">
+                    <img class="w-full h-full object-contain transform group-hover:scale-110 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-amuxTi9PxVMRjNs_OEo0BEiS-hrtVz5k2r93UHklRXLwj51oAWyN2DeP0_G_p-DLV-Jmad9mzl0DeNwkP-NnEv4eJW-gdxshIGbCjkELzCghnNc6vJ0ZFvWkiREOGB7tB2QTiPoXtQKhwntcXXiI5T0u7mQDXWC7tgwIjayd4HGnO4G10U8GCotpTR8anAbZiirHljnLuJcHsQjpmS61H_CKbJz0YlohmAc6EZGxL6xY7HmFjaPX4DrcP2FyDYZvY1KKssdY0mk">
+                </div>
+                <div class="absolute -right-4 -bottom-4 w-32 h-32 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-colors"></div>
+            </div>
+            <!-- Approved Today Card -->
+            <div class="glass-panel p-8 rounded-xl flex items-center justify-between relative overflow-hidden group shadow-sm">
+                <div class="relative z-10">
+                    <p class="text-on-surface-variant font-label-md">금일 승인</p>
+                    <p class="text-display-lg font-display-lg text-on-surface mt-2">42<span class="text-body-lg ml-1">건</span></p>
+                    <div class="flex items-center gap-1 text-primary-container mt-4 font-label-md">
+                        <span class="material-symbols-outlined text-[16px]">check_circle</span>
+                        <span>승인율 92%</span>
+                    </div>
+                </div>
+                <div class="w-24 h-24 relative z-10">
+                    <img class="w-full h-full object-contain transform group-hover:rotate-6 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrkY6V-N__OzzAOhyH8miWB2vlhHt76ElQzgJN_0e-dWuRhP4ehq-vwJxEvDIaUe28eFVxqJlBg-EmvZI5OoPdrr1nljN3XFfKv2kJbFCPl8uJ6nkGrPa6EundmGkFRrZXMzcbPb8faqVnaFO94AJd76nYGJHeiGwETn3PqQieL13-f8FueoFBs4A0JZsOt24DeKm54Wj3X565xu6-tHd-bvCB_lvK8L6iEhr_bM7TCSCJBPGjqK9k3T0rhIcpOg-vLLE0HgbgADo">
+                </div>
+            </div>
+            <!-- Declined Today Card -->
+            <div class="glass-panel p-8 rounded-xl flex items-center justify-between relative overflow-hidden group shadow-sm">
+                <div class="relative z-10">
+                    <p class="text-on-surface-variant font-label-md">금일 거절</p>
+                    <p class="text-display-lg font-display-lg text-on-surface mt-2">04<span class="text-body-lg ml-1">건</span></p>
+                    <div class="flex items-center gap-1 text-error mt-4 font-label-md">
+                        <span class="material-symbols-outlined text-[16px]">info</span>
+                        <span>리스크 감지 3건</span>
+                    </div>
+                </div>
+                <div class="w-24 h-24 relative z-10">
+                    <img class="w-full h-full object-contain transform group-hover:scale-95 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPjPF9HVULuzm2LFt7st21OJT0fhNuLPtJLKV4OjAjZicQd63fWE0Fs5RjWtF_g26Xc6DnG3RR6CfKrSutLiZZm3zvddD8sz59q3iJ9CNEyzRP4nTpRXvoGehXTwLoLKkLekMTkutlK6lkpTxe-1EsAORJzj3Y30gd19TNtSAYEfHHqVBjXgKRAd0J00kRg_1GG97ey5sVc3bcfXDHndlo5ILTWA_FRT_civ6zGyyW-SK4gTLi1v2iT9YAKg-WtcZ0kxVyO6nnPh4">
+                </div>
+            </div>
+        </div>
+        <!-- Data Table Section -->
+        <div class="glass-panel rounded-xl overflow-hidden border border-white/40 shadow-sm">
+            <div class="p-6 border-b border-white/20 flex justify-between items-center bg-white/20">
+                <div class="flex gap-4">
+                    <div class="relative">
+                        <input class="pl-10 pr-4 py-2 bg-white/40 border border-white/60 rounded-full text-label-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all w-64" placeholder="고객명 또는 신청번호 검색" type="text">
+                        <span class="material-symbols-outlined absolute left-3 top-2 text-on-surface-variant opacity-60">search</span>
+                    </div>
+                    <select class="px-4 py-2 bg-white/40 border border-white/60 rounded-full text-label-md focus:outline-none focus:ring-2 focus:ring-primary/20 appearance-none pr-10 relative">
+                        <option>상품 유형 전체</option>
+                        <option>종신보험</option>
+                        <option>중대질병보험</option>
+                        <option>자동차보험</option>
+                    </select>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button class="p-2 hover:bg-white/40 rounded-lg transition-colors">
+                        <span class="material-symbols-outlined text-on-surface-variant">filter_list</span>
+                    </button>
+                    <button class="p-2 hover:bg-white/40 rounded-lg transition-colors">
+                        <span class="material-symbols-outlined text-on-surface-variant">refresh</span>
+                    </button>
+                </div>
+            </div>
+            <div class="overflow-x-auto custom-scrollbar">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                    <tr class="bg-surface-container-low/30">
+                        <th class="px-6 py-4 font-label-md text-on-surface-variant border-b border-white/20">신청번호</th>
+                        <th class="px-6 py-4 font-label-md text-on-surface-variant border-b border-white/20">고객명</th>
+                        <th class="px-6 py-4 font-label-md text-on-surface-variant border-b border-white/20">상품 유형</th>
+                        <th class="px-6 py-4 font-label-md text-on-surface-variant border-b border-white/20">신청일</th>
+                        <th class="px-6 py-4 font-label-md text-on-surface-variant border-b border-white/20">심사 단계</th>
+                        <th class="px-6 py-4 font-label-md text-on-surface-variant border-b border-white/20 text-right">관리</th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/10">
+                    <!-- Row 1 -->
+                    <tr class="hover:bg-white/40 transition-colors group">
+                        <td class="px-6 py-4 font-label-md text-primary">#APP-2024-001</td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container font-bold text-xs">김</div>
+                                <span class="font-label-md">김철수</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="px-3 py-1 bg-primary/10 text-primary text-[12px] font-bold rounded-full">Whole Life (종신)</span>
+                        </td>
+                        <td class="px-6 py-4 font-body-md opacity-70 text-sm">2024.10.24 09:15</td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-2">
+                                <div class="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+                                <span class="text-sm font-medium">1차 의무심사 중</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <button class="px-4 py-1.5 bg-primary/10 text-primary hover:bg-primary hover:text-white rounded-full text-xs font-bold transition-all">상세보기</button>
+                        </td>
+                    </tr>
+                    <!-- Row 2 -->
+                    <tr class="hover:bg-white/40 transition-colors group">
+                        <td class="px-6 py-4 font-label-md text-primary">#APP-2024-002</td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-tertiary-container flex items-center justify-center text-on-tertiary-container font-bold text-xs">이</div>
+                                <span class="font-label-md">이영희</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="px-3 py-1 bg-secondary-container/50 text-secondary text-[12px] font-bold rounded-full">Critical Illness (CI)</span>
+                        </td>
+                        <td class="px-6 py-4 font-body-md opacity-70 text-sm">2024.10.24 10:30</td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-2">
+                                <div class="w-2 h-2 bg-on-surface-variant/40 rounded-full"></div>
+                                <span class="text-sm font-medium">서류 보완 대기</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <button class="px-4 py-1.5 bg-primary/10 text-primary hover:bg-primary hover:text-white rounded-full text-xs font-bold transition-all">상세보기</button>
+                        </td>
+                    </tr>
+                    <!-- Row 3 -->
+                    <tr class="hover:bg-white/40 transition-colors group">
+                        <td class="px-6 py-4 font-label-md text-primary">#APP-2024-003</td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center text-on-surface-variant font-bold text-xs">박</div>
+                                <span class="font-label-md">박지민</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="px-3 py-1 bg-primary-container/20 text-on-primary-container text-[12px] font-bold rounded-full">Auto (자동차)</span>
+                        </td>
+                        <td class="px-6 py-4 font-body-md opacity-70 text-sm">2024.10.24 11:45</td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-2">
+                                <div class="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+                                <span class="text-sm font-medium">최종 승인 대기</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <button class="px-4 py-1.5 bg-primary/10 text-primary hover:bg-primary hover:text-white rounded-full text-xs font-bold transition-all">상세보기</button>
+                        </td>
+                    </tr>
+                    <!-- Row 4 -->
+                    <tr class="hover:bg-white/40 transition-colors group">
+                        <td class="px-6 py-4 font-label-md text-primary">#APP-2024-004</td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-error-container flex items-center justify-center text-on-error-container font-bold text-xs">최</div>
+                                <span class="font-label-md">최유진</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="px-3 py-1 bg-primary/10 text-primary text-[12px] font-bold rounded-full">Whole Life (종신)</span>
+                        </td>
+                        <td class="px-6 py-4 font-body-md opacity-70 text-sm">2024.10.24 13:20</td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-2">
+                                <div class="w-2 h-2 bg-error rounded-full"></div>
+                                <span class="text-sm font-medium text-error">심사 부적격 검토</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <button class="px-4 py-1.5 bg-primary/10 text-primary hover:bg-primary hover:text-white rounded-full text-xs font-bold transition-all">상세보기</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!-- Pagination -->
+            <div class="p-6 bg-white/20 border-t border-white/20 flex justify-between items-center">
+                <p class="text-caption text-on-surface-variant">전체 128개 중 1-10개 표시 중</p>
+                <div class="flex items-center gap-2">
+                    <button class="w-10 h-10 flex items-center justify-center rounded-full border border-white/60 hover:bg-white/40 transition-colors">
+                        <span class="material-symbols-outlined">chevron_left</span>
+                    </button>
+                    <button class="w-10 h-10 flex items-center justify-center rounded-full bg-primary text-white font-bold">1</button>
+                    <button class="w-10 h-10 flex items-center justify-center rounded-full border border-white/60 hover:bg-white/40 transition-colors">2</button>
+                    <button class="w-10 h-10 flex items-center justify-center rounded-full border border-white/60 hover:bg-white/40 transition-colors">3</button>
+                    <span class="px-2">...</span>
+                    <button class="w-10 h-10 flex items-center justify-center rounded-full border border-white/60 hover:bg-white/40 transition-colors">13</button>
+                    <button class="w-10 h-10 flex items-center justify-center rounded-full border border-white/60 hover:bg-white/40 transition-colors">
+                        <span class="material-symbols-outlined">chevron_right</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Footer Spacing -->
+        <div class="h-12"></div>
+    </div>
+</main>
+<!-- Floating Action Button -->
+<button class="fixed bottom-8 right-8 w-16 h-16 bg-primary text-on-primary rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-50">
+    <span class="material-symbols-outlined text-[32px]">support_agent</span>
+</button>
+<script>
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        const menuIcon = document.querySelector('[onclick="toggleSidebar()"] span');
+
+        sidebar.classList.toggle('collapsed');
+
+        if (sidebar.classList.contains('collapsed')) {
+            mainContent.style.marginLeft = '80px';
+            menuIcon.textContent = 'menu';
+        } else {
+            mainContent.style.marginLeft = '256px';
+            menuIcon.textContent = 'menu_open';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log("Kindred Assurance Underwriting Queue Loaded");
+
+        // Subtle glass intensity hover for table rows
+        const rows = document.querySelectorAll('tbody tr');
+        rows.forEach(row => {
+            row.addEventListener('mouseenter', () => {
+                row.style.backgroundColor = 'rgba(255, 255, 255, 0.5)';
+            });
+            row.addEventListener('mouseleave', () => {
+                row.style.backgroundColor = '';
+            });
+        });
+    });
+</script>
+</body></html>

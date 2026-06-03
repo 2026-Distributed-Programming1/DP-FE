@@ -15,7 +15,7 @@ const MENU = [
     label: '납입·환급',
     icon: '💳',
     children: [
-      { label: '납부 내역 관리', to: '/payment-records', disabled: true },
+      { label: '납부 내역 관리', to: '/payment-records' },
       { label: '해지 관리', to: '/cancellations', disabled: true },
       { label: '환급 산출·지급', to: '/refunds', disabled: true },
     ],

@@ -1,0 +1,413 @@
+.page {
+  padding: 32px;
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.pageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #006c49;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.pageTitle {
+  font-size: 32px;
+  font-weight: 600;
+  color: #191c1e;
+}
+
+.pageSubtitle {
+  font-size: 16px;
+  color: #3c4a42;
+  margin-top: 4px;
+}
+
+.headerActions {
+  display: flex;
+  gap: 12px;
+}
+
+.btnPrimary {
+  padding: 8px 20px;
+  background: #006c49;
+  color: #fff;
+  border: none;
+  border-radius: 9999px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,108,73,0.2);
+}
+.btnPrimary:hover { opacity: 0.9; transform: scale(1.02); }
+
+.btnOutline {
+  padding: 8px 20px;
+  background: transparent;
+  color: #3c4a42;
+  border: 1px solid rgba(108,122,113,0.3);
+  border-radius: 9999px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btnOutline:hover { background: #fff; }
+
+/* Top Grid */
+.topGrid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+}
+
+.caseSummaryCard {
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.5);
+  border-radius: 1.5rem;
+  padding: 32px;
+  display: flex;
+  gap: 32px;
+  align-items: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.caseIcon {
+  font-size: 80px;
+  flex-shrink: 0;
+}
+
+.caseInfo {
+  flex: 1;
+}
+
+.sectionTitle {
+  font-size: 24px;
+  font-weight: 500;
+  color: #006c49;
+  margin-bottom: 16px;
+}
+
+.caseGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.fieldLabel {
+  font-size: 12px;
+  color: #3c4a42;
+  margin-bottom: 2px;
+}
+
+.fieldValue {
+  font-size: 14px;
+  font-weight: 600;
+  color: #191c1e;
+}
+
+.caseNote {
+  padding: 16px;
+  background: #eceef0;
+  border-radius: 1rem;
+  font-size: 15px;
+  color: #3c4a42;
+  line-height: 1.6;
+  font-style: italic;
+}
+
+.paymentCard {
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(0,108,73,0.15);
+  border-radius: 1.5rem;
+  padding: 32px;
+  background: rgba(0,108,73,0.05);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.paymentLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: #006c49;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 24px;
+}
+
+.paymentSub {
+  font-size: 12px;
+  color: #3c4a42;
+  margin-bottom: 4px;
+}
+
+.paymentAmount {
+  font-size: 28px;
+  font-weight: 700;
+  color: #191c1e;
+  margin-bottom: 32px;
+}
+
+.paymentBreakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.paymentRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 16px;
+  color: #191c1e;
+}
+
+.deduction {
+  font-size: 14px;
+  font-weight: 600;
+  color: #ba1a1a;
+}
+
+.paymentTotal {
+  padding-top: 12px;
+  border-top: 1px solid rgba(108,122,113,0.1);
+  font-weight: 700;
+}
+
+.totalAmount {
+  font-size: 22px;
+  font-weight: 800;
+  color: #006c49;
+}
+
+/* Fault */
+.faultCard {
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.5);
+  border-radius: 1.5rem;
+  padding: 32px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.faultHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.agreedBadge {
+  padding: 4px 16px;
+  background: #adedd3;
+  color: #2b6954;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.faultBars {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 600px;
+}
+
+.faultBar {}
+
+.faultBarLabel {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.faultPct { color: #006c49; }
+.faultPct2 { color: #2b6954; }
+
+.barTrack {
+  height: 16px;
+  background: #eceef0;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.barFill {
+  height: 100%;
+  border-radius: 9999px;
+}
+
+.barGreen { background: #006c49; }
+.barSecondary { background: #2b6954; }
+
+.faultNote {
+  margin-top: 24px;
+  padding: 16px;
+  background: rgba(255,255,255,0.5);
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 1rem;
+  font-size: 15px;
+  color: #191c1e;
+  line-height: 1.6;
+}
+
+/* Table */
+.tableCard {
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.5);
+  border-radius: 1.5rem;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.tableCardHeader {
+  padding: 24px 32px;
+  border-bottom: 1px solid rgba(108,122,113,0.1);
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.table thead {
+  background: #f2f4f6;
+  color: #3c4a42;
+}
+
+.table th {
+  padding: 16px 32px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.tableRow td {
+  padding: 24px 32px;
+  border-bottom: 1px solid rgba(0,0,0,0.04);
+}
+
+.tableRow:hover td { background: rgba(255,255,255,0.6); }
+
+.itemName {
+  font-size: 14px;
+  font-weight: 600;
+  color: #191c1e;
+}
+
+.itemSub {
+  font-size: 12px;
+  color: #3c4a42;
+  margin-top: 2px;
+}
+
+.boldCell {
+  font-weight: 700;
+  color: #191c1e;
+}
+
+.statusBadge {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge_green { background: rgba(0,108,73,0.1); color: #006c49; }
+.badge_secondary { background: #adedd3; color: #2b6954; }
+
+.tableFootnote {
+  padding: 16px 32px;
+  background: #fff;
+  font-size: 12px;
+  color: #3c4a42;
+}
+
+/* Logic Grid */
+.logicGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+.logicCard {
+  background: rgba(255,255,255,0.4);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 1.5rem;
+  padding: 24px;
+}
+
+.logicCardPrimary {
+  background: #006c49;
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(0,108,73,0.2);
+}
+
+.logicCardPrimary .logicLabel,
+.logicCardPrimary .logicAmount,
+.logicCardPrimary .logicNote {
+  color: #fff;
+}
+
+.logicLabel {
+  font-size: 12px;
+  color: #3c4a42;
+  margin-bottom: 8px;
+}
+
+.logicAmount {
+  font-size: 22px;
+  font-weight: 700;
+  color: #191c1e;
+}
+
+.logicNote {
+  font-size: 12px;
+  color: #6c7a71;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(108,122,113,0.1);
+}
+
+.logicCardPrimary .logicNote {
+  border-top: 1px solid rgba(255,255,255,0.2);
+}
+
+.amountRed { color: #ba1a1a; }
+
+@media (max-width: 1024px) {
+  .topGrid { grid-template-columns: 1fr; }
+  .logicGrid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 640px) {
+  .page { padding: 16px; }
+  .logicGrid { grid-template-columns: 1fr; }
+}

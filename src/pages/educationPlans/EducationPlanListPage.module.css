@@ -1,245 +1,428 @@
-.root {
-  display: flex;
-  gap: 0;
-  align-items: flex-start;
+.page {
+  padding: 32px;
+  max-width: 1280px;
+  margin: 0 auto;
 }
 
-.tableArea {
-  flex: 1;
-  min-width: 0;
-  background: #fff;
-  border-radius: 10px;
-  border: 1px solid #e5e7eb;
-  overflow: hidden;
-}
-
-.toolbar {
+.header {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  padding: 14px 20px;
-  border-bottom: 1px solid #e5e7eb;
-  background: #f9fafb;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-bottom: 32px;
 }
 
-.filters {
+.pageTitle {
+  font-size: 32px;
+  font-weight: 600;
+  color: #191c1e;
+  line-height: 1.2;
+}
+
+.pageSub {
+  font-size: 16px;
+  color: #3c4a42;
+  margin-top: 4px;
+}
+
+.headerStats {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.statPill {
+  background: rgba(255,255,255,0.6);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 9999px;
+  padding: 8px 20px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
-.filterLabel {
+.statPillLabel {
   font-size: 13px;
-  color: #6b7280;
-  font-weight: 500;
+  color: #3c4a42;
+  font-weight: 600;
 }
 
-.select {
-  padding: 6px 10px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 13px;
-  color: #374151;
-  background: #fff;
-  cursor: pointer;
+.statPillValue {
+  font-size: 16px;
+  font-weight: 700;
+  color: #191c1e;
 }
 
-.select:focus {
-  outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px #dbeafe;
+.statGreen { color: #006c49; }
+.statYellow { color: #c97a00; }
+
+/* Main Grid */
+.mainGrid {
+  display: grid;
+  grid-template-columns: 5fr 7fr;
+  gap: 24px;
+  align-items: start;
 }
 
-.totalCount {
-  font-size: 13px;
-  color: #6b7280;
+/* Left Column */
+.leftCol { display: flex; flex-direction: column; gap: 20px; }
+
+/* Glass Card base */
+.formCard, .filterCard, .planListCard, .scheduleCard, .attendanceCard {
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.5);
+  border-radius: 2rem;
+  padding: 24px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
 }
 
-.errorBox {
-  margin: 16px 20px;
+.cardTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: #191c1e;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Registration Form */
+.regForm { display: flex; flex-direction: column; gap: 16px; }
+
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+
+.label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #3f4943;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-left: 4px;
+}
+
+.input {
+  width: 100%;
+  background: #f2f4f6;
+  border: 1px solid #bbcabf;
+  border-radius: 0.75rem;
   padding: 12px 16px;
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: 6px;
-  font-size: 13px;
-  color: #dc2626;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  box-sizing: border-box;
+}
+.input:focus { border-color: #10b981; box-shadow: 0 0 0 2px rgba(16,185,129,0.1); }
+
+.inputRight { text-align: right; }
+
+.uploadArea {
+  border: 2px dashed #bbcabf;
+  border-radius: 0.75rem;
+  padding: 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.uploadArea:hover { border-color: #10b981; background: rgba(16,185,129,0.03); }
+
+.uploadIcon { font-size: 28px; display: block; margin-bottom: 8px; }
+.uploadText { font-size: 12px; color: #3f4943; }
+
+.regBtn {
+  width: 100%;
+  height: 52px;
+  background: #10b981;
+  color: #fff;
+  border: none;
+  border-radius: 0.75rem;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-top: 4px;
+}
+.regBtn:hover { opacity: 0.9; box-shadow: 0 4px 16px rgba(16,185,129,0.2); }
+
+/* Filter Card */
+.filterCard { padding: 16px 24px; }
+.filterSelect {
+  width: 100%;
+  background: #f2f4f6;
+  border: 1px solid #bbcabf;
+  border-radius: 0.75rem;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  margin-top: 8px;
 }
 
-.tableWrap { overflow-x: auto; }
+/* Plan List */
+.planList { display: flex; flex-direction: column; gap: 12px; }
+
+.planItem {
+  padding: 14px;
+  background: rgba(255,255,255,0.4);
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 1rem;
+  transition: background 0.1s;
+}
+.planItem:hover { background: rgba(255,255,255,0.7); }
+
+.planItemTop { margin-bottom: 6px; }
+
+.statusBadge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.statusDraft { background: #e6e8ea; color: #3c4a42; }
+.statusPending { background: #fef3c7; color: #c97a00; }
+.statusApproved { background: rgba(0,108,73,0.1); color: #006c49; }
+.statusRejected { background: #ffdad6; color: #ba1a1a; }
+
+.planItemTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: #191c1e;
+  margin-bottom: 4px;
+}
+
+.planItemMeta {
+  font-size: 12px;
+  color: #3c4a42;
+}
+
+.msg { text-align: center; padding: 24px; color: #6f7a72; font-size: 14px; }
+
+/* Right Column */
+.rightCol { display: flex; flex-direction: column; gap: 20px; }
+
+/* Schedule Card */
+.scheduleHeader { margin-bottom: 0; }
+
+.scheduleList { display: flex; flex-direction: column; gap: 12px; }
+
+.scheduleItem {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: #f2f4f6;
+  border-radius: 1rem;
+  border-left: 4px solid #bbcabf;
+  transition: box-shadow 0.15s;
+}
+.scheduleItem:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+
+.scheduleItemActive {
+  background: #f2f4f6;
+  border-left-color: #10b981;
+}
+
+.dateBadge {
+  width: 56px;
+  height: 56px;
+  background: #fff;
+  border-radius: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  flex-shrink: 0;
+}
+
+.dateBadgeActive { background: #fff; }
+
+.dateMon {
+  font-size: 10px;
+  font-weight: 700;
+  color: #3f4943;
+  text-transform: uppercase;
+}
+
+.dateDay {
+  font-size: 20px;
+  font-weight: 900;
+  color: #3f4943;
+  line-height: 1;
+}
+
+.dateDayActive { color: #10b981; }
+
+.scheduleContent { flex: 1; min-width: 0; }
+
+.scheduleTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: #191c1e;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 4px;
+}
+
+.scheduleMeta {
+  font-size: 12px;
+  color: #3f4943;
+  white-space: nowrap;
+}
+
+.scheduleBadge {
+  background: rgba(0,108,73,0.05);
+  color: #006c49;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Attendance */
+.attendanceCard { overflow: hidden; padding: 0; }
+
+.attendanceHeader {
+  padding: 20px 24px;
+  border-bottom: 1px solid #bbcabf;
+  background: #f2f4f6;
+}
+
+.attendanceHeader .cardTitle { margin-bottom: 0; }
 
 .table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
-}
-
-.table thead th {
-  padding: 10px 16px;
   text-align: left;
-  font-size: 12px;
-  font-weight: 600;
-  color: #6b7280;
-  background: #f9fafb;
-  border-bottom: 1px solid #e5e7eb;
-  white-space: nowrap;
 }
 
-.table tbody td {
-  padding: 12px 16px;
-  color: #374151;
-  border-bottom: 1px solid #f3f4f6;
-  white-space: nowrap;
+.table th {
+  padding: 14px 24px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #3f4943;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: #f2f4f6;
+  border-bottom: 1px solid #bbcabf;
 }
 
-.row { cursor: pointer; transition: background 0.1s; }
-.row:hover { background: #f8faff; }
-.selectedRow { background: #eff6ff !important; }
+.thRight { text-align: right; }
 
-.msgCell {
-  text-align: center;
-  color: #9ca3af;
-  padding: 48px 0 !important;
+.tableRow td {
+  padding: 16px 24px;
   font-size: 14px;
+  color: #191c1e;
+  border-bottom: 1px solid rgba(187,202,191,0.3);
+  transition: background 0.1s;
 }
+.tableRow:last-child td { border-bottom: none; }
+.tableRow:hover td { background: rgba(0,108,73,0.03); }
 
-.mono {
-  font-family: monospace;
-  font-size: 13px;
-  color: #2563eb;
-  font-weight: 600;
-}
+.attendeeCell { display: flex; align-items: center; gap: 12px; }
 
-/* Badge */
-.badge {
-  display: inline-block;
-  padding: 2px 10px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.badgeGreen  { background: #dcfce7; color: #166534; }
-.badgeYellow { background: #fef9c3; color: #854d0e; }
-.badgeRed    { background: #fee2e2; color: #991b1b; }
-.badgeGray   { background: #f3f4f6; color: #4b5563; }
-
-/* Detail panel */
-.panel {
-  width: 340px;
-  min-width: 340px;
-  background: #fff;
-  border-left: 1px solid #e5e7eb;
-  display: flex;
-  flex-direction: column;
-  height: calc(100vh - 56px);
-  position: sticky;
-  top: 56px;
-  overflow-y: auto;
-}
-
-.panelHeader {
+.attendeeAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(0,108,73,0.1);
+  color: #006c49;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 16px 20px;
-  border-bottom: 1px solid #e5e7eb;
-  background: #f9fafb;
-  position: sticky;
-  top: 0;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  flex-shrink: 0;
 }
 
-.panelTitle { font-size: 14px; font-weight: 700; color: #111827; }
+.attendeeName { font-size: 13px; font-weight: 700; color: #191c1e; }
+.attendeeEmail { font-size: 10px; color: #3f4943; margin-top: 1px; }
 
-.closeBtn {
+.tdDept { font-size: 13px; font-weight: 500; }
+
+.attendanceStatus {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.tdRight { text-align: right; }
+
+.checkBtns {
+  display: inline-flex;
+  border: 1px solid #bbcabf;
+  border-radius: 9999px;
+  overflow: hidden;
+  padding: 3px;
+  background: #f2f4f6;
+  gap: 2px;
+}
+
+.checkBtn {
+  padding: 4px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  border: none;
+  border-radius: 9999px;
+  background: transparent;
+  color: #3f4943;
+  cursor: pointer;
+  transition: all 0.1s;
+}
+
+.checkBtnActive {
+  background: #10b981;
+  color: #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+.checkBtnAbsent {
+  background: #ba1a1a;
+  color: #fff;
+}
+
+.attendanceFooter {
+  padding: 16px 24px;
+  background: #f2f4f6;
+  text-align: center;
+  border-top: 1px solid #bbcabf;
+}
+
+.viewAllBtn {
   background: none;
   border: none;
-  font-size: 16px;
-  color: #6b7280;
+  color: #10b981;
+  font-size: 13px;
+  font-weight: 700;
   cursor: pointer;
-  padding: 2px 6px;
-  border-radius: 4px;
+}
+.viewAllBtn:hover { text-decoration: underline; }
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .mainGrid { grid-template-columns: 1fr; }
 }
 
-.closeBtn:hover { background: #f3f4f6; }
-
-.panelBody { padding: 16px 20px; flex: 1; }
-
-.msg { text-align: center; color: #6b7280; font-size: 13px; padding: 24px 0; }
-.error { color: #dc2626; }
-
-.planNo {
-  font-size: 16px;
-  font-weight: 700;
-  color: #1e293b;
-  margin-bottom: 8px;
-  font-family: monospace;
-}
-
-.section { margin-bottom: 24px; }
-
-.sectionTitle {
-  font-size: 12px;
-  font-weight: 700;
-  color: #6b7280;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin: 0 0 10px;
-}
-
-.dl {
-  display: grid;
-  grid-template-columns: 64px 1fr;
-  gap: 8px 12px;
-  font-size: 13px;
-}
-
-.dl dt { color: #6b7280; font-weight: 500; }
-.dl dd { color: #111827; margin: 0; word-break: break-all; }
-
-.scheduleList {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.scheduleItem {
-  display: flex;
-  gap: 10px;
-  font-size: 13px;
-  background: #f3f4f6;
-  padding: 6px 10px;
-  border-radius: 6px;
-  color: #374151;
-}
-
-.scheduleDate {
-  color: #6b7280;
-  min-width: 90px;
-  font-size: 12px;
-}
-
-.actions {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-
-.actionBtn {
-  flex: 1;
-  padding: 8px 0;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  background: #f9fafb;
-  font-size: 13px;
-  color: #374151;
-  cursor: not-allowed;
-  opacity: 0.5;
-}
-
-.actionNote {
-  font-size: 11px;
-  color: #9ca3af;
+@media (max-width: 640px) {
+  .page { padding: 16px; }
+  .header { flex-direction: column; }
+  .row2 { grid-template-columns: 1fr; }
 }

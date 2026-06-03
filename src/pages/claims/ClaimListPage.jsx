@@ -5,6 +5,9 @@ function formatDate(iso) {
   return iso ? new Date(iso).toLocaleDateString('ko-KR') : '—';
 }
 
+/* ══════════════════════════════════
+   메인 페이지
+══════════════════════════════════ */
 export default function ClaimListPage() {
   const [items, setItems] = useState([]);
   const [total, setTotal] = useState(0);

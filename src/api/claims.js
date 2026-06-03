@@ -7,3 +7,7 @@ export function fetchClaims() {
 export function fetchClaim(claimNo) {
   return client.get(`/api/claims/${claimNo}`).then((r) => r.data);
 }
+
+export function submitClaimRequest(payload) {
+  return client.post('/api/claims', payload).then((r) => r.data);
+}

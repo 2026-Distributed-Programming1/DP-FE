@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>InsurFlow - 교육 제반 등록 시스템</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-tint": "#006c49",
+                        "secondary": "#2b6954",
+                        "on-surface": "#191c1e",
+                        "surface-container": "#eceef0",
+                        "tertiary-container": "#006c49",
+                        "on-tertiary-container": "#63f1b4",
+                        "error-container": "#ffdad6",
+                        "outline": "#6f7a72",
+                        "on-background": "#191c1e",
+                        "surface-container-lowest": "#ffffff",
+                        "on-error": "#ffffff",
+                        "surface-variant": "#e0e3e5",
+                        "surface-container-low": "#f2f4f6",
+                        "outline-variant": "#bec9c0",
+                        "secondary-container": "#b0f0d5",
+                        "secondary-fixed-dim": "#95d3ba",
+                        "on-tertiary-fixed": "#002113",
+                        "glass-border": "rgba(0, 108, 73, 0.08)",
+                        "glass-bg": "rgba(255, 255, 255, 0.75)",
+                        "on-primary-fixed-variant": "#005236",
+                        "on-secondary-fixed-variant": "#0b513d",
+                        "inverse-on-surface": "#eff1f3",
+                        "background": "#f7f9fb",
+                        "tertiary": "#005136",
+                        "tertiary-fixed": "#6ffbbe",
+                        "on-error-container": "#93000a",
+                        "surface-container-high": "#e6e8ea",
+                        "on-secondary-container": "#326f5a",
+                        "on-tertiary-fixed-variant": "#005236",
+                        "tertiary-fixed-dim": "#4edea3",
+                        "primary": "#005136",
+                        "primary-fixed-dim": "#81d8ad",
+                        "on-surface-variant": "#3f4943",
+                        "inverse-surface": "#2d3133",
+                        "primary-container": "#006c49",
+                        "inverse-primary": "#81d8ad",
+                        "on-primary-container": "#93eabe",
+                        "on-secondary": "#ffffff",
+                        "secondary-fixed": "#b0f0d5",
+                        "surface-bright": "#f7f9fb",
+                        "primary-fixed": "#9df4c8",
+                        "on-primary": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed": "#002113",
+                        "surface": "#f7f9fb",
+                        "surface-container-highest": "#e0e3e5",
+                        "on-secondary-fixed": "#002117",
+                        "error": "#ba1a1a",
+                        "surface-dim": "#d8dadc"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-max-width": "1280px",
+                        "margin-desktop": "40px",
+                        "margin-mobile": "16px",
+                        "gutter": "24px",
+                        "unit": "8px",
+                        "nav-height": "80px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "caption": ["Inter"],
+                        "label-md": ["Inter"],
+                        "display-lg": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #f7f9fb; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 108, 73, 0.08);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #bec9c0; border-radius: 10px; }
+    </style>
+</head>
+<body class="text-on-surface overflow-hidden">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-margin-desktop h-nav-height bg-surface/60 backdrop-blur-xl border-b border-white/40 dark:border-outline-variant/20 shadow-[0_4px_30px_rgba(0,0,0,0.1)]">
+<div class="flex items-center gap-8">
+<h1 class="font-headline-md text-headline-md font-bold text-primary">InsurFlow</h1>
+<nav class="hidden md:flex gap-6">
+<a class="text-on-surface-variant font-body-md hover:text-primary transition-colors" href="#">Dashboard</a>
+<a class="text-on-surface-variant font-body-md hover:text-primary transition-colors" href="#">Claims</a>
+<a class="text-primary font-bold relative after:content-[''] after:absolute after:-bottom-2 after:left-1/2 after:-translate-x-1/2 after:w-1 after:h-1 after:bg-primary after:rounded-full" href="#">Policy</a>
+<a class="text-on-surface-variant font-body-md hover:text-primary transition-colors" href="#">Sales</a>
+<a class="text-on-surface-variant font-body-md hover:text-primary transition-colors" href="#">HR</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center bg-surface-container rounded-full px-4 py-1.5 gap-2 border border-outline-variant/20">
+<span class="material-symbols-outlined text-outline">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-md w-48" placeholder="교육 검색..." type="text"/>
+</div>
+<button class="p-2 text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<img alt="User Profile" class="w-10 h-10 rounded-full border-2 border-primary-fixed-dim" data-alt="A professional headshot of a middle-aged male insurance executive wearing a sharp navy blue suit and a friendly, confident expression. The lighting is soft and studio-quality, emphasizing clarity and trust. The background is a clean, minimalist office setting with a bright, light-mode corporate aesthetic and emerald green accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTTayQYgNDEdOQCRjWbYsY3clZkBsBQlgTmARQt6KMhCMsCgm9OqzjooX3oh3Z-Tgxz87kp0nPzIqOIneTnGljnUCYHEH0Pd3V34qO9WswKPLTBJai6RAaWMPWo4JA430gq3suzJ8BqBSN5JSuGDiHSgpt9ZJFwTfyhFI1G38k45x-6tFxSttzBuqxqxxiNf3uVIIbKK1im-SiLRyBFqaPkcEl8uIIYuLWk6q56vME16WIy--Tw1X_bLRgoR9MUq3Qadwbl8xBAO8"/>
+</div>
+</header>
+<div class="flex h-screen pt-nav-height">
+<!-- Side Navigation Bar -->
+<aside class="w-64 bg-surface-container-low flex flex-col p-6 gap-2 border-r border-outline-variant/10">
+<div class="mb-6 flex items-center gap-3 px-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">school</span>
+<span class="font-label-md text-label-md text-primary uppercase tracking-wider">Education Admin</span>
+</div>
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-on-primary-container rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="font-body-md text-body-md">제반 등록</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-variant rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+<span class="font-body-md text-body-md">교육 일정</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-variant rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-body-md text-body-md">대상자 관리</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-variant rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-body-md text-body-md">결과 보고</span>
+</a>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 overflow-y-auto custom-scrollbar p-10 space-y-8">
+<!-- Hero Header with 3D Emoji -->
+<div class="flex justify-between items-end">
+<div>
+<div class="flex items-center gap-3 mb-2">
+<img alt="Education Icon" class="w-12 h-12 object-contain" src="https://lh3.googleusercontent.com/aida/AP1WRLvn7m6Qiah6dRgko3mcjvCyms1vXOVvDWsK-x9xeqsJG3-6x6dQK-6RWOT-MrQmETHAkx54O5Ipr0oeNkK0w43Scosw-hZZy4jPoowR2bDBO3so2vzrfjZtS9DcY1ul8n_qcI44jAks2LITKD_UFry6oE60zusApHM7wsD9tSBlAiE2Df7J4e1-M1KURqBTEHurV-Xias3DoiqvU_aCZfdQxoj63_uYs6bQjqcXVhTF9FN0a7SRUsU-Jw"/>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">교육 제반 등록</h2>
+</div>
+<p class="text-on-surface-variant font-body-md">승인된 교육 계획안의 상세 운영 제반 사항을 등록합니다.</p>
+</div>
+<div class="flex gap-3">
+<button class="px-6 py-2.5 rounded-full border border-outline-variant text-on-surface hover:bg-surface-variant transition-all font-label-md flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px]">close</span>
+                        취소
+                    </button>
+<button class="px-6 py-2.5 rounded-full bg-primary text-white hover:bg-surface-tint shadow-lg transition-all font-label-md flex items-center gap-2" onclick="showToast()">
+<span class="material-symbols-outlined text-[20px]">save</span>
+                        저장
+                    </button>
+<button class="px-6 py-2.5 rounded-full bg-secondary text-white hover:bg-primary-container shadow-lg transition-all font-label-md flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px]">play_arrow</span>
+                        교육 진행
+                    </button>
+</div>
+</div>
+<!-- 1. Search Section -->
+<section class="glass-panel p-8 rounded-lg">
+<h3 class="font-label-md text-label-md text-primary-container mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">search</span>
+                    교육 계획안 조회
+                </h3>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
+<div class="col-span-2 space-y-2">
+<label class="font-label-md text-on-surface-variant ml-1">교육명</label>
+<input class="w-full bg-white border border-outline-variant/30 rounded-full px-5 py-3 focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="조회할 교육명을 입력하세요" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="font-label-md text-on-surface-variant ml-1">교육 기간</label>
+<div class="relative">
+<input class="w-full bg-white border border-outline-variant/30 rounded-full pl-5 pr-10 py-3 focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="2024-05-01 ~ 2024-05-31" type="text"/>
+<span class="material-symbols-outlined absolute right-4 top-3 text-outline">calendar_today</span>
+</div>
+</div>
+<button class="bg-primary text-white px-8 py-3 rounded-full font-label-md hover:bg-surface-tint transition-all shadow-md">
+                        조회
+                    </button>
+</div>
+</section>
+<!-- 2. Table Section -->
+<section class="glass-panel p-0 rounded-lg overflow-hidden border border-outline-variant/20">
+<div class="p-6 border-b border-outline-variant/10 flex justify-between items-center bg-white/50">
+<h3 class="font-headline-md text-headline-md text-on-surface">승인된 교육 계획안 목록</h3>
+<span class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-caption font-label-md">총 4건</span>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="bg-surface-container-low border-b border-outline-variant/10">
+<tr>
+<th class="px-6 py-4 font-label-md text-outline uppercase tracking-wider">계획번호</th>
+<th class="px-6 py-4 font-label-md text-outline uppercase tracking-wider">교육명</th>
+<th class="px-6 py-4 font-label-md text-outline uppercase tracking-wider">교육기간</th>
+<th class="px-6 py-4 font-label-md text-outline uppercase tracking-wider">채널유형</th>
+<th class="px-6 py-4 font-label-md text-outline uppercase tracking-wider">대상자수</th>
+<th class="px-6 py-4 font-label-md text-outline uppercase tracking-wider">승인일시</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/5">
+<tr class="hover:bg-primary/5 cursor-pointer transition-colors group" onclick="activateDetails(this)">
+<td class="px-6 py-5 font-label-md text-primary">EDU-2024-001</td>
+<td class="px-6 py-5 font-body-md font-semibold text-on-surface">디지털 자산 연금 특화 과정</td>
+<td class="px-6 py-5 font-body-md text-on-surface-variant">2024.05.10 - 2024.05.12</td>
+<td class="px-6 py-5 font-body-md text-on-surface-variant">오프라인 집합</td>
+<td class="px-6 py-5 font-body-md text-on-surface-variant">45명</td>
+<td class="px-6 py-5 font-body-md text-on-surface-variant">2024.04.28 14:20</td>
+</tr>
+<tr class="hover:bg-primary/5 cursor-pointer transition-colors group bg-primary/5 border-l-4 border-primary" onclick="activateDetails(this)">
+<td class="px-6 py-5 font-label-md text-primary">EDU-2024-002</td>
+<td class="px-6 py-5 font-body-md font-semibold text-on-surface">신입 설계사 역량 강화 캠프</td>
+<td class="px-6 py-5 font-body-md text-on-surface-variant">2024.05.15 - 2024.05.19</td>
+<td class="px-6 py-5 font-body-md text-on-surface-variant">온/오프 혼합</td>
+<td class="px-6 py-5 font-body-md text-on-surface-variant">120명</td>
+<td class="px-6 py-5 font-body-md text-on-surface-variant">2024.05.02 09:15</td>
+</tr>
+<tr class="hover:bg-primary/5 cursor-pointer transition-colors group" onclick="activateDetails(this)">
+<td class="px-6 py-5 font-label-md text-primary">EDU-2024-003</td>
+<td class="px-6 py-5 font-body-md font-semibold text-on-surface">변액보험 판매 자격 보수 교육</td>
+<td class="px-6 py-5 font-body-md text-on-surface-variant">2024.05.20 - 2024.05.20</td>
+<td class="px-6 py-5 font-body-md text-on-surface-variant">온라인 실시간</td>
+<td class="px-6 py-5 font-body-md text-on-surface-variant">300명</td>
+<td class="px-6 py-5 font-body-md text-on-surface-variant">2024.05.05 16:45</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- 3. Details Registration Section -->
+<section class="glass-panel p-10 rounded-lg space-y-10 border-2 border-primary/20 bg-white/90 shadow-2xl transition-all" id="registration-form">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">edit_note</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface">교육 제반 등록 상세</h3>
+</div>
+<span class="text-caption text-error font-semibold">* 필수 입력 항목</span>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+<!-- Basic Info (Read Only Style) -->
+<div class="space-y-6">
+<div class="bg-surface-container-low p-6 rounded-lg border border-outline-variant/10 space-y-4">
+<h4 class="font-label-md text-outline uppercase tracking-widest border-b border-outline-variant/10 pb-2 mb-4">기본 교육 정보</h4>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<p class="text-caption text-on-surface-variant">교육명</p>
+<p class="font-body-md font-bold text-on-surface">신입 설계사 역량 강화 캠프</p>
+</div>
+<div>
+<p class="text-caption text-on-surface-variant">교육 기간</p>
+<p class="font-body-md text-on-surface">2024.05.15 - 2024.05.19</p>
+</div>
+<div>
+<p class="text-caption text-on-surface-variant">채널 유형</p>
+<p class="font-body-md text-on-surface">온/오프 혼합</p>
+</div>
+<div>
+<p class="text-caption text-on-surface-variant">대상자 수</p>
+<p class="font-body-md text-on-surface">120명</p>
+</div>
+</div>
+</div>
+<div class="space-y-4">
+<div class="space-y-2">
+<label class="font-label-md text-on-surface-variant flex items-center gap-1">교육 장소 <span class="text-error">*</span></label>
+<input class="w-full bg-white border border-outline-variant/30 rounded-lg px-5 py-3 focus:ring-2 focus:ring-primary focus:border-transparent" type="text" value="서울 본사 4층 컨퍼런스 홀 및 Zoom 온라인"/>
+</div>
+<div class="space-y-2">
+<label class="font-label-md text-on-surface-variant flex items-center gap-1">강사명 <span class="text-error">*</span></label>
+<div class="flex gap-2">
+<input class="flex-1 bg-white border border-outline-variant/30 rounded-lg px-5 py-3 focus:ring-2 focus:ring-primary focus:border-transparent" type="text" value="김이수 팀장, 박진철 수석강사"/>
+<button class="px-4 py-2 border border-primary text-primary rounded-lg font-label-md hover:bg-primary/5">검색</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Preparation Info -->
+<div class="space-y-6">
+<div class="space-y-2">
+<label class="font-label-md text-on-surface-variant flex items-center gap-1">교재 준비 현황 <span class="text-error">*</span></label>
+<select class="w-full bg-white border border-outline-variant/30 rounded-lg px-5 py-3 focus:ring-2 focus:ring-primary focus:border-transparent appearance-none">
+<option>교재 제작 완료 및 배부 대기</option>
+<option>제작 진행 중</option>
+<option>전자 교재(PDF) 배포 완료</option>
+</select>
+</div>
+<div class="space-y-2">
+<label class="font-label-md text-on-surface-variant flex items-center gap-1">교육 대상자 명단 첨부 <span class="text-error">*</span></label>
+<div class="border-2 border-dashed border-outline-variant/30 rounded-lg p-8 flex flex-col items-center justify-center gap-3 bg-surface-container-low/50 hover:bg-white transition-all cursor-pointer">
+<span class="material-symbols-outlined text-outline text-[40px]">upload_file</span>
+<div class="text-center">
+<p class="font-body-md text-on-surface">파일을 드래그하거나 클릭하여 업로드</p>
+<p class="text-caption text-outline">Excel, CSV 형식만 가능 (최대 10MB)</p>
+</div>
+<button class="mt-2 bg-secondary text-white px-5 py-2 rounded-full font-label-md hover:shadow-lg transition-all">파일 선택</button>
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-label-md text-on-surface-variant ml-1">기타 준비 사항 (선택)</label>
+<textarea class="w-full bg-white border border-outline-variant/30 rounded-lg px-5 py-3 focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="다과 준비, 기념품 세트 구성 등 상세 요청 사항" rows="3"></textarea>
+</div>
+</div>
+</div>
+<div class="pt-6 border-t border-outline-variant/10 flex justify-end gap-4">
+<button class="px-8 py-3 rounded-full border border-outline-variant text-on-surface hover:bg-surface-variant transition-all font-label-md">초기화</button>
+<button class="px-12 py-3 rounded-full bg-primary text-white hover:bg-surface-tint shadow-xl transition-all font-label-md scale-105" onclick="showToast()">등록 완료</button>
+</div>
+</section>
+</main>
+</div>
+<!-- Toast Notification -->
+<div class="fixed bottom-10 left-1/2 -translate-x-1/2 translate-y-20 opacity-0 bg-inverse-surface text-inverse-on-surface px-8 py-4 rounded-xl shadow-2xl flex items-center gap-4 transition-all duration-500 z-[100]" id="toast">
+<div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-[20px]">check</span>
+</div>
+<p class="font-body-md">교육 제반 등록이 완료되었습니다.</p>
+</div>
+<!-- Footer -->
+<footer class="fixed bottom-0 left-0 w-full py-6 px-margin-desktop flex flex-col md:flex-row justify-between items-center gap-4 bg-surface-container-lowest/40 backdrop-blur-md border-t border-white/20 z-40">
+<div class="font-label-md text-label-md font-bold text-on-surface">InsurFlow Enterprise</div>
+<div class="flex gap-6">
+<a class="text-outline font-caption text-caption hover:text-on-surface-variant transition-opacity opacity-80 hover:opacity-100" href="#">Privacy Policy</a>
+<a class="text-outline font-caption text-caption hover:text-on-surface-variant transition-opacity opacity-80 hover:opacity-100" href="#">Terms of Service</a>
+<a class="text-outline font-caption text-caption hover:text-on-surface-variant transition-opacity opacity-80 hover:opacity-100" href="#">Help Center</a>
+</div>
+<p class="text-outline font-caption text-caption opacity-80">© 2024 InsurFlow Enterprise. All rights reserved.</p>
+</footer>
+<script>
+        function activateDetails(row) {
+            // Remove active style from all rows
+            const rows = document.querySelectorAll('tbody tr');
+            rows.forEach(r => {
+                r.classList.remove('bg-primary/5', 'border-l-4', 'border-primary');
+            });
+
+            // Add active style to selected row
+            row.classList.add('bg-primary/5', 'border-l-4', 'border-primary');
+
+            // Subtle scroll effect to registration form
+            const form = document.getElementById('registration-form');
+            form.scrollIntoView({ behavior: 'smooth', block: 'end' });
+
+            // Visual highlight of the form
+            form.classList.add('ring-4', 'ring-primary/20');
+            setTimeout(() => {
+                form.classList.remove('ring-4', 'ring-primary/20');
+            }, 1000);
+        }
+
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 3000);
+        }
+    </script>
+</body></html>

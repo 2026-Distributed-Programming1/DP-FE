@@ -54,8 +54,8 @@ const MENU = [
     icon: '🎓',
     children: [
       { label: '교육 계획', to: '/education-plans' },
-      { label: '교육 제반', to: '/education-preparations', disabled: true },
-      { label: '교육 실행', to: '/education-executions', disabled: true },
+      { label: '교육 제반', to: '/education-preparations' },
+      { label: '교육 실행', to: '/education-executions' },
     ],
   },
   {

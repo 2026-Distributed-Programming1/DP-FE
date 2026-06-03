@@ -15,6 +15,8 @@ import UnderwritingDashboardPage from './pages/underwriting/UnderwritingDashboar
 import InterviewSchedulePage from './pages/interviewSchedules/InterviewSchedulePage';
 import ChannelRecruitmentPage from './pages/channelRecruitments/ChannelRecruitmentPage';
 import InsuranceProductPage from './pages/insuranceProducts/InsuranceProductPage';
+import EducationPreparationPage from './pages/educationPlans/EducationPreparationPage';
+import EducationExecutionPage from './pages/educationPlans/EducationExecutionPage';
 import LoginPage from './pages/auth/LoginPage';
 
 function PrivateRoute({ user, children }) {
@@ -89,6 +91,14 @@ export default function App() {
         <Route
           path="/insurance-products"
           element={<PrivateRoute user={user}><InsuranceProductPage /></PrivateRoute>}
+        />
+        <Route
+          path="/education-preparations"
+          element={<PrivateRoute user={user}><EducationPreparationPage /></PrivateRoute>}
+        />
+        <Route
+          path="/education-executions"
+          element={<PrivateRoute user={user}><EducationExecutionPage /></PrivateRoute>}
         />
       </Routes>
     </BrowserRouter>

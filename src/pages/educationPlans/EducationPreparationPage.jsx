@@ -1,142 +1,274 @@
-import { useState, useEffect, useCallback } from 'react';
-import { fetchEducationPreparations, createEducationPreparation } from '../../api/educationPreparations';
+import { useEffect, useRef, useState } from 'react';
 import { fetchEducationPlans } from '../../api/educationPlans';
+import Layout from '../../components/layout/Layout';
+import styles from './EducationPreparationPage.module.css';
 
-function NewModal({ onClose, onCreated }) {
-  const [plans, setPlans] = useState([]);
-  const [form, setForm] = useState({ planNo: '', instructorName: '', venue: '', textbookStatus: '', additionalNotice: '', attendees: '' });
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState('');
-  const set = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.value }));
-
-  useEffect(() => {
-    fetchEducationPlans({ status: 'APPROVED', size: 100 })
-      .then(d => setPlans(d.items ?? []))
-      .catch(() => {});
-  }, []);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSubmitting(true);
-    try {
-      await createEducationPreparation({
-        ...form,
-        attendees: form.attendees.split(',').map(s => s.trim()).filter(Boolean),
-      });
-      onCreated();
-    } catch { setError('등록에 실패했습니다.'); } finally { setSubmitting(false); }
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm px-4">
-      <div className="card w-full max-w-md p-6 space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-on-surface">교육 제반 등록</h3>
-          <button onClick={onClose} className="btn-ghost p-1"><span className="material-symbols-outlined text-[20px]">close</span></button>
-        </div>
-        <form onSubmit={handleSubmit} className="space-y-3">
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-on-surface-variant">교육 계획 (승인된 것만) *</label>
-            <select className="input text-sm" value={form.planNo} onChange={set('planNo')} required>
-              <option value="">선택하세요</option>
-              {plans.map(p => <option key={p.planNo} value={p.planNo}>{p.educationName} ({p.planNo})</option>)}
-            </select>
-          </div>
-          {[['강사명', 'instructorName', ''], ['교육 장소', 'venue', ''], ['교재 준비 현황', 'textbookStatus', '예: 인쇄 완료'], ['기타 준비 사항', 'additionalNotice', '선택']].map(([label, k, ph]) => (
-            <div key={k} className="space-y-1.5">
-              <label className="text-xs font-semibold text-on-surface-variant">{label}</label>
-              <input className="input text-sm" placeholder={ph} value={form[k]} onChange={set(k)} required={!ph.includes('선택')} />
-            </div>
-          ))}
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-on-surface-variant">대상자 명단 (쉼표 구분)</label>
-            <input className="input text-sm" placeholder="홍설계사, 김설계사" value={form.attendees} onChange={set('attendees')} />
-          </div>
-          {error && <p className="text-xs text-error">{error}</p>}
-          <div className="flex gap-2 pt-1">
-            <button type="button" className="btn-secondary flex-1" onClick={onClose}>취소</button>
-            <button type="submit" className="btn-primary flex-1" disabled={submitting}>{submitting ? '등록 중...' : '등록'}</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-}
+const MATERIAL_OPTIONS = [
+  '교재 제작 완료 및 배부 대기',
+  '제작 진행 중',
+  '전자 교재(PDF) 배포 완료',
+];
 
 export default function EducationPreparationPage() {
-  const [items, setItems] = useState([]);
-  const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(1);
+  const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [showNew, setShowNew] = useState(false);
+  const [searchName, setSearchName] = useState('');
+  const [searchPeriod, setSearchPeriod] = useState('');
+  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [venue, setVenue] = useState('');
+  const [instructor, setInstructor] = useState('');
+  const [materialStatus, setMaterialStatus] = useState(MATERIAL_OPTIONS[0]);
+  const [notes, setNotes] = useState('');
+  const [toast, setToast] = useState(false);
+  const formRef = useRef(null);
 
-  const load = useCallback(async () => {
+  useEffect(() => {
     setLoading(true);
-    try {
-      const d = await fetchEducationPreparations({ page, size: 20 });
-      setItems(d.items ?? []);
-      setTotal(d.total ?? 0);
-    } catch { } finally { setLoading(false); }
-  }, [page]);
+    fetchEducationPlans({ status: '승인' })
+      .then((data) => setPlans(Array.isArray(data) ? data : (data?.items ?? data?.content ?? [])))
+      .catch(() => setPlans([]))
+      .finally(() => setLoading(false));
+  }, []);
 
-  useEffect(() => { load(); }, [load]);
-  const totalPages = Math.max(1, Math.ceil(total / 20));
+  function handleSearch(e) {
+    e.preventDefault();
+    setLoading(true);
+    fetchEducationPlans({ status: '승인' })
+      .then((data) => {
+        let items = Array.isArray(data) ? data : (data?.items ?? data?.content ?? []);
+        if (searchName) items = items.filter((p) => (p.educationName ?? p.title ?? '').includes(searchName));
+        setPlans(items);
+      })
+      .catch(() => setPlans([]))
+      .finally(() => setLoading(false));
+  }
+
+  function handleSelectPlan(plan) {
+    setSelectedPlan(plan);
+    setVenue('');
+    setInstructor('');
+    setMaterialStatus(MATERIAL_OPTIONS[0]);
+    setNotes('');
+    setTimeout(() => formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+  }
+
+  function handleSave() {
+    setToast(true);
+    setTimeout(() => setToast(false), 3000);
+  }
+
+  function handleReset() {
+    setVenue('');
+    setInstructor('');
+    setMaterialStatus(MATERIAL_OPTIONS[0]);
+    setNotes('');
+  }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-on-surface">교육 제반</h1>
-          <p className="text-sm text-on-surface-variant mt-0.5">총 {total}건</p>
+    <Layout title="교육 제반 등록">
+      <div className={styles.page}>
+        {/* Hero */}
+        <div className={styles.hero}>
+          <div>
+            <div className={styles.heroTitle}>
+              <span className={styles.heroIcon}>🎓</span>
+              <h2 className={styles.title}>교육 제반 등록</h2>
+            </div>
+            <p className={styles.subtitle}>승인된 교육 계획안의 상세 운영 제반 사항을 등록합니다.</p>
+          </div>
+          <div className={styles.actions}>
+            <button className={styles.btnOutline} onClick={() => setSelectedPlan(null)}>✕ 취소</button>
+            <button className={styles.btnPrimary} onClick={handleSave}>💾 저장</button>
+            <button className={styles.btnSecondary}>▶ 교육 진행</button>
+          </div>
         </div>
-        <button onClick={() => setShowNew(true)} className="btn-primary flex items-center gap-1.5">
-          <span className="material-symbols-outlined text-[16px]">add</span>등록
-        </button>
-      </div>
 
-      {loading ? (
-        <div className="flex justify-center py-16"><div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" /></div>
-      ) : items.length === 0 ? (
-        <div className="card flex flex-col items-center justify-center py-16 gap-3 text-on-surface-variant">
-          <span className="material-symbols-outlined text-4xl text-outline">checklist</span>
-          <p className="text-sm">등록된 교육 제반이 없습니다.</p>
-        </div>
-      ) : (
-        <div className="card overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-outline-variant/50 bg-surface-container-low">
-                {['제반번호', '계획번호', '강사', '장소', '교재 현황', '상태'].map(h => (
-                  <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-on-surface-variant">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {items.map(item => (
-                <tr key={item.prepNo} className="border-b border-outline-variant/30 hover:bg-surface-container-low">
-                  <td className="px-4 py-3 font-mono text-xs text-primary">{item.prepNo}</td>
-                  <td className="px-4 py-3 text-on-surface-variant text-xs">{item.planNo}</td>
-                  <td className="px-4 py-3 font-medium text-on-surface">{item.instructorName}</td>
-                  <td className="px-4 py-3 text-on-surface-variant">{item.venue}</td>
-                  <td className="px-4 py-3 text-on-surface-variant text-xs">{item.textbookStatus}</td>
-                  <td className="px-4 py-3"><span className="badge bg-primary-container/20 text-primary text-[11px]">{item.status ?? '준비중'}</span></td>
+        {/* Search */}
+        <section className={styles.glassPanel}>
+          <h3 className={styles.sectionTitle}>🔍 교육 계획안 조회</h3>
+          <form className={styles.searchFields} onSubmit={handleSearch}>
+            <div className={styles.fieldGroup}>
+              <label className={styles.label}>교육명</label>
+              <input
+                className={styles.inputRound}
+                type="text"
+                placeholder="조회할 교육명을 입력하세요"
+                value={searchName}
+                onChange={(e) => setSearchName(e.target.value)}
+              />
+            </div>
+            <div className={styles.fieldGroup}>
+              <label className={styles.label}>교육 기간</label>
+              <input
+                className={styles.inputRound}
+                type="text"
+                placeholder="2024-05-01 ~ 2024-05-31"
+                value={searchPeriod}
+                onChange={(e) => setSearchPeriod(e.target.value)}
+              />
+            </div>
+            <button className={styles.btnSearch} type="submit">조회</button>
+          </form>
+        </section>
+
+        {/* Table */}
+        <section className={styles.tablePanel}>
+          <div className={styles.tableHeader}>
+            <h3 className={styles.tableTitle}>승인된 교육 계획안 목록</h3>
+            <span className={styles.countBadge}>총 {plans.length}건</span>
+          </div>
+          <div className={styles.tableWrapper}>
+            <table className={styles.table}>
+              <thead>
+                <tr>
+                  <th>계획번호</th>
+                  <th>교육명</th>
+                  <th>교육기간</th>
+                  <th>채널유형</th>
+                  <th>대상자수</th>
+                  <th>승인일시</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+              </thead>
+              <tbody>
+                {loading && (
+                  <tr><td colSpan={6} className={styles.msg}>불러오는 중…</td></tr>
+                )}
+                {!loading && plans.length === 0 && (
+                  <tr><td colSpan={6} className={styles.msg}>승인된 교육 계획이 없습니다.</td></tr>
+                )}
+                {!loading && plans.map((plan) => (
+                  <tr
+                    key={plan.planNo}
+                    className={`${styles.tableRow} ${selectedPlan?.planNo === plan.planNo ? styles.tableRowActive : ''}`}
+                    onClick={() => handleSelectPlan(plan)}
+                  >
+                    <td className={styles.planNo}>{plan.planNo ?? '-'}</td>
+                    <td className={styles.planName}>{plan.educationName ?? plan.title ?? '-'}</td>
+                    <td>{plan.startDate ?? '-'} - {plan.endDate ?? '-'}</td>
+                    <td>{plan.channelType ?? '-'}</td>
+                    <td>{plan.targetCount != null ? `${plan.targetCount}명` : '-'}</td>
+                    <td>{plan.approvedAt ?? plan.approvalDate ?? '-'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
 
-      {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-1">
-          <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="btn-ghost p-1.5 disabled:opacity-30"><span className="material-symbols-outlined text-[18px]">chevron_left</span></button>
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
-            <button key={p} onClick={() => setPage(p)} className={`w-8 h-8 rounded-lg text-sm font-medium ${p === page ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:bg-surface-container'}`}>{p}</button>
-          ))}
-          <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="btn-ghost p-1.5 disabled:opacity-30"><span className="material-symbols-outlined text-[18px]">chevron_right</span></button>
-        </div>
-      )}
-      {showNew && <NewModal onClose={() => setShowNew(false)} onCreated={() => { setShowNew(false); load(); }} />}
-    </div>
+        {/* Registration Form */}
+        {selectedPlan && (
+          <section className={styles.formPanel} ref={formRef}>
+            <div className={styles.formHeader}>
+              <div className={styles.formTitleGroup}>
+                <div className={styles.formIconWrap}>✏️</div>
+                <h3 className={styles.formTitle}>교육 제반 등록 상세</h3>
+              </div>
+              <span className={styles.requiredNote}>* 필수 입력 항목</span>
+            </div>
+
+            <div className={styles.formGrid}>
+              <div className={styles.leftCol}>
+                <div className={styles.infoBox}>
+                  <p className={styles.infoBoxTitle}>기본 교육 정보</p>
+                  <div className={styles.infoGrid}>
+                    <div>
+                      <p className={styles.infoLabel}>교육명</p>
+                      <p className={styles.infoValue}>{selectedPlan.educationName ?? selectedPlan.title ?? '-'}</p>
+                    </div>
+                    <div>
+                      <p className={styles.infoLabel}>교육 기간</p>
+                      <p className={styles.infoValue}>{selectedPlan.startDate ?? '-'} - {selectedPlan.endDate ?? '-'}</p>
+                    </div>
+                    <div>
+                      <p className={styles.infoLabel}>채널 유형</p>
+                      <p className={styles.infoValue}>{selectedPlan.channelType ?? '-'}</p>
+                    </div>
+                    <div>
+                      <p className={styles.infoLabel}>대상자 수</p>
+                      <p className={styles.infoValue}>{selectedPlan.targetCount != null ? `${selectedPlan.targetCount}명` : '-'}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className={styles.fieldGroup}>
+                  <label className={styles.labelReq}>교육 장소 <span className={styles.reqStar}>*</span></label>
+                  <input
+                    className={styles.inputBox}
+                    type="text"
+                    placeholder="교육 장소를 입력하세요"
+                    value={venue}
+                    onChange={(e) => setVenue(e.target.value)}
+                  />
+                </div>
+
+                <div className={styles.fieldGroup}>
+                  <label className={styles.labelReq}>강사명 <span className={styles.reqStar}>*</span></label>
+                  <div className={styles.inputRow}>
+                    <input
+                      className={styles.inputBox}
+                      type="text"
+                      placeholder="강사명을 입력하세요"
+                      value={instructor}
+                      onChange={(e) => setInstructor(e.target.value)}
+                    />
+                    <button className={styles.btnInlineSearch} type="button">검색</button>
+                  </div>
+                </div>
+              </div>
+
+              <div className={styles.rightCol}>
+                <div className={styles.fieldGroup}>
+                  <label className={styles.labelReq}>교재 준비 현황 <span className={styles.reqStar}>*</span></label>
+                  <select
+                    className={styles.selectBox}
+                    value={materialStatus}
+                    onChange={(e) => setMaterialStatus(e.target.value)}
+                  >
+                    {MATERIAL_OPTIONS.map((opt) => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className={styles.fieldGroup}>
+                  <label className={styles.labelReq}>교육 대상자 명단 첨부 <span className={styles.reqStar}>*</span></label>
+                  <div className={styles.uploadArea}>
+                    <span className={styles.uploadIcon}>📤</span>
+                    <div className={styles.uploadTextWrap}>
+                      <p className={styles.uploadText}>파일을 드래그하거나 클릭하여 업로드</p>
+                      <p className={styles.uploadSub}>Excel, CSV 형식만 가능 (최대 10MB)</p>
+                    </div>
+                    <button className={styles.uploadBtn} type="button">파일 선택</button>
+                  </div>
+                </div>
+
+                <div className={styles.fieldGroup}>
+                  <label className={styles.label}>기타 준비 사항 (선택)</label>
+                  <textarea
+                    className={styles.textarea}
+                    placeholder="다과 준비, 기념품 세트 구성 등 상세 요청 사항"
+                    rows={3}
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.formFooter}>
+              <button className={styles.btnReset} type="button" onClick={handleReset}>초기화</button>
+              <button className={styles.btnComplete} type="button" onClick={handleSave}>등록 완료</button>
+            </div>
+          </section>
+        )}
+
+        {toast && (
+          <div className={styles.toast}>
+            <div className={styles.toastIcon}>✓</div>
+            <p>교육 제반 등록이 완료되었습니다.</p>
+          </div>
+        )}
+      </div>
+    </Layout>
   );
 }

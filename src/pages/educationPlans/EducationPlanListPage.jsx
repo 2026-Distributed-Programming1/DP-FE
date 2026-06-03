@@ -1,350 +1,212 @@
-import { useState, useEffect, useCallback } from 'react';
-import { fetchEducationPlans, createEducationPlan, approveEducationPlan, rejectEducationPlan, PLAN_STATUS_LABEL } from '../../api/educationPlans';
+import { useEffect, useState } from 'react';
+import { fetchEducationPlans } from '../../api/educationPlans';
+import Layout from '../../components/layout/Layout';
+import styles from './EducationPlanListPage.module.css';
 
-function formatDate(iso) {
-  return iso ? new Date(iso).toLocaleDateString('ko-KR') : '—';
-}
+const EDU_STATUSES = [
+  { value: '', label: '전체' },
+  { value: '임시저장', label: '임시저장' },
+  { value: '승인요청', label: '승인요청' },
+  { value: '승인', label: '승인' },
+  { value: '반려', label: '반려' },
+];
 
-function DetailPanel({ item, onAction }) {
-  const [rejectReason, setRejectReason] = useState('');
-  const [showReject, setShowReject] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState('');
+const ATTENDANCE_STATUS = {
+  attending: { label: '참여 중', color: '#10b981' },
+  late: { label: '지각', color: '#f59e0b' },
+  absent: { label: '미참석', color: '#94a3b8' },
+};
 
-  useEffect(() => {
-    setShowReject(false);
-    setRejectReason('');
-    setError('');
-  }, [item]);
+const STATUS_CLASS = {
+  '임시저장': 'statusDraft',
+  '승인요청': 'statusPending',
+  '승인': 'statusApproved',
+  '반려': 'statusRejected',
+};
 
-  if (!item)
-    return (
-      <div className='card h-full flex flex-col items-center justify-center gap-3 text-on-surface-variant p-8'>
-        <span className='material-symbols-outlined text-4xl text-outline'>school</span>
-        <p className='text-sm'>교육 계획을 선택하면 상세 정보가 표시됩니다.</p>
-      </div>
-    );
+const MOCK_UPCOMING = [
+  { month: '10월', day: '12', title: '신입 사원 온보딩 기술 교육', time: '오전 10:00 - 오후 04:00 • 대회의실 A', active: true },
+  { month: '10월', day: '15', title: '보험 심사 리스크 관리 심화 과정', time: '오후 02:00 - 오후 05:00 • 온라인 교육', active: false },
+];
 
-  const st = PLAN_STATUS_LABEL[item.status] ?? { label: item.status, cls: 'bg-surface-container text-outline' };
-
-  const handleApprove = async () => {
-    setSubmitting(true);
-    try {
-      await approveEducationPlan(item.planNo);
-      onAction();
-    } catch {
-      setError('승인에 실패했습니다.');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleReject = async (e) => {
-    e.preventDefault();
-    setSubmitting(true);
-    try {
-      await rejectEducationPlan(item.planNo, rejectReason);
-      onAction();
-    } catch {
-      setError('반려에 실패했습니다.');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  return (
-    <div className='card flex flex-col overflow-hidden'>
-      <div className='p-5 border-b border-outline-variant/50 bg-surface-container-low'>
-        <span className={`badge ${st.cls}`}>{st.label}</span>
-        <h3 className='font-bold text-on-surface mt-2'>{item.educationName}</h3>
-        <p className='text-xs text-outline mt-0.5'>{item.planNo}</p>
-      </div>
-      <div className='p-5 border-b border-outline-variant/50 space-y-3'>
-        {[
-          { label: '강사명', value: item.trainerName },
-          { label: '채널 유형', value: item.channelType === 'DESIGNER' ? '설계사' : '대리점' },
-          { label: '교육 기간', value: `${item.startDate} ~ ${item.endDate}` },
-          { label: '대상 인원', value: `${item.targetCount}명` },
-          { label: '예산', value: item.budget ? `${item.budget.toLocaleString()}원` : '—' },
-          { label: '교육 목표', value: item.educationGoal },
-        ].map(({ label, value }) => (
-          <div key={label} className='flex justify-between text-sm'>
-            <span className='text-on-surface-variant'>{label}</span>
-            <span className='font-medium text-on-surface text-right max-w-[60%]'>{value ?? '—'}</span>
-          </div>
-        ))}
-        {item.educationContent && (
-          <div className='pt-2 border-t border-outline-variant/30'>
-            <p className='text-xs text-on-surface-variant mb-1'>교육 내용</p>
-            <p className='text-sm text-on-surface leading-relaxed'>{item.educationContent}</p>
-          </div>
-        )}
-      </div>
-      {item.status === 'UNDER_REVIEW' && (
-        <div className='p-5 space-y-3'>
-          {!showReject ? (
-            <div className='flex gap-2'>
-              <button onClick={handleApprove} disabled={submitting} className='flex-1 bg-primary text-on-primary py-2 rounded-lg text-sm font-semibold'>
-                승인
-              </button>
-              <button onClick={() => setShowReject(true)} className='flex-1 bg-error/10 text-error py-2 rounded-lg text-sm font-semibold'>
-                반려
-              </button>
-            </div>
-          ) : (
-            <form onSubmit={handleReject} className='space-y-2'>
-              <textarea className='input resize-none text-sm' rows={3} placeholder='반려 사유...' value={rejectReason} onChange={(e) => setRejectReason(e.target.value)} required />
-              <div className='flex gap-2'>
-                <button type='button' className='btn-ghost flex-1' onClick={() => setShowReject(false)}>
-                  취소
-                </button>
-                <button type='submit' disabled={submitting} className='flex-1 bg-error text-on-error py-2 rounded-lg text-sm font-semibold'>
-                  반려
-                </button>
-              </div>
-            </form>
-          )}
-          {error && <p className='text-xs text-error'>{error}</p>}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function NewPlanModal({ onClose, onCreated }) {
-  const [form, setForm] = useState({
-    trainerName: '',
-    educationName: '',
-    channelType: 'DESIGNER',
-    startDate: '',
-    endDate: '',
-    targetCount: '',
-    budget: '',
-    educationGoal: '',
-    educationContent: '',
-    textbookList: '',
-    action: '',
-  });
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState('');
-  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
-
-  const handleSubmit = async (e, action) => {
-    e.preventDefault();
-    setSubmitting(true);
-    try {
-      await createEducationPlan({ ...form, targetCount: Number(form.targetCount), budget: Number(form.budget), action });
-      onCreated();
-    } catch {
-      setError('등록에 실패했습니다.');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  return (
-    <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm px-4'>
-      <div className='card w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 space-y-4'>
-        <div className='flex items-center justify-between'>
-          <h3 className='font-semibold text-on-surface'>교육 계획 작성</h3>
-          <button onClick={onClose} className='btn-ghost p-1'>
-            <span className='material-symbols-outlined text-[20px]'>close</span>
-          </button>
-        </div>
-        <form className='grid grid-cols-2 gap-3'>
-          {[
-            ['교육명', 'educationName', 'col-span-2'],
-            ['강사명', 'trainerName', ''],
-            ['대상 인원', 'targetCount', ''],
-            ['예산(원)', 'budget', ''],
-            ['시작일', 'startDate', ''],
-            ['종료일', 'endDate', ''],
-          ].map(([label, key, span]) => (
-            <div key={key} className={`space-y-1.5 ${span}`}>
-              <label className='text-xs font-semibold text-on-surface-variant'>{label}</label>
-              <input
-                type={key.includes('Date') ? 'date' : key.includes('Count') || key.includes('budget') ? 'number' : 'text'}
-                className='input text-sm'
-                value={form[key]}
-                onChange={set(key)}
-                required
-              />
-            </div>
-          ))}
-          <div className='space-y-1.5 col-span-2'>
-            <label className='text-xs font-semibold text-on-surface-variant'>채널 유형</label>
-            <select className='input text-sm' value={form.channelType} onChange={set('channelType')}>
-              <option value='DESIGNER'>설계사</option>
-              <option value='AGENCY'>대리점</option>
-            </select>
-          </div>
-          <div className='space-y-1.5 col-span-2'>
-            <label className='text-xs font-semibold text-on-surface-variant'>교육 목표</label>
-            <textarea className='input resize-none text-sm' rows={2} value={form.educationGoal} onChange={set('educationGoal')} required />
-          </div>
-          <div className='space-y-1.5 col-span-2'>
-            <label className='text-xs font-semibold text-on-surface-variant'>교육 내용</label>
-            <textarea className='input resize-none text-sm' rows={2} value={form.educationContent} onChange={set('educationContent')} required />
-          </div>
-          {error && <p className='col-span-2 text-xs text-error'>{error}</p>}
-          <button type='button' className='btn-secondary' onClick={onClose}>
-            취소
-          </button>
-          <button type='button' className='btn-ghost border border-outline-variant' disabled={submitting} onClick={(e) => handleSubmit(e, '')}>
-            임시저장
-          </button>
-          <button type='button' className='btn-primary col-span-2' disabled={submitting} onClick={(e) => handleSubmit(e, 'REQUEST_APPROVAL')}>
-            승인 요청
-          </button>
-        </form>
-      </div>
-    </div>
-  );
-}
+const MOCK_ATTENDEES = [
+  { name: '김민준', dept: '영업 지원팀', status: 'attending' },
+  { name: '이서연', dept: '리스크 심사팀', status: 'late' },
+  { name: '박지훈', dept: '고객 만족센터', status: 'absent' },
+];
 
 export default function EducationPlanListPage() {
-  const [items, setItems] = useState([]);
-  const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState('');
+  const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [selected, setSelected] = useState(null);
-  const [showNew, setShowNew] = useState(false);
-
-  const load = useCallback(async () => {
-    setLoading(true);
-    try {
-      const data = await fetchEducationPlans({ status: statusFilter, page, size: 20 });
-      setItems(data.items ?? []);
-      setTotal(data.total ?? 0);
-    } catch {
-    } finally {
-      setLoading(false);
-    }
-  }, [statusFilter, page]);
+  const [showModal, setShowModal] = useState(false);
+  const [form, setForm] = useState({ title: '', startDate: '', budget: '' });
 
   useEffect(() => {
-    load();
-  }, [load]);
-  const totalPages = Math.max(1, Math.ceil(total / 20));
+    setLoading(true);
+    fetchEducationPlans({ status: statusFilter })
+      .then((data) => setItems(Array.isArray(data) ? data : (data?.items ?? data?.content ?? [])))
+      .catch(() => setItems([]))
+      .finally(() => setLoading(false));
+  }, [statusFilter]);
+
+  function handleChange(field) {
+    return (e) => setForm((prev) => ({ ...prev, [field]: e.target.value }));
+  }
+
+  const approvedCount = items.filter((i) => i.status === '승인').length;
+  const pendingCount = items.filter((i) => i.status === '승인요청').length;
 
   return (
-    <div className='space-y-6'>
-      <div className='flex items-center justify-between'>
-        <div>
-          <h1 className='text-xl font-bold text-on-surface'>교육 계획</h1>
-          <p className='text-sm text-on-surface-variant mt-0.5'>총 {total}건</p>
-        </div>
-        <div className='flex items-center gap-2'>
-          <div className='flex gap-1'>
-            {[
-              { v: '', l: '전체' },
-              { v: 'TEMP_SAVE', l: '임시저장' },
-              { v: 'UNDER_REVIEW', l: '승인요청' },
-              { v: 'APPROVED', l: '승인' },
-              { v: 'REJECTED', l: '반려' },
-            ].map(({ v, l }) => (
-              <button
-                key={v}
-                onClick={() => {
-                  setStatusFilter(v);
-                  setPage(1);
-                }}
-                className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${statusFilter === v ? 'bg-primary text-on-primary' : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'}`}>
-                {l}
-              </button>
-            ))}
+    <Layout title="교육 계획">
+      <div className={styles.page}>
+        {/* Header */}
+        <div className={styles.header}>
+          <div>
+            <h1 className={styles.pageTitle}>교육 계획 및 진행 관리</h1>
+            <p className={styles.pageSub}>체계적인 교육 운영으로 조직 역량을 강화하세요.</p>
           </div>
-          <button onClick={() => setShowNew(true)} className='btn-primary flex items-center gap-1.5'>
-            <span className='material-symbols-outlined text-[16px]'>add</span>신규
-          </button>
+          <div className={styles.headerStats}>
+            <div className={styles.statPill}><span className={styles.statPillLabel}>총 계획</span><span className={styles.statPillValue}>{items.length}건</span></div>
+            <div className={styles.statPill}><span className={styles.statPillLabel}>승인</span><span className={`${styles.statPillValue} ${styles.statGreen}`}>{approvedCount}건</span></div>
+            <div className={styles.statPill}><span className={styles.statPillLabel}>심사중</span><span className={`${styles.statPillValue} ${styles.statYellow}`}>{pendingCount}건</span></div>
+          </div>
         </div>
-      </div>
-      <div className='grid grid-cols-1 lg:grid-cols-12 gap-6'>
-        <div className='lg:col-span-7 flex flex-col gap-3'>
-          {loading ? (
-            <div className='flex justify-center py-16'>
-              <div className='w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin' />
+
+        <div className={styles.mainGrid}>
+          {/* Left: Registration Form */}
+          <aside className={styles.leftCol}>
+            <div className={styles.formCard}>
+              <h2 className={styles.cardTitle}>📝 교육 계획 등록</h2>
+              <form className={styles.regForm} onSubmit={(e) => { e.preventDefault(); setShowModal(false); }}>
+                <div className={styles.field}>
+                  <label className={styles.label}>교육 제목</label>
+                  <input className={styles.input} type="text" placeholder="예: 2024 상반기 보안 직무 교육" value={form.title} onChange={handleChange('title')} />
+                </div>
+                <div className={styles.row2}>
+                  <div className={styles.field}>
+                    <label className={styles.label}>교육 기간</label>
+                    <input className={styles.input} type="date" value={form.startDate} onChange={handleChange('startDate')} />
+                  </div>
+                  <div className={styles.field}>
+                    <label className={styles.label}>예산 (KRW)</label>
+                    <input className={`${styles.input} ${styles.inputRight}`} type="number" placeholder="0" value={form.budget} onChange={handleChange('budget')} />
+                  </div>
+                </div>
+                <div className={styles.field}>
+                  <label className={styles.label}>교육 자료</label>
+                  <div className={styles.uploadArea}>
+                    <span className={styles.uploadIcon}>📤</span>
+                    <p className={styles.uploadText}>파일을 끌어오거나 클릭하여 업로드</p>
+                  </div>
+                </div>
+                <button className={styles.regBtn} type="submit">등록 완료</button>
+              </form>
             </div>
-          ) : items.length === 0 ? (
-            <div className='card flex flex-col items-center justify-center py-16 gap-3 text-on-surface-variant'>
-              <span className='material-symbols-outlined text-4xl text-outline'>school</span>
-              <p className='text-sm'>교육 계획이 없습니다.</p>
+
+            {/* Filter */}
+            <div className={styles.filterCard}>
+              <label className={styles.label}>상태 필터</label>
+              <select className={styles.filterSelect} value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+                {EDU_STATUSES.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
+              </select>
             </div>
-          ) : (
-            <div className='card overflow-hidden'>
-              <table className='w-full text-sm'>
+
+            {/* Plan List */}
+            <div className={styles.planListCard}>
+              <h3 className={styles.cardTitle}>📋 교육 계획 목록</h3>
+              {loading && <p className={styles.msg}>불러오는 중…</p>}
+              {!loading && items.length === 0 && <p className={styles.msg}>등록된 교육 계획이 없습니다.</p>}
+              <div className={styles.planList}>
+                {items.map((item, i) => (
+                  <div key={item.planNo ?? i} className={styles.planItem}>
+                    <div className={styles.planItemTop}>
+                      <span className={`${styles.statusBadge} ${styles[STATUS_CLASS[item.status] ?? 'statusDraft']}`}>{item.status ?? '-'}</span>
+                    </div>
+                    <p className={styles.planItemTitle}>{item.educationName ?? item.title ?? '-'}</p>
+                    <p className={styles.planItemMeta}>{item.startDate ?? '-'} ~ {item.endDate ?? '-'}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </aside>
+
+          {/* Right: Calendar + Attendance */}
+          <div className={styles.rightCol}>
+            {/* Upcoming Schedule */}
+            <div className={styles.scheduleCard}>
+              <div className={styles.scheduleHeader}>
+                <h3 className={styles.cardTitle}>🗓️ 예정된 교육 일정</h3>
+              </div>
+              <div className={styles.scheduleList}>
+                {MOCK_UPCOMING.map((ev) => (
+                  <div key={ev.title} className={`${styles.scheduleItem} ${ev.active ? styles.scheduleItemActive : ''}`}>
+                    <div className={`${styles.dateBadge} ${ev.active ? styles.dateBadgeActive : ''}`}>
+                      <span className={styles.dateMon}>{ev.month}</span>
+                      <span className={`${styles.dateDay} ${ev.active ? styles.dateDayActive : ''}`}>{ev.day}</span>
+                    </div>
+                    <div className={styles.scheduleContent}>
+                      <h4 className={styles.scheduleTitle}>{ev.title}</h4>
+                      <p className={styles.scheduleMeta}>{ev.time}</p>
+                    </div>
+                    {!ev.active && (
+                      <span className={styles.scheduleBadge}>진행 예정</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Attendance Table */}
+            <div className={styles.attendanceCard}>
+              <div className={styles.attendanceHeader}>
+                <h3 className={styles.cardTitle}>👥 실시간 출석 관리</h3>
+              </div>
+              <table className={styles.table}>
                 <thead>
-                  <tr className='border-b border-outline-variant/50 bg-surface-container-low'>
-                    {['교육명', '강사명', '기간', '대상', '상태'].map((h) => (
-                      <th key={h} className='px-4 py-3 text-left text-xs font-semibold text-on-surface-variant'>
-                        {h}
-                      </th>
-                    ))}
+                  <tr>
+                    <th>대상자</th>
+                    <th>부서</th>
+                    <th>교육 상태</th>
+                    <th className={styles.thRight}>출결 체크</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {items.map((item) => {
-                    const st = PLAN_STATUS_LABEL[item.status] ?? { label: item.status, cls: 'bg-surface-container text-outline' };
-                    return (
-                      <tr
-                        key={item.planNo}
-                        onClick={() => setSelected(item)}
-                        className={`border-b border-outline-variant/30 cursor-pointer hover:bg-surface-container-low transition-colors ${selected?.planNo === item.planNo ? 'bg-primary/5' : ''}`}>
-                        <td className='px-4 py-3 font-medium text-on-surface'>{item.educationName}</td>
-                        <td className='px-4 py-3 text-on-surface-variant'>{item.trainerName}</td>
-                        <td className='px-4 py-3 text-xs text-on-surface-variant'>
-                          {item.startDate}~{item.endDate}
-                        </td>
-                        <td className='px-4 py-3 text-on-surface-variant'>{item.targetCount}명</td>
-                        <td className='px-4 py-3'>
-                          <span className={`badge ${st.cls}`}>{st.label}</span>
-                        </td>
-                      </tr>
-                    );
-                  })}
+                  {MOCK_ATTENDEES.map((a) => (
+                    <tr key={a.name} className={styles.tableRow}>
+                      <td>
+                        <div className={styles.attendeeCell}>
+                          <div className={styles.attendeeAvatar}>{a.name[0]}</div>
+                          <div>
+                            <div className={styles.attendeeName}>{a.name}</div>
+                            <div className={styles.attendeeEmail}>{a.name.toLowerCase()}@kindred.com</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className={styles.tdDept}>{a.dept}</td>
+                      <td>
+                        <div className={styles.attendanceStatus}>
+                          <span className={styles.statusDot} style={{ backgroundColor: ATTENDANCE_STATUS[a.status].color }} />
+                          <span>{ATTENDANCE_STATUS[a.status].label}</span>
+                        </div>
+                      </td>
+                      <td className={styles.tdRight}>
+                        <div className={styles.checkBtns}>
+                          <button className={`${styles.checkBtn} ${a.status !== 'absent' ? styles.checkBtnActive : ''}`}>출석</button>
+                          <button className={`${styles.checkBtn} ${a.status === 'absent' ? styles.checkBtnAbsent : ''}`}>결석</button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
+              <div className={styles.attendanceFooter}>
+                <button className={styles.viewAllBtn}>전체 명단 보기 (42명)</button>
+              </div>
             </div>
-          )}
-          {totalPages > 1 && (
-            <div className='flex items-center justify-center gap-1 pt-2'>
-              <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1} className='btn-ghost p-1.5 disabled:opacity-30'>
-                <span className='material-symbols-outlined text-[18px]'>chevron_left</span>
-              </button>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                <button
-                  key={p}
-                  onClick={() => setPage(p)}
-                  className={`w-8 h-8 rounded-lg text-sm font-medium ${p === page ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:bg-surface-container'}`}>
-                  {p}
-                </button>
-              ))}
-              <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages} className='btn-ghost p-1.5 disabled:opacity-30'>
-                <span className='material-symbols-outlined text-[18px]'>chevron_right</span>
-              </button>
-            </div>
-          )}
-        </div>
-        <div className='lg:col-span-5 lg:sticky lg:top-24 self-start'>
-          <DetailPanel
-            item={selected}
-            onAction={() => {
-              setSelected(null);
-              load();
-            }}
-          />
+          </div>
         </div>
       </div>
-      {showNew && (
-        <NewPlanModal
-          onClose={() => setShowNew(false)}
-          onCreated={() => {
-            setShowNew(false);
-            load();
-          }}
-        />
-      )}
-    </div>
+    </Layout>
   );
 }

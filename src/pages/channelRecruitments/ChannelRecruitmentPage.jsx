@@ -1,141 +1,267 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
+import Layout from '../../components/layout/Layout';
 import { fetchChannelRecruitments, createChannelRecruitment } from '../../api/channelRecruitments';
+import styles from './ChannelRecruitmentPage.module.css';
 
-function NewModal({ onClose, onCreated }) {
-  const [form, setForm] = useState({ managerName: '', channelType: 'DESIGNER', recruitCount: '', startDate: '', endDate: '', condition: '' });
+const STAGE_LABEL = {
+  DOCUMENT_REVIEW: '서류 검토',
+  FIRST_INTERVIEW: '1차 면접 완료',
+  SECOND_INTERVIEW: '2차 인터뷰',
+  REFERENCE_CHECK: '레퍼런스 체크',
+  FINAL: '채용 확정',
+};
+
+const STAGE_CLASS = {
+  DOCUMENT_REVIEW: 'stageDoc',
+  FIRST_INTERVIEW: 'stageFirst',
+  SECOND_INTERVIEW: 'stageSecond',
+  REFERENCE_CHECK: 'stageRef',
+  FINAL: 'stageFinal',
+};
+
+const CHANNEL_OPTIONS = [
+  { value: '', label: '채널 유형 선택' },
+  { value: 'DIRECT', label: '개인 영업' },
+  { value: 'CORPORATE', label: '법인 컨설팅' },
+  { value: 'MANAGER', label: '영업 관리자' },
+  { value: 'PARTNER', label: '파트너사' },
+];
+
+export default function ChannelRecruitmentPage() {
+  const [recruitments, setRecruitments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState('');
-  const set = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.value }));
 
-  const handleSubmit = async (e) => {
+  const [form, setForm] = useState({
+    applicantName: '',
+    channelType: '',
+    experience: '',
+    region: '',
+    notes: '',
+  });
+
+  useEffect(() => {
+    fetchChannelRecruitments()
+      .then((data) => setRecruitments(Array.isArray(data) ? data : (data?.items ?? data?.content ?? [])))
+      .catch(() => setRecruitments([]))
+      .finally(() => setLoading(false));
+  }, []);
+
+  function handleChange(field) {
+    return (e) => setForm((prev) => ({ ...prev, [field]: e.target.value }));
+  }
+
+  async function handleSubmit(e) {
     e.preventDefault();
     setSubmitting(true);
     try {
-      await createChannelRecruitment({ ...form, recruitCount: Number(form.recruitCount) });
-      onCreated();
-    } catch { setError('등록에 실패했습니다.'); } finally { setSubmitting(false); }
-  };
+      const created = await createChannelRecruitment(form);
+      setRecruitments((prev) => [created, ...prev]);
+      setShowModal(false);
+      setForm({ applicantName: '', channelType: '', experience: '', region: '', notes: '' });
+    } catch {
+      alert('등록 중 오류가 발생했습니다.');
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  const totalCount = recruitments.length;
+  const documentCount = recruitments.filter((r) => r.stage === 'DOCUMENT_REVIEW').length;
+  const interviewCount = recruitments.filter((r) => r.stage === 'SECOND_INTERVIEW' || r.stage === 'FIRST_INTERVIEW').length;
+  const finalCount = recruitments.filter((r) => r.stage === 'FINAL').length;
+
+  function getInitial(name) {
+    return name ? name[0] : '?';
+  }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm px-4">
-      <div className="card w-full max-w-md p-6 space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-on-surface">신규 모집 등록</h3>
-          <button onClick={onClose} className="btn-ghost p-1"><span className="material-symbols-outlined text-[20px]">close</span></button>
+    <Layout title="채널 모집">
+      <div className={styles.page}>
+        {/* Header */}
+        <header className={styles.header}>
+          <div className={styles.headerLeft}>
+            <div className={styles.headerIconWrap}>
+              <span className={styles.headerIcon}>🤝</span>
+            </div>
+            <div>
+              <h1 className={styles.pageTitle}>리크루팅 관리 센터</h1>
+              <p className={styles.pageSub}>새로운 보험 영업 채널 및 에이전트 모집 현황입니다.</p>
+            </div>
+          </div>
+          <button className={styles.registerBtn} onClick={() => setShowModal(true)}>
+            + 공고 등록하기
+          </button>
+        </header>
+
+        {/* Stats Bento */}
+        <div className={styles.statsGrid}>
+          <div className={styles.statCard}>
+            <div className={styles.statTop}>
+              <div className={`${styles.statIconWrap} ${styles.statGreen}`}>👥</div>
+              <span className={styles.statTrend}>+12%</span>
+            </div>
+            <div className={styles.statNum}>{totalCount}</div>
+            <div className={styles.statLabel}>전체 지원자</div>
+          </div>
+          <div className={styles.statCard}>
+            <div className={styles.statTop}>
+              <div className={`${styles.statIconWrap} ${styles.statLight}`}>📋</div>
+              <span className={styles.statBadge}>진행중</span>
+            </div>
+            <div className={styles.statNum}>{documentCount}</div>
+            <div className={styles.statLabel}>서류 심사중</div>
+          </div>
+          <div className={styles.statCard}>
+            <div className={styles.statTop}>
+              <div className={`${styles.statIconWrap} ${styles.statTeal}`}>🎤</div>
+              <span className={`${styles.statBadge} ${styles.statBadgeHot}`}>HOT</span>
+            </div>
+            <div className={styles.statNum}>{interviewCount}</div>
+            <div className={styles.statLabel}>인터뷰 예정</div>
+          </div>
+          <div className={styles.statCard}>
+            <div className={styles.statTop}>
+              <div className={`${styles.statIconWrap} ${styles.statSecondary}`}>✅</div>
+              <span className={styles.statFinalBadge}>최종</span>
+            </div>
+            <div className={styles.statNum}>{String(finalCount).padStart(2, '0')}</div>
+            <div className={styles.statLabel}>채용 확정</div>
+          </div>
         </div>
-        <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-3">
-          <div className="space-y-1.5 col-span-2">
-            <label className="text-xs font-semibold text-on-surface-variant">담당자명 *</label>
-            <input className="input text-sm" value={form.managerName} onChange={set('managerName')} required />
-          </div>
-          <div className="space-y-1.5 col-span-2">
-            <label className="text-xs font-semibold text-on-surface-variant">채널 유형</label>
-            <select className="input text-sm" value={form.channelType} onChange={set('channelType')}>
-              <option value="DESIGNER">설계사</option>
-              <option value="AGENCY">대리점</option>
-            </select>
-          </div>
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-on-surface-variant">모집 인원 *</label>
-            <input type="number" min="1" className="input text-sm" value={form.recruitCount} onChange={set('recruitCount')} required />
-          </div>
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-on-surface-variant">모집 조건</label>
-            <input className="input text-sm" placeholder="예: 생명보험 자격 보유" value={form.condition} onChange={set('condition')} />
-          </div>
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-on-surface-variant">시작일 *</label>
-            <input type="date" className="input text-sm" value={form.startDate} onChange={set('startDate')} required />
-          </div>
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-on-surface-variant">종료일 *</label>
-            <input type="date" className="input text-sm" value={form.endDate} onChange={set('endDate')} required />
-          </div>
-          {error && <p className="col-span-2 text-xs text-error">{error}</p>}
-          <button type="button" className="btn-secondary" onClick={onClose}>취소</button>
-          <button type="submit" className="btn-primary" disabled={submitting}>{submitting ? '등록 중...' : '등록'}</button>
-        </form>
+
+        {/* Main Grid */}
+        <div className={styles.mainGrid}>
+          {/* Left: Active Job Postings */}
+          <section className={styles.leftCol}>
+            <h2 className={styles.sectionTitle}>활성 공고</h2>
+            {[
+              { type: '신입/경력', title: '수도권 거점 보험 설계사 모집', deadline: 'D-12', count: 86, progress: 65, typeClass: 'tagGreen' },
+              { type: '전략 영업', title: '기업 보험 전문 컨설턴트', deadline: 'D-05', count: 42, progress: 88, typeClass: 'tagSecondary' },
+              { type: '파트너사', title: '영업 대리점 지점장 리쿠루팅', deadline: 'D-21', count: 12, progress: 15, typeClass: 'tagGray' },
+            ].map((posting) => (
+              <div key={posting.title} className={styles.postingCard}>
+                <div className={styles.postingTop}>
+                  <span className={`${styles.postingTag} ${styles[posting.typeClass]}`}>{posting.type}</span>
+                </div>
+                <h3 className={styles.postingTitle}>{posting.title}</h3>
+                <p className={styles.postingMeta}>마감: {posting.deadline} | 지원자: {posting.count}명</p>
+                <div className={styles.progressBar}>
+                  <div className={styles.progressFill} style={{ width: `${posting.progress}%` }} />
+                </div>
+              </div>
+            ))}
+          </section>
+
+          {/* Right: Applicant List */}
+          <section className={styles.rightCol}>
+            <div className={styles.listHeader}>
+              <h2 className={styles.sectionTitle}>최근 지원자 목록</h2>
+              <div className={styles.listActions}>
+                <button className={styles.actionBtn}>필터</button>
+                <button className={styles.actionBtn}>내보내기</button>
+              </div>
+            </div>
+
+            <div className={styles.tableCard}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>지원자 정보</th>
+                    <th>희망 채널</th>
+                    <th>평가 단계</th>
+                    <th>점수</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {loading && (
+                    <tr><td colSpan={5} className={styles.msgCell}>불러오는 중…</td></tr>
+                  )}
+                  {!loading && recruitments.length === 0 && (
+                    <tr><td colSpan={5} className={styles.msgCell}>등록된 지원자가 없습니다.</td></tr>
+                  )}
+                  {!loading && recruitments.map((r, i) => (
+                    <tr key={r.recruitmentNo ?? i} className={styles.tableRow}>
+                      <td>
+                        <div className={styles.applicantCell}>
+                          <div className={styles.avatar}>{getInitial(r.applicantName)}</div>
+                          <div>
+                            <div className={styles.applicantName}>{r.applicantName ?? '-'}</div>
+                            <div className={styles.applicantSub}>
+                              {r.experience ? `경력 ${r.experience}년` : '신입'}{r.region ? ` | ${r.region}` : ''}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className={styles.channelCell}>{r.channelType ?? '-'}</td>
+                      <td>
+                        <span className={`${styles.stageBadge} ${styles[STAGE_CLASS[r.stage] ?? 'stageDoc']}`}>
+                          {STAGE_LABEL[r.stage] ?? r.stage ?? '서류 검토'}
+                        </span>
+                      </td>
+                      <td>
+                        <div className={styles.scoreCell}>
+                          <span className={styles.starIcon}>⭐</span>
+                          <span className={styles.scoreVal}>{r.score ?? '-'}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <button className={styles.detailBtn}>상세보기</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <div className={styles.loadMore}>
+                <button className={styles.loadMoreBtn}>더 많은 지원자 보기 ↓</button>
+              </div>
+            </div>
+          </section>
+        </div>
       </div>
-    </div>
-  );
-}
 
-export default function ChannelRecruitmentPage() {
-  const [items, setItems] = useState([]);
-  const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [showNew, setShowNew] = useState(false);
-
-  const load = useCallback(async () => {
-    setLoading(true);
-    try {
-      const data = await fetchChannelRecruitments({ page, size: 20 });
-      setItems(data.items ?? []);
-      setTotal(data.total ?? 0);
-    } catch { } finally { setLoading(false); }
-  }, [page]);
-
-  useEffect(() => { load(); }, [load]);
-  const totalPages = Math.max(1, Math.ceil(total / 20));
-
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-on-surface">채널 모집</h1>
-          <p className="text-sm text-on-surface-variant mt-0.5">총 {total}건</p>
-        </div>
-        <button onClick={() => setShowNew(true)} className="btn-primary flex items-center gap-1.5">
-          <span className="material-symbols-outlined text-[16px]">add</span>신규 모집 등록
-        </button>
-      </div>
-
-      {loading ? (
-        <div className="flex justify-center py-16"><div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" /></div>
-      ) : items.length === 0 ? (
-        <div className="card flex flex-col items-center justify-center py-16 gap-3 text-on-surface-variant">
-          <span className="material-symbols-outlined text-4xl text-outline">group_add</span>
-          <p className="text-sm">모집 공고가 없습니다.</p>
-        </div>
-      ) : (
-        <div className="card overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-outline-variant/50 bg-surface-container-low">
-                {['모집번호', '담당자', '채널 유형', '모집 인원', '기간', '조건', '상태'].map(h => (
-                  <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-on-surface-variant">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {items.map(item => (
-                <tr key={item.recruitmentNo} className="border-b border-outline-variant/30 hover:bg-surface-container-low transition-colors">
-                  <td className="px-4 py-3 font-mono text-xs text-primary">{item.recruitmentNo}</td>
-                  <td className="px-4 py-3 font-medium text-on-surface">{item.managerName}</td>
-                  <td className="px-4 py-3 text-on-surface-variant">{item.channelType === 'DESIGNER' ? '설계사' : '대리점'}</td>
-                  <td className="px-4 py-3">{item.recruitCount}명</td>
-                  <td className="px-4 py-3 text-xs text-on-surface-variant">{item.startDate}~{item.endDate}</td>
-                  <td className="px-4 py-3 text-on-surface-variant text-xs">{item.condition || '—'}</td>
-                  <td className="px-4 py-3"><span className="badge bg-primary-container/20 text-primary text-[11px]">{item.status}</span></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {/* Modal */}
+      {showModal && (
+        <div className={styles.overlay} onClick={() => setShowModal(false)}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h2 className={styles.modalTitle}>공고 등록</h2>
+              <button className={styles.closeBtn} onClick={() => setShowModal(false)}>✕</button>
+            </div>
+            <form className={styles.modalForm} onSubmit={handleSubmit}>
+              <div className={styles.field}>
+                <label className={styles.label}>지원자 이름</label>
+                <input className={styles.input} type="text" placeholder="이름 입력" value={form.applicantName} onChange={handleChange('applicantName')} required />
+              </div>
+              <div className={styles.field}>
+                <label className={styles.label}>희망 채널</label>
+                <select className={styles.select} value={form.channelType} onChange={handleChange('channelType')}>
+                  {CHANNEL_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+                </select>
+              </div>
+              <div className={styles.row2}>
+                <div className={styles.field}>
+                  <label className={styles.label}>경력 (년)</label>
+                  <input className={styles.input} type="number" placeholder="0" min="0" value={form.experience} onChange={handleChange('experience')} />
+                </div>
+                <div className={styles.field}>
+                  <label className={styles.label}>지역</label>
+                  <input className={styles.input} type="text" placeholder="서울" value={form.region} onChange={handleChange('region')} />
+                </div>
+              </div>
+              <div className={styles.field}>
+                <label className={styles.label}>메모</label>
+                <textarea className={styles.textarea} rows={3} placeholder="추가 메모" value={form.notes} onChange={handleChange('notes')} />
+              </div>
+              <button className={styles.submitBtn} type="submit" disabled={submitting}>
+                {submitting ? '등록 중…' : '등록하기'}
+              </button>
+            </form>
+          </div>
         </div>
       )}
-
-      {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-1">
-          <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="btn-ghost p-1.5 disabled:opacity-30"><span className="material-symbols-outlined text-[18px]">chevron_left</span></button>
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
-            <button key={p} onClick={() => setPage(p)} className={`w-8 h-8 rounded-lg text-sm font-medium ${p === page ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:bg-surface-container'}`}>{p}</button>
-          ))}
-          <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="btn-ghost p-1.5 disabled:opacity-30"><span className="material-symbols-outlined text-[18px]">chevron_right</span></button>
-        </div>
-      )}
-
-      {showNew && <NewModal onClose={() => setShowNew(false)} onCreated={() => { setShowNew(false); load(); }} />}
-    </div>
+    </Layout>
   );
 }

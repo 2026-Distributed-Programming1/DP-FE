@@ -1,151 +1,134 @@
-import { useEffect, useState } from 'react';
-import { fetchClaims, fetchClaim } from '../../api/claims';
-import Layout from '../../components/layout/Layout';
-import styles from './ClaimListPage.module.css';
+import { useState, useEffect, useCallback } from 'react';
+import { fetchClaims, fetchClaim, CLAIM_STATUS_LABEL, CLAIM_TYPE_LABEL } from '../../api/claims';
 
-// FE-CLAIM-10: enum 출처 없으므로 하드코딩
-const CLAIM_STATUS = {
-  REGISTERED: { label: '접수', cls: styles.badgeYellow },
-  INVESTIGATING: { label: '조사중', cls: styles.badgeYellow },
-  CALCULATING: { label: '산출중', cls: styles.badgeYellow },
-  APPROVED: { label: '승인', cls: styles.badgeGreen },
-  PAID: { label: '지급완료', cls: styles.badgeGreen },
-  REJECTED: { label: '거절', cls: styles.badgeRed },
-};
-
-function ClaimBadge({ status }) {
-  const cfg = CLAIM_STATUS[status] ?? { label: status, cls: styles.badgeGray };
-  return <span className={`${styles.badge} ${cfg.cls}`}>{cfg.label}</span>;
-}
-
-function DetailPanel({ claimNo, onClose }) {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    if (!claimNo) return;
-    setLoading(true);
-    setError(null);
-    fetchClaim(claimNo)
-      .then(setData)
-      .catch((e) => setError(e.message))
-      .finally(() => setLoading(false));
-  }, [claimNo]);
-
-  return (
-    <aside className={styles.panel}>
-      <div className={styles.panelHeader}>
-        <span className={styles.panelTitle}>청구 상세</span>
-        <button className={styles.closeBtn} onClick={onClose}>✕</button>
-      </div>
-      <div className={styles.panelBody}>
-        {loading && <p className={styles.msg}>불러오는 중…</p>}
-        {error && <p className={`${styles.msg} ${styles.error}`}>{error}</p>}
-        {data && (
-          <>
-            <div className={styles.claimNo}>{data.claimNo}</div>
-
-            <section className={styles.section}>
-              <h3 className={styles.sectionTitle}>청구 정보</h3>
-              <dl className={styles.dl}>
-                <dt>계약번호</dt><dd className={styles.mono}>{data.contractNo ?? '-'}</dd>
-                <dt>청구유형</dt><dd>{data.claimType ?? '-'}</dd>
-                <dt>상태</dt><dd>{data.status ?? '-'}</dd>
-                <dt>청구금액</dt><dd>{data.claimAmount != null ? `${data.claimAmount.toLocaleString()}원` : '-'}</dd>
-                <dt>계좌번호</dt><dd>{data.accountNo ?? '-'}</dd>
-                <dt>은행</dt><dd>{data.bankName ?? '-'}</dd>
-                <dt>등록일</dt><dd>{data.createdAt ?? '-'}</dd>
-              </dl>
-            </section>
-
-            <section className={styles.section}>
-              <h3 className={styles.sectionTitle}>진행 단계</h3>
-              {/* FE-CLAIM-01: 조사/산출/지급번호가 청구 응답에 없으므로 상태값만 표시 */}
-              <p className={styles.stepNote}>
-                조사·산출·지급 단계 정보는 Phase 2에서 연결됩니다.
-              </p>
-            </section>
-          </>
-        )}
-      </div>
-    </aside>
-  );
+function formatDate(iso) {
+  return iso ? new Date(iso).toLocaleDateString('ko-KR') : '—';
 }
 
 export default function ClaimListPage() {
   const [items, setItems] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [selectedNo, setSelectedNo] = useState(null);
+  const [selected, setSelected] = useState(null);
+  const [detail, setDetail] = useState(null);
+  const [detailLoading, setDetailLoading] = useState(false);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await fetchClaims({ page, size: 20 });
+      setItems(data.items ?? []);
+      setTotal(data.total ?? 0);
+    } catch { } finally { setLoading(false); }
+  }, [page]);
+
+  useEffect(() => { load(); }, [load]);
 
   useEffect(() => {
-    setLoading(true);
-    setError(null);
-    fetchClaims()
-      .then((data) => setItems(Array.isArray(data) ? data : (data.items ?? data.content ?? [])))
-      .catch((e) => setError(e.message))
-      .finally(() => setLoading(false));
-  }, []);
+    if (!selected) { setDetail(null); return; }
+    setDetailLoading(true);
+    fetchClaim(selected)
+      .then(setDetail)
+      .catch(() => {})
+      .finally(() => setDetailLoading(false));
+  }, [selected]);
+
+  const totalPages = Math.max(1, Math.ceil(total / 20));
 
   return (
-    <Layout title="청구 목록">
-      <div className={styles.root}>
-        <div className={styles.tableArea}>
-          <div className={styles.toolbar}>
-            <span className={styles.note}>
-              {/* FE-CLAIM-03: 서버 필터/페이지네이션 미지원 — 전체 배열 표시 */}
-              전체 목록 조회 (서버 필터·페이지네이션 미지원)
-            </span>
-            <span className={styles.totalCount}>{items.length > 0 ? `${items.length}건` : ''}</span>
-          </div>
-
-          {error && <div className={styles.errorBox}><strong>오류:</strong> {error}</div>}
-
-          <div className={styles.tableWrap}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>청구번호</th>
-                  <th>계약번호</th>
-                  <th>청구유형</th>
-                  <th>상태</th>
-                  <th>청구금액</th>
-                  <th>등록일</th>
-                </tr>
-              </thead>
-              <tbody>
-                {loading && (
-                  <tr><td colSpan={6} className={styles.msgCell}>불러오는 중…</td></tr>
-                )}
-                {!loading && items.length === 0 && (
-                  <tr><td colSpan={6} className={styles.msgCell}>조회된 청구가 없습니다.</td></tr>
-                )}
-                {!loading && items.map((item) => (
-                  <tr
-                    key={item.claimNo}
-                    className={`${styles.row} ${selectedNo === item.claimNo ? styles.selectedRow : ''}`}
-                    onClick={() => setSelectedNo((p) => p === item.claimNo ? null : item.claimNo)}
-                  >
-                    <td className={styles.mono}>{item.claimNo}</td>
-                    <td className={styles.mono}>{item.contractNo ?? '-'}</td>
-                    <td>{item.claimType ?? '-'}</td>
-                    <td><ClaimBadge status={item.status} /></td>
-                    <td className={styles.right}>
-                      {item.claimAmount != null ? `${item.claimAmount.toLocaleString()}원` : '-'}
-                    </td>
-                    <td>{item.createdAt ?? '-'}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {selectedNo && (
-          <DetailPanel claimNo={selectedNo} onClose={() => setSelectedNo(null)} />
-        )}
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-xl font-bold text-on-surface">청구 목록</h1>
+        <p className="text-sm text-on-surface-variant mt-0.5">총 {total}건</p>
       </div>
-    </Layout>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="lg:col-span-7 flex flex-col gap-3">
+          {loading ? (
+            <div className="flex justify-center py-16"><div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" /></div>
+          ) : items.length === 0 ? (
+            <div className="card flex flex-col items-center justify-center py-16 gap-3 text-on-surface-variant">
+              <span className="material-symbols-outlined text-4xl text-outline">receipt_long</span>
+              <p className="text-sm">청구 내역이 없습니다.</p>
+            </div>
+          ) : (
+            <div className="card overflow-hidden">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-outline-variant/50 bg-surface-container-low">
+                    {['청구번호', '고객명', '계약번호', '유형', '접수일', '상태'].map(h => (
+                      <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-on-surface-variant">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {items.map(item => {
+                    const st = CLAIM_STATUS_LABEL[item.status] ?? { label: item.status, cls: 'bg-surface-container text-outline' };
+                    return (
+                      <tr key={item.claimNo} onClick={() => setSelected(item.claimNo)}
+                        className={`border-b border-outline-variant/30 cursor-pointer hover:bg-surface-container-low transition-colors ${selected === item.claimNo ? 'bg-primary/5' : ''}`}>
+                        <td className="px-4 py-3 font-mono text-xs text-primary">{item.claimNo}</td>
+                        <td className="px-4 py-3 font-medium text-on-surface">{item.customerName}</td>
+                        <td className="px-4 py-3 text-on-surface-variant text-xs">{item.contractNo}</td>
+                        <td className="px-4 py-3"><span className="badge bg-surface-container text-on-surface-variant text-[11px]">{CLAIM_TYPE_LABEL[item.claimType] ?? item.claimType}</span></td>
+                        <td className="px-4 py-3 text-on-surface-variant text-xs">{formatDate(item.requestedAt)}</td>
+                        <td className="px-4 py-3"><span className={`badge ${st.cls}`}>{st.label}</span></td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-1 pt-2">
+              <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="btn-ghost p-1.5 disabled:opacity-30"><span className="material-symbols-outlined text-[18px]">chevron_left</span></button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
+                <button key={p} onClick={() => setPage(p)} className={`w-8 h-8 rounded-lg text-sm font-medium ${p === page ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:bg-surface-container'}`}>{p}</button>
+              ))}
+              <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="btn-ghost p-1.5 disabled:opacity-30"><span className="material-symbols-outlined text-[18px]">chevron_right</span></button>
+            </div>
+          )}
+        </div>
+        <div className="lg:col-span-5 lg:sticky lg:top-24 self-start">
+          {detailLoading ? (
+            <div className="card h-40 flex items-center justify-center"><div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" /></div>
+          ) : detail ? (
+            <div className="card overflow-hidden">
+              <div className="p-5 border-b border-outline-variant/50 bg-surface-container-low">
+                <span className={`badge ${(CLAIM_STATUS_LABEL[detail.status] ?? { cls: 'bg-surface-container text-outline' }).cls}`}>{(CLAIM_STATUS_LABEL[detail.status] ?? { label: detail.status }).label}</span>
+                <h3 className="font-bold text-on-surface mt-1">{detail.customerName}</h3>
+                <p className="text-xs text-outline">{detail.claimNo}</p>
+              </div>
+              <div className="p-5 space-y-3">
+                {[
+                  { label: '계약번호', value: detail.contractNo },
+                  { label: '청구 유형', value: CLAIM_TYPE_LABEL[detail.claimType] ?? detail.claimType },
+                  { label: '접수일', value: formatDate(detail.requestedAt) },
+                  { label: '은행', value: detail.bankName },
+                  { label: '계좌번호', value: detail.accountNo },
+                ].map(({ label, value }) => (
+                  <div key={label} className="flex justify-between text-sm">
+                    <span className="text-on-surface-variant">{label}</span>
+                    <span className="font-medium text-on-surface">{value ?? '—'}</span>
+                  </div>
+                ))}
+                {detail.claimReasons?.length > 0 && (
+                  <div className="pt-2 border-t border-outline-variant/30">
+                    <p className="text-xs text-on-surface-variant mb-1">청구 사유</p>
+                    <p className="text-sm text-on-surface">{detail.claimReasons.join(', ')}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="card h-full flex flex-col items-center justify-center gap-3 text-on-surface-variant p-8">
+              <span className="material-symbols-outlined text-4xl text-outline">receipt_long</span>
+              <p className="text-sm">청구를 선택하면 상세 정보가 표시됩니다.</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }

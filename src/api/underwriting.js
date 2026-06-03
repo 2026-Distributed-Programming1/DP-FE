@@ -1,7 +1,12 @@
 import client from './client';
 
-export function fetchUnderwritingPending() {
-  return client.get('/api/underwriting/pending').then((r) => r.data);
+export const APPLICATION_TYPE_LABEL = {
+  POLICY:    '청약서',
+  INSURANCE: '보험신청',
+};
+
+export function fetchUnderwritingPending({ page = 1, size = 20 } = {}) {
+  return client.get('/api/underwriting/pending', { params: { page, size } }).then((r) => r.data);
 }
 
 export function createUnderwriting(data) {

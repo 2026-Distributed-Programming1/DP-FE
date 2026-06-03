@@ -1,15 +1,13 @@
-import Sidebar from './Sidebar';
-import Header from './Header';
-import styles from './Layout.module.css';
+import { Outlet } from 'react-router-dom';
+import Navbar from './Navbar';
 
-export default function Layout({ title, children }) {
+export default function Layout() {
   return (
-    <div className={styles.root}>
-      <Sidebar />
-      <div className={styles.main}>
-        <Header title={title} />
-        <div className={styles.content}>{children}</div>
-      </div>
+    <div className="min-h-screen bg-background">
+      <Navbar />
+      <main className="pt-16 max-w-[1280px] mx-auto px-6 py-8">
+        <Outlet />
+      </main>
     </div>
   );
 }

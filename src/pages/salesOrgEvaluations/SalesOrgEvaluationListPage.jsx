@@ -1,242 +1,197 @@
-import { useEffect, useState } from 'react';
-import { fetchSalesOrgEvaluations } from '../../api/salesOrgEvaluations';
-import Layout from '../../components/layout/Layout';
-import styles from './SalesOrgEvaluationListPage.module.css';
+import { useState, useEffect, useCallback } from 'react';
+import {
+  fetchSalesOrgEvaluations,
+  createSalesOrgEvaluation,
+  createBonusRequest,
+  EVAL_GRADE_CLS,
+  EVAL_GRADE_LABEL,
+  CHANNEL_TYPE_OPTIONS,
+} from '../../api/salesOrgEvaluations';
 
-const CHANNEL_TYPES = [
-  { value: '', label: '전체 채널' },
-  { value: 'DIRECT', label: '직영 영업소' },
-  { value: 'AGENCY', label: '대리점 (GA)' },
-  { value: 'ONLINE', label: '온라인 채널' },
-  { value: 'BANCASSURANCE', label: '방카슈랑스' },
-];
+function fmt(n) { return n?.toLocaleString('ko-KR') ?? '—'; }
 
-const GRADE_CLASS = { S: 'gradeS', A: 'gradeA', B: 'gradeB', C: 'gradeC', D: 'gradeD' };
+function DetailPanel({ item, onEvaluated }) {
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState({ evaluationGrade: 'B', evaluationComment: '' });
+  const [baseSalary, setBaseSalary] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
-function today() { return new Date().toISOString().slice(0, 10); }
-function monthAgo() { const d = new Date(); d.setMonth(d.getMonth() - 3); return d.toISOString().slice(0, 10); }
+  useEffect(() => { setShowForm(false); setError(''); }, [item]);
 
-const GRADES = ['S', 'A', 'B', 'C', 'D'];
+  if (!item) return (
+    <div className="card h-full flex flex-col items-center justify-center gap-3 text-on-surface-variant p-8">
+      <span className="material-symbols-outlined text-4xl text-outline">leaderboard</span>
+      <p className="text-sm">채널을 선택하면 상세 정보가 표시됩니다.</p>
+    </div>
+  );
 
-export default function SalesOrgEvaluationListPage() {
-  const [startDate, setStartDate] = useState(monthAgo());
-  const [endDate, setEndDate] = useState(today());
-  const [channelType, setChannelType] = useState('');
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(null);
-  const [panelOpen, setPanelOpen] = useState(false);
-  const [panelGrade, setPanelGrade] = useState('S');
-  const [panelComment, setPanelComment] = useState('');
+  const gradeHighEnough = ['S', 'A'].includes(form.evaluationGrade);
 
-  function load() {
-    setLoading(true);
-    fetchSalesOrgEvaluations({ startDate, endDate, channelType, page: 0, size: 50 })
-      .then(setData)
-      .catch(() => setData(null))
-      .finally(() => setLoading(false));
-  }
-
-  useEffect(() => { load(); }, []);
-
-  const items = data?.items ?? data?.content ?? [];
-  const total = data?.total ?? data?.totalElements ?? items.length;
-
-  const totalRevenue = items.reduce((s, i) => s + (i.revenue ?? 0), 0);
-  const avgAchievement = items.length > 0
-    ? (items.reduce((s, i) => s + (i.achievementRate ?? 0), 0) / items.length).toFixed(1)
-    : '0.0';
-  const totalContracts = items.reduce((s, i) => s + (i.contractCount ?? 0), 0);
-
-  function openPanel(item) {
-    setSelectedItem(item);
-    setPanelGrade(item.evaluationGrade ?? 'S');
-    setPanelComment('');
-    setPanelOpen(true);
-  }
-
-  function formatRevenue(v) {
-    if (!v) return '-';
-    return `₩${Number(v).toLocaleString()}`;
-  }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    try {
+      const result = await createSalesOrgEvaluation({
+        channelName: item.channelName, channelType: item.channelType,
+        salesResult: item.salesResult, contractCount: item.contractCount,
+        achievementRate: item.achievementRate,
+        ...form,
+      });
+      if (gradeHighEnough && baseSalary) {
+        await createBonusRequest({
+          evaluationNo: result.evaluationNo, channelName: item.channelName,
+          channelType: item.channelType, evaluationGrade: form.evaluationGrade,
+          baseSalary: Number(baseSalary), requestReason: '평가 등급에 따른 성과급 요청',
+        });
+      }
+      onEvaluated();
+    } catch { setError('평가 등록에 실패했습니다.'); } finally { setSubmitting(false); }
+  };
 
   return (
-    <Layout title="영업조직 평가">
-      <div className={styles.page}>
-        {/* Header + Filters */}
-        <div className={styles.topRow}>
-          <div>
-            <h1 className={styles.pageTitle}>영업 조직 평가 및 성과급 관리</h1>
-            <p className={styles.pageSub}>채널별 성과를 평가하고 성과급을 관리합니다.</p>
+    <div className="card flex flex-col overflow-hidden">
+      <div className="p-5 border-b border-outline-variant/50 bg-surface-container-low">
+        <h3 className="font-bold text-on-surface">{item.channelName}</h3>
+        <p className="text-xs text-on-surface-variant mt-0.5">{item.channelType === 'DESIGNER' ? '설계사' : '대리점'}</p>
+      </div>
+      <div className="p-5 border-b border-outline-variant/50 space-y-3">
+        {[
+          { label: '매출실적', value: `${fmt(item.salesResult)}원` },
+          { label: '계약건수', value: `${fmt(item.contractCount)}건` },
+          { label: '목표달성률', value: item.achievementRate != null ? `${Number(item.achievementRate).toFixed(1)}%` : '—' },
+          { label: '평가등급', value: item.evaluationGrade ? EVAL_GRADE_LABEL[item.evaluationGrade] : '미평가' },
+        ].map(({ label, value }) => (
+          <div key={label} className="flex justify-between text-sm">
+            <span className="text-on-surface-variant">{label}</span>
+            <span className="font-medium text-on-surface">{value}</span>
           </div>
-          <div className={styles.filterRow}>
-            <div className={styles.filterGroup}>
-              <span className={styles.filterLabel}>평가 기간</span>
-              <div className={styles.dateRange}>
-                <input type="date" className={styles.dateInput} value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-                <span className={styles.dateSep}>~</span>
-                <input type="date" className={styles.dateInput} value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+        ))}
+      </div>
+      <div className="p-5">
+        {!showForm ? (
+          <button onClick={() => setShowForm(true)} className="btn-primary w-full">평가 등록</button>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-on-surface-variant">평가 등급</label>
+              <div className="flex gap-1">
+                {['S', 'A', 'B', 'C', 'D'].map((g) => (
+                  <button key={g} type="button" onClick={() => setForm(f => ({ ...f, evaluationGrade: g }))}
+                    className={`flex-1 py-2 rounded-lg text-sm font-bold border-2 transition-colors ${form.evaluationGrade === g ? EVAL_GRADE_CLS[g] + ' border-transparent' : 'border-outline-variant text-on-surface-variant'}`}>{g}</button>
+                ))}
               </div>
             </div>
-            <div className={styles.filterGroup}>
-              <span className={styles.filterLabel}>채널 유형</span>
-              <select className={styles.filterSelect} value={channelType} onChange={(e) => setChannelType(e.target.value)}>
-                {CHANNEL_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
-              </select>
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-on-surface-variant">평가 의견 (선택)</label>
+              <textarea className="input resize-none text-sm" rows={2} value={form.evaluationComment} onChange={(e) => setForm(f => ({ ...f, evaluationComment: e.target.value }))} />
             </div>
-            <button className={styles.filterBtn} onClick={load}>적용하기</button>
-          </div>
-        </div>
+            {gradeHighEnough && (
+              <div className="space-y-1.5 bg-primary/5 p-3 rounded-lg">
+                <label className="text-xs font-semibold text-primary">성과급 요청 (S/A 등급)</label>
+                <input type="number" className="input text-sm" placeholder="기본급 입력 (원)" value={baseSalary} onChange={(e) => setBaseSalary(e.target.value)} />
+              </div>
+            )}
+            {error && <p className="text-xs text-error">{error}</p>}
+            <div className="flex gap-2">
+              <button type="button" className="btn-ghost flex-1" onClick={() => setShowForm(false)}>취소</button>
+              <button type="submit" className="btn-primary flex-1" disabled={submitting}>{submitting ? '등록 중...' : '등록'}</button>
+            </div>
+          </form>
+        )}
+      </div>
+    </div>
+  );
+}
 
-        {/* KPI Cards */}
-        <div className={styles.kpiGrid}>
-          <div className={styles.kpiCard}>
-            <p className={styles.kpiLabel}>전체 매출액</p>
-            <h3 className={styles.kpiValue}>{totalRevenue > 0 ? `₩${totalRevenue.toLocaleString()}` : '₩1,420,000,000'}</h3>
-            <div className={styles.kpiTrend}>▲ 12.5% 증가 <span className={styles.kpiMuted}>vs 지난 분기</span></div>
-            <div className={styles.kpiEmoji}>💰</div>
-          </div>
-          <div className={styles.kpiCard}>
-            <p className={styles.kpiLabel}>목표 달성률</p>
-            <h3 className={styles.kpiValue}>{avgAchievement}%</h3>
-            <div className={styles.progressBar}>
-              <div className={styles.progressFill} style={{ width: `${Math.min(parseFloat(avgAchievement), 100)}%` }} />
-            </div>
-            <div className={styles.kpiEmoji}>🏆</div>
-          </div>
-          <div className={styles.kpiCardDark}>
-            <p className={styles.kpiLabelLight}>활성 계약 수</p>
-            <h3 className={styles.kpiValueLight}>{totalContracts > 0 ? `${totalContracts.toLocaleString()} 건` : '5,842 건'}</h3>
-            <div className={styles.kpiBadge}>✓ 업계 평균 대비 +8%</div>
-          </div>
-        </div>
+export default function SalesOrgEvaluationListPage() {
+  const [items, setItems] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const [channelType, setChannelType] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [selected, setSelected] = useState(null);
 
-        {/* Performance Table */}
-        <div className={styles.tableCard}>
-          <div className={styles.tableTop}>
-            <h3 className={styles.tableTitle}>채널별 세부 성과 현황</h3>
-            <div className={styles.tableTopRight}>
-              {total > 0 && <span className={styles.totalCount}>총 {total}개의 결과</span>}
-              <button className={styles.newBtn} onClick={() => setPanelOpen(true)}>+ 평가 등록</button>
-            </div>
-          </div>
-          <div className={styles.tableWrap}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>채널 명</th>
-                  <th>유형</th>
-                  <th>매출액</th>
-                  <th className={styles.thCenter}>계약 건수</th>
-                  <th className={styles.thRight}>달성률</th>
-                  <th className={styles.thCenter}>등급</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {loading && <tr><td colSpan={7} className={styles.msgCell}>불러오는 중…</td></tr>}
-                {!loading && items.length === 0 && (
-                  <tr><td colSpan={7} className={styles.msgCell}>조회된 평가가 없습니다.</td></tr>
-                )}
-                {!loading && items.map((item, i) => (
-                  <tr key={item.evaluationNo ?? i} className={styles.tableRow} onClick={() => openPanel(item)}>
-                    <td className={styles.tdBold}>{item.channelName ?? '-'}</td>
-                    <td className={styles.tdMuted}>{item.channelType ?? '-'}</td>
-                    <td className={styles.tdMedium}>{formatRevenue(item.revenue)}</td>
-                    <td className={styles.tdCenter}>{(item.contractCount ?? 0).toLocaleString()}</td>
-                    <td className={`${styles.tdRight} ${(item.achievementRate ?? 0) >= 90 ? styles.tdGreen : (item.achievementRate ?? 0) < 70 ? styles.tdRed : styles.tdOrange}`}>
-                      {item.achievementRate != null ? `${item.achievementRate}%` : '-'}
-                    </td>
-                    <td className={styles.tdCenter}>
-                      {item.evaluationGrade && (
-                        <span className={`${styles.gradeBadge} ${styles[GRADE_CLASS[item.evaluationGrade] ?? 'gradeB']}`}>
-                          {item.evaluationGrade}
-                        </span>
-                      )}
-                    </td>
-                    <td>
-                      <button className={styles.detailBtn}>평가</button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await fetchSalesOrgEvaluations({ channelType, page, size: 20 });
+      setItems(data.items ?? []);
+      setTotal(data.total ?? 0);
+    } catch { } finally { setLoading(false); }
+  }, [channelType, page]);
+
+  useEffect(() => { load(); }, [load]);
+
+  const totalPages = Math.max(1, Math.ceil(total / 20));
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-bold text-on-surface">영업조직 평가</h1>
+          <p className="text-sm text-on-surface-variant mt-0.5">총 {total}건</p>
+        </div>
+        <div className="flex gap-1">
+          {CHANNEL_TYPE_OPTIONS.map(({ value, label }) => (
+            <button key={value} onClick={() => { setChannelType(value); setPage(1); }}
+              className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${channelType === value ? 'bg-primary text-on-primary' : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'}`}>{label}</button>
+          ))}
         </div>
       </div>
-
-      {/* Side Panel */}
-      {panelOpen && (
-        <div className={styles.panelOverlay} onClick={() => setPanelOpen(false)}>
-          <div className={styles.panel} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.panelHeader}>
-              <div>
-                <h3 className={styles.panelTitle}>평가 등록</h3>
-                <p className={styles.panelSub}>선택된 조직에 대한 최종 평가를 입력하세요.</p>
-              </div>
-              <button className={styles.panelClose} onClick={() => setPanelOpen(false)}>✕</button>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="lg:col-span-7 flex flex-col gap-3">
+          {loading ? (
+            <div className="flex justify-center py-16"><div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" /></div>
+          ) : items.length === 0 ? (
+            <div className="card flex flex-col items-center justify-center py-16 gap-3 text-on-surface-variant">
+              <span className="material-symbols-outlined text-4xl text-outline">leaderboard</span>
+              <p className="text-sm">평가 내역이 없습니다.</p>
             </div>
-
-            <div className={styles.panelBody}>
-              {selectedItem && (
-                <div className={styles.selectedInfo}>
-                  <p className={styles.selectedInfoLabel}>SELECTED CHANNEL</p>
-                  <p className={styles.selectedInfoName}>{selectedItem.channelName ?? selectedItem.channelType ?? '-'}</p>
-                  {selectedItem.evaluationGrade && (
-                    <p className={styles.selectedInfoSub}>최근 평가: {selectedItem.startDate ?? '-'} ({selectedItem.evaluationGrade}등급)</p>
-                  )}
-                </div>
-              )}
-
-              <div className={styles.panelField}>
-                <label className={styles.panelLabel}>평가 등급 선택</label>
-                <div className={styles.gradeGrid}>
-                  {GRADES.map((g) => (
-                    <button
-                      key={g}
-                      className={`${styles.gradeBtn} ${panelGrade === g ? styles.gradeBtnActive : ''}`}
-                      onClick={() => setPanelGrade(g)}
-                    >
-                      {g}
-                    </button>
+          ) : (
+            <div className="card overflow-hidden">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-outline-variant/50 bg-surface-container-low">
+                    {['채널명', '채널유형', '매출실적', '계약건수', '달성률', '등급'].map(h => (
+                      <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-on-surface-variant">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {items.map((item) => (
+                    <tr key={item.evaluationNo} onClick={() => setSelected(item)}
+                      className={`border-b border-outline-variant/30 cursor-pointer hover:bg-surface-container-low transition-colors ${selected?.evaluationNo === item.evaluationNo ? 'bg-primary/5' : ''}`}>
+                      <td className="px-4 py-3 font-medium text-on-surface">{item.channelName}</td>
+                      <td className="px-4 py-3 text-on-surface-variant">{item.channelType === 'DESIGNER' ? '설계사' : '대리점'}</td>
+                      <td className="px-4 py-3">{fmt(item.salesResult)}원</td>
+                      <td className="px-4 py-3">{fmt(item.contractCount)}건</td>
+                      <td className="px-4 py-3">{item.achievementRate != null ? `${Number(item.achievementRate).toFixed(1)}%` : '—'}</td>
+                      <td className="px-4 py-3">
+                        {item.evaluationGrade
+                          ? <span className={`badge ${EVAL_GRADE_CLS[item.evaluationGrade]}`}>{item.evaluationGrade}</span>
+                          : <span className="text-outline text-xs">미평가</span>}
+                      </td>
+                    </tr>
                   ))}
-                </div>
-              </div>
-
-              <div className={styles.panelField}>
-                <label className={styles.panelLabel}>평가 의견</label>
-                <textarea
-                  className={styles.panelTextarea}
-                  rows={6}
-                  placeholder="등급 산정 사유 및 향후 개선사항을 입력하세요..."
-                  value={panelComment}
-                  onChange={(e) => setPanelComment(e.target.value)}
-                />
-              </div>
-
-              <div className={styles.bonusCalc}>
-                <h4 className={styles.bonusTitle}>예상 성과급 계산</h4>
-                <div className={styles.bonusRow}><span className={styles.bonusMuted}>기본 지급률</span><span>100%</span></div>
-                <div className={styles.bonusRow}>
-                  <span className={styles.bonusMuted}>등급 가산 ({panelGrade})</span>
-                  <span className={styles.bonusGreen}>
-                    {panelGrade === 'S' ? '+40%' : panelGrade === 'A' ? '+20%' : panelGrade === 'B' ? '+10%' : panelGrade === 'C' ? '+0%' : '-10%'}
-                  </span>
-                </div>
-                <div className={styles.bonusFinal}>
-                  <span className={styles.bonusFinalLabel}>최종 지급액</span>
-                  <span className={styles.bonusFinalValue}>₩4,200,000</span>
-                </div>
-              </div>
+                </tbody>
+              </table>
             </div>
-
-            <div className={styles.panelFooter}>
-              <button className={styles.panelSubmitBtn}>평가 결과 저장 및 제출</button>
-              <p className={styles.panelNote}>제출 후에는 관리자의 승인 전까지만 수정이 가능합니다.</p>
+          )}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-1 pt-2">
+              <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="btn-ghost p-1.5 disabled:opacity-30"><span className="material-symbols-outlined text-[18px]">chevron_left</span></button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
+                <button key={p} onClick={() => setPage(p)} className={`w-8 h-8 rounded-lg text-sm font-medium ${p === page ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:bg-surface-container'}`}>{p}</button>
+              ))}
+              <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="btn-ghost p-1.5 disabled:opacity-30"><span className="material-symbols-outlined text-[18px]">chevron_right</span></button>
             </div>
-          </div>
+          )}
         </div>
-      )}
-    </Layout>
+        <div className="lg:col-span-5 lg:sticky lg:top-24 self-start">
+          <DetailPanel item={selected} onEvaluated={() => { setSelected(null); load(); }} />
+        </div>
+      </div>
+    </div>
   );
 }

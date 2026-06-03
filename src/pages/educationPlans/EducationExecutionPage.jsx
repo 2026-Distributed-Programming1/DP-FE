@@ -1,215 +1,154 @@
-import { useState } from 'react';
-import Layout from '../../components/layout/Layout';
-import styles from './EducationExecutionPage.module.css';
+import { useState, useEffect, useCallback } from 'react';
+import { fetchEducationExecutions, createEducationExecution, fetchEducationPreparations } from '../../api/educationPreparations';
 
-const MOCK_PLAN = {
-  title: '신입 설계사 온보딩 기술 교육',
-  date: '2024.10.12',
-  channelType: '오프라인 집합',
-  venue: '대회의실 A',
-  instructor: '김민준 팀장',
-};
+function NewModal({ onClose, onCreated }) {
+  const [preps, setPreps] = useState([]);
+  const [form, setForm] = useState({ prepNo: '', trainerName: '', memo: '' });
+  const [attendees, setAttendees] = useState([{ attendeeName: '', attended: true }]);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
-const INITIAL_ATTENDEES = [
-  { id: 1, name: '이서윤', dept: '서울 영업 1본부', attended: true },
-  { id: 2, name: '강도현', dept: '경기 지원본부', attended: true },
-  { id: 3, name: '박지아', dept: '상품개발 TFT', attended: false },
-  { id: 4, name: '최준호', dept: '영남 관리팀', attended: true },
-  { id: 5, name: '정유진', dept: '전략기획실', attended: true },
-];
+  useEffect(() => {
+    fetchEducationPreparations({ size: 100 })
+      .then(d => setPreps(d.items ?? []))
+      .catch(() => {});
+  }, []);
 
-const TOTAL = 42;
-const BASE_ATTENDED = 31; // 나머지 37명 중 31명 출석 (초기값 35/42 맞춤)
+  const set = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.value }));
 
-export default function EducationExecutionPage() {
-  const [attendees, setAttendees] = useState(INITIAL_ATTENDEES);
-  const [memo, setMemo] = useState('');
-  const [toast, setToast] = useState(false);
-
-  const attendedCount = BASE_ATTENDED + attendees.filter((a) => a.attended).length;
-  const progressPct = Math.round((attendedCount / TOTAL) * 100);
-
-  function toggleAttendance(id, attended) {
-    setAttendees((prev) => prev.map((a) => (a.id === id ? { ...a, attended } : a)));
-  }
-
-  function handleComplete() {
-    setToast(true);
-    setTimeout(() => setToast(false), 3000);
-  }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    try {
+      await createEducationExecution({ ...form, attendances: attendees.filter(a => a.attendeeName) });
+      onCreated();
+    } catch { setError('등록에 실패했습니다.'); } finally { setSubmitting(false); }
+  };
 
   return (
-    <Layout title="교육 진행 관리">
-      <div className={styles.page}>
-        {/* Hero */}
-        <section className={styles.hero}>
-          <div className={styles.heroLeft}>
-            <div className={styles.iconWrap}>📖</div>
-            <div>
-              <h2 className={styles.title}>교육 진행 관리</h2>
-              <p className={styles.subtitle}>Education Progress Management</p>
-            </div>
-          </div>
-          <div className={styles.actions}>
-            <button className={styles.btnOutline}>취소</button>
-            <button className={styles.btnPrimary} onClick={handleComplete}>진행 완료</button>
-          </div>
-        </section>
-
-        {/* Grid */}
-        <div className={styles.grid}>
-          {/* Left Column */}
-          <div className={styles.leftCol}>
-            <div className={styles.glassPanel}>
-              <h3 className={styles.cardTitle}>
-                <span className={styles.accentBar} />
-                교육 정보
-              </h3>
-              <div className={styles.infoList}>
-                <div>
-                  <p className={styles.infoLabel}>교육 명칭</p>
-                  <p className={styles.infoValuePrimary}>{MOCK_PLAN.title}</p>
-                </div>
-                <div className={styles.infoRow2}>
-                  <div>
-                    <p className={styles.infoLabel}>교육 일시</p>
-                    <p className={styles.infoValue}>📅 {MOCK_PLAN.date}</p>
-                  </div>
-                  <div>
-                    <p className={styles.infoLabel}>채널 유형</p>
-                    <span className={styles.channelBadge}>{MOCK_PLAN.channelType}</span>
-                  </div>
-                </div>
-                <div>
-                  <p className={styles.infoLabel}>장소</p>
-                  <p className={styles.infoValue}>📍 {MOCK_PLAN.venue}</p>
-                </div>
-                <div>
-                  <p className={styles.infoLabel}>강사명</p>
-                  <div className={styles.instructorRow}>
-                    <div className={styles.instructorAvatar}>👤</div>
-                    <span className={styles.infoValue}>{MOCK_PLAN.instructor}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className={styles.glassPanel}>
-              <h3 className={styles.cardTitle}>
-                <span className={styles.accentBar} />
-                교육 진행 메모
-              </h3>
-              <textarea
-                className={styles.memoTextarea}
-                placeholder="특이사항이나 진행 중 메모를 입력하세요..."
-                value={memo}
-                onChange={(e) => setMemo(e.target.value)}
-                rows={6}
-              />
-            </div>
-          </div>
-
-          {/* Right Column */}
-          <div className={styles.rightCol}>
-            {/* Status Summary */}
-            <div className={styles.statusSummary}>
-              <div className={styles.statusLeft}>
-                <div className={styles.statusIconWrap}>👥</div>
-                <div>
-                  <p className={styles.statusLabel}>실시간 출석 현황</p>
-                  <p className={styles.statusCount}>
-                    <span className={styles.statusCountNum}>{attendedCount}</span>
-                    <span className={styles.statusCountTotal}> / {TOTAL}명</span>
-                  </p>
-                </div>
-              </div>
-              <div className={styles.progressTrack}>
-                <div className={styles.progressBar} style={{ width: `${progressPct}%` }} />
-              </div>
-            </div>
-
-            {/* Attendance Table */}
-            <div className={styles.tablePanel}>
-              <div className={styles.tableHeader}>
-                <h3 className={styles.tableTitle}>출석 관리 명단</h3>
-                <div className={styles.tableActions}>
-                  <button className={styles.iconBtn} title="필터">⚙️</button>
-                  <button className={styles.iconBtn} title="다운로드">⬇️</button>
-                </div>
-              </div>
-              <div className={styles.tableWrapper}>
-                <table className={styles.table}>
-                  <thead>
-                    <tr>
-                      <th>이름</th>
-                      <th>부서</th>
-                      <th className={styles.thCenter}>출석 여부</th>
-                      <th className={styles.thRight}>상태</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {attendees.map((a) => (
-                      <tr key={a.id} className={styles.tableRow}>
-                        <td>
-                          <div className={styles.nameCell}>
-                            <div className={styles.avatar}>{a.name[0]}</div>
-                            <span className={styles.nameText}>{a.name}</span>
-                          </div>
-                        </td>
-                        <td className={styles.deptCell}>{a.dept}</td>
-                        <td className={styles.attendanceCell}>
-                          <div className={styles.toggleBtns}>
-                            <button
-                              className={a.attended ? styles.btnAttendActive : styles.btnAttend}
-                              onClick={() => toggleAttendance(a.id, true)}
-                            >
-                              {a.attended ? '✓ 출석' : '출석'}
-                            </button>
-                            <button
-                              className={!a.attended ? styles.btnAbsentActive : styles.btnAbsent}
-                              onClick={() => toggleAttendance(a.id, false)}
-                            >
-                              {!a.attended ? '✕ 결석' : '결석'}
-                            </button>
-                          </div>
-                        </td>
-                        <td className={styles.statusCell}>
-                          {a.attended ? (
-                            <span className={styles.badgeComplete}>
-                              <span className={styles.dotGreen} /> 완료
-                            </span>
-                          ) : (
-                            <span className={styles.badgeAbsent}>
-                              <span className={styles.dotRed} /> 미입실
-                            </span>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              <div className={styles.tablePagination}>
-                <span className={styles.paginationInfo}>Showing 5 of {TOTAL} participants</span>
-                <div className={styles.paginationBtns}>
-                  <button className={styles.pageBtn}>‹</button>
-                  <button className={`${styles.pageBtn} ${styles.pageBtnActive}`}>1</button>
-                  <button className={styles.pageBtn}>2</button>
-                  <button className={styles.pageBtn}>3</button>
-                  <button className={styles.pageBtn}>›</button>
-                </div>
-              </div>
-            </div>
-          </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm px-4">
+      <div className="card w-full max-w-md max-h-[90vh] overflow-y-auto p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="font-semibold text-on-surface">교육 실행 등록</h3>
+          <button onClick={onClose} className="btn-ghost p-1"><span className="material-symbols-outlined text-[20px]">close</span></button>
         </div>
-
-        {toast && (
-          <div className={styles.toast}>
-            <div className={styles.toastIcon}>✓</div>
-            <p>교육 진행이 완료 처리되었습니다.</p>
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-on-surface-variant">교육 제반 *</label>
+            <select className="input text-sm" value={form.prepNo} onChange={set('prepNo')} required>
+              <option value="">선택하세요</option>
+              {preps.map(p => <option key={p.prepNo} value={p.prepNo}>{p.planNo} - {p.venue} ({p.prepNo})</option>)}
+            </select>
           </div>
-        )}
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-on-surface-variant">강사명 *</label>
+            <input className="input text-sm" value={form.trainerName} onChange={set('trainerName')} required />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-on-surface-variant">출석 현황</label>
+            {attendees.map((a, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <input className="input text-sm flex-1" placeholder="이름" value={a.attendeeName}
+                  onChange={e => setAttendees(arr => arr.map((x, j) => j === i ? { ...x, attendeeName: e.target.value } : x))} />
+                <label className="flex items-center gap-1 text-sm shrink-0">
+                  <input type="checkbox" className="accent-primary" checked={a.attended}
+                    onChange={e => setAttendees(arr => arr.map((x, j) => j === i ? { ...x, attended: e.target.checked } : x))} />
+                  출석
+                </label>
+              </div>
+            ))}
+            <button type="button" className="btn-ghost text-xs" onClick={() => setAttendees(arr => [...arr, { attendeeName: '', attended: true }])}>+ 추가</button>
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-on-surface-variant">메모</label>
+            <textarea className="input resize-none text-sm" rows={2} value={form.memo} onChange={set('memo')} />
+          </div>
+          {error && <p className="text-xs text-error">{error}</p>}
+          <div className="flex gap-2">
+            <button type="button" className="btn-secondary flex-1" onClick={onClose}>취소</button>
+            <button type="submit" className="btn-primary flex-1" disabled={submitting}>{submitting ? '등록 중...' : '실행 완료 등록'}</button>
+          </div>
+        </form>
       </div>
-    </Layout>
+    </div>
+  );
+}
+
+export default function EducationExecutionPage() {
+  const [items, setItems] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const d = await fetchEducationExecutions({ page, size: 20 });
+      setItems(d.items ?? []);
+      setTotal(d.total ?? 0);
+    } catch { } finally { setLoading(false); }
+  }, [page]);
+
+  useEffect(() => { load(); }, [load]);
+  const totalPages = Math.max(1, Math.ceil(total / 20));
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-bold text-on-surface">교육 실행</h1>
+          <p className="text-sm text-on-surface-variant mt-0.5">총 {total}건</p>
+        </div>
+        <button onClick={() => setShowNew(true)} className="btn-primary flex items-center gap-1.5">
+          <span className="material-symbols-outlined text-[16px]">add</span>실행 등록
+        </button>
+      </div>
+
+      {loading ? (
+        <div className="flex justify-center py-16"><div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" /></div>
+      ) : items.length === 0 ? (
+        <div className="card flex flex-col items-center justify-center py-16 gap-3 text-on-surface-variant">
+          <span className="material-symbols-outlined text-4xl text-outline">play_circle</span>
+          <p className="text-sm">등록된 교육 실행이 없습니다.</p>
+        </div>
+      ) : (
+        <div className="card overflow-hidden">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-outline-variant/50 bg-surface-container-low">
+                {['실행번호', '강사', '실행일시', '출석/전체', '상태'].map(h => (
+                  <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-on-surface-variant">{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {items.map(item => (
+                <tr key={item.executionNo} className="border-b border-outline-variant/30 hover:bg-surface-container-low">
+                  <td className="px-4 py-3 font-mono text-xs text-primary">{item.executionNo}</td>
+                  <td className="px-4 py-3 font-medium text-on-surface">{item.trainerName}</td>
+                  <td className="px-4 py-3 text-xs text-on-surface-variant">
+                    {item.executedAt ? new Date(item.executedAt).toLocaleDateString('ko-KR') : '—'}
+                  </td>
+                  <td className="px-4 py-3 text-on-surface-variant">{item.attendeeCount}/{item.totalCount}</td>
+                  <td className="px-4 py-3"><span className="badge bg-primary-container/20 text-primary text-[11px]">{item.status ?? '완료'}</span></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-1">
+          <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="btn-ghost p-1.5 disabled:opacity-30"><span className="material-symbols-outlined text-[18px]">chevron_left</span></button>
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
+            <button key={p} onClick={() => setPage(p)} className={`w-8 h-8 rounded-lg text-sm font-medium ${p === page ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:bg-surface-container'}`}>{p}</button>
+          ))}
+          <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="btn-ghost p-1.5 disabled:opacity-30"><span className="material-symbols-outlined text-[18px]">chevron_right</span></button>
+        </div>
+      )}
+      {showNew && <NewModal onClose={() => setShowNew(false)} onCreated={() => { setShowNew(false); load(); }} />}
+    </div>
   );
 }

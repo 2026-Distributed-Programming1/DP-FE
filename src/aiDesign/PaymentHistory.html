@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+
+<html lang="ko"><head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>보험료 납부 내역 관리 - Kindred Assurance</title>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-surface": "#191c1e",
+            "on-tertiary-fixed": "#002113",
+            "on-secondary": "#ffffff",
+            "glass-border": "rgba(0, 108, 73, 0.08)",
+            "on-secondary-fixed-variant": "#0b513d",
+            "surface-container": "#eceef0",
+            "primary-fixed": "#9df4c8",
+            "outline-variant": "#bbcabf",
+            "outline": "#6f7a72",
+            "inverse-surface": "#2d3133",
+            "on-primary-container": "#93eabe",
+            "error-container": "#ffdad6",
+            "surface-bright": "#f7f9fb",
+            "primary-container": "#006c49",
+            "tertiary-fixed": "#6ffbbe",
+            "error": "#ba1a1a",
+            "tertiary-fixed-dim": "#4edea3",
+            "on-primary-fixed": "#002113",
+            "on-tertiary-container": "#63f1b4",
+            "on-background": "#191c1e",
+            "primary-fixed-dim": "#81d8ad",
+            "on-secondary-fixed": "#002117",
+            "tertiary": "#005136",
+            "surface-container-lowest": "#ffffff",
+            "inverse-primary": "#81d8ad",
+            "on-secondary-container": "#326f5a",
+            "surface-container-highest": "#e0e3e5",
+            "glass-bg": "rgba(255, 255, 255, 0.75)",
+            "secondary-container": "#b0f0d5",
+            "secondary-fixed": "#b0f0d5",
+            "primary": "#005136",
+            "inverse-on-surface": "#eff1f3",
+            "surface-tint": "#006c49",
+            "surface-container-low": "#f2f4f6",
+            "surface": "#f7f9fb",
+            "surface-container-high": "#e6e8ea",
+            "secondary": "#2b6954",
+            "surface-dim": "#d8dadc",
+            "on-surface-variant": "#3f4943",
+            "tertiary-container": "#006c49",
+            "on-tertiary-fixed-variant": "#005236",
+            "on-error-container": "#93000a",
+            "surface-variant": "#e0e3e5",
+            "on-tertiary": "#ffffff",
+            "on-error": "#ffffff",
+            "background": "#f7f9fb",
+            "on-primary": "#ffffff",
+            "secondary-fixed-dim": "#95d3ba",
+            "on-primary-fixed-variant": "#005236"
+          },
+          "borderRadius": {
+            "DEFAULT": "1rem",
+            "lg": "2rem",
+            "xl": "3rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "margin-desktop": "40px",
+            "gutter": "24px",
+            "margin-mobile": "16px",
+            "unit": "8px",
+            "container-max-width": "1280px",
+            "nav-height": "80px"
+          },
+          "fontFamily": {
+            "caption": ["Inter"],
+            "headline-md": ["Inter"],
+            "body-md": ["Inter"],
+            "label-md": ["Inter"],
+            "headline-lg": ["Inter"],
+            "display-lg": ["Inter"],
+            "body-lg": ["Inter"]
+          },
+          "fontSize": {
+            "caption": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "400"}],
+            "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "0em", "fontWeight": "500"}],
+            "body-md": ["16px", {"lineHeight": "24px", "letterSpacing": "0.01em", "fontWeight": "400"}],
+            "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+            "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+            "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+            "body-lg": ["18px", {"lineHeight": "28px", "letterSpacing": "0.01em", "fontWeight": "400"}]
+          }
+        },
+      },
+    }
+  </script>
+  <style>
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(0, 108, 73, 0.08);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+    .glass-panel:hover {
+      box-shadow: 0 30px 60px -15px rgba(0, 108, 73, 0.12);
+      transform: translateY(-4px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #bbcabf;
+      border-radius: 10px;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+  </style>
+</head>
+<body class="bg-background font-body-md text-on-surface custom-scrollbar">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full h-[80px] z-50 flex items-center justify-between px-margin-desktop bg-glass-bg border-b border-glass-border backdrop-blur-md shadow-sm">
+  <div class="flex items-center gap-4">
+    <span class="font-headline-md text-headline-md font-bold text-primary">Kindred Assurance</span>
+  </div>
+  <div class="flex items-center gap-gutter">
+    <div class="relative w-64">
+      <input class="w-full pl-10 pr-4 py-2 rounded-full border-outline-variant bg-surface-container-low focus:ring-primary focus:border-primary font-body-md text-body-md" placeholder="Search..." type="text"/>
+      <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+    </div>
+    <div class="flex items-center gap-4 text-on-surface-variant">
+      <button class="p-2 hover:bg-surface-container-low rounded-full transition-colors"><span class="material-symbols-outlined">notifications</span></button>
+      <div class="flex items-center gap-3 cursor-pointer p-1 pr-3 hover:bg-surface-container-low rounded-full transition-colors">
+        <img class="w-10 h-10 rounded-full object-cover shadow-sm" data-alt="A professional headshot of a mature Asian male executive in his 40s, wearing a tailored navy suit and smiling warmly. The lighting is soft and corporate, set against a blurred modern office background with emerald green interior accents, maintaining a high-key professional aesthetic that reflects security and trust." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZxlsidl7vRO9aWqzE2Ab-NrHYeT_p4QUZc3jfRMxhyEKN5glV8Y4d7vXoGwnjD2QDAiI1XUGuEtxjI9Ojlj2OGLp_Z5Sa3EmnwDR_LSzO0t_EM3y13y_DiH9479kwlryYW6mEEfVkjVBqiP1a7l34yZ7Ovi2Afjf6P3gPmdvWPVE7F3KwdTtGiDLdt0jQNlhu1rxX-dkUS_F1Mb6c7l4QOV6lueWv6vGg2C9s0WMs6sFzSS5lpEs-_jIi0iSe54--OqHri-LwoQc"/>
+        <span class="font-label-md text-label-md">김관리 매니저</span>
+      </div>
+    </div>
+  </div>
+</header>
+<!-- SideNavBar (Collapsible) -->
+<aside class="fixed left-0 top-0 h-full pt-[80px] flex flex-col z-40 transition-all duration-300 w-64 bg-surface-container-lowest border-r border-glass-border shadow-md" id="sidebar">
+  <div class="p-6">
+    <div class="flex flex-col gap-1">
+      <span class="font-headline-md text-headline-md text-primary font-bold">Kindred</span>
+      <span class="font-label-md text-label-md text-on-surface-variant opacity-70">Management Suite</span>
+    </div>
+  </div>
+  <nav class="flex-1 px-3 space-y-1">
+    <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-r-full transition-all duration-300" href="#">
+      <span class="material-symbols-outlined">dashboard</span>
+      <span class="font-label-md text-label-md">Dashboard</span>
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-r-full font-bold" href="#">
+      <span class="material-symbols-outlined">policy</span>
+      <span class="font-label-md text-label-md">Policies</span>
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-r-full transition-all duration-300" href="#">
+      <span class="material-symbols-outlined">description</span>
+      <span class="font-label-md text-label-md">Claims</span>
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-r-full transition-all duration-300" href="#">
+      <span class="material-symbols-outlined">group</span>
+      <span class="font-label-md text-label-md">Agents</span>
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-r-full transition-all duration-300" href="#">
+      <span class="material-symbols-outlined">gavel</span>
+      <span class="font-label-md text-label-md">Underwriting</span>
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-r-full transition-all duration-300" href="#">
+      <span class="material-symbols-outlined">assessment</span>
+      <span class="font-label-md text-label-md">Reports</span>
+    </a>
+  </nav>
+  <div class="p-6">
+    <button class="w-full flex items-center justify-center gap-2 py-2 bg-surface-container-high text-on-surface-variant rounded-lg hover:bg-outline-variant transition-colors active:scale-95" id="sidebarToggle">
+      <span class="material-symbols-outlined">first_page</span>
+      <span class="font-label-md">접기</span>
+    </button>
+  </div>
+</aside>
+<!-- Main Content -->
+<main class="ml-64 pt-[80px] min-h-screen transition-all duration-300" id="main-content">
+  <div class="max-w-[1280px] mx-auto px-margin-desktop py-10">
+    <!-- Header Section -->
+    <div class="flex items-center justify-between mb-8">
+      <div class="flex items-center gap-4">
+        <button class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-lowest border border-glass-border hover:bg-surface-container-high transition-colors text-primary active:scale-90">
+          <span class="material-symbols-outlined">arrow_back</span>
+        </button>
+        <div class="flex items-center gap-3">
+          <img alt="Payment Icon" class="w-12 h-12" src="https://lh3.googleusercontent.com/aida/AP1WRLvbCBFyXZjiEgVqXvwpB2gyPdXKJ80niekbCtl5xwiTxo5r_-lWCJoONE06T_6tXxf9jsa9vvPAtKABdWRZWOJEQ_VwApfQ1I2ZPJFUiVH_zqddh7XZnq_10kL0TIU7yQfXLKwoV5bhRzlWaeBdszYNimLKhxxLawEmvqUHbv4QrDObwIfihvpHRWSad_dCDrApSwrc9T_shvssjIcxJ-PNama_OD-W_enHcxgYvjmKFiuWZlOYpe5LNB4"/>
+          <h1 class="font-headline-lg text-headline-lg text-on-surface">수납/입금 관리</h1>
+        </div>
+      </div>
+      <button class="flex items-center gap-2 px-6 py-3 bg-primary-container text-on-primary text-label-md font-label-md rounded-full shadow-lg hover:shadow-xl hover:translate-y-[-2px] active:scale-95 transition-all">
+        <span class="material-symbols-outlined">schedule_send</span>
+        미납 알림 자동 발송 설정
+      </button>
+    </div>
+    <!-- Search/Filter Section -->
+    <section class="glass-panel p-8 rounded-lg mb-gutter">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
+        <div class="flex flex-col gap-2">
+          <label class="font-label-md text-label-md text-on-surface-variant">조회 기간</label>
+          <div class="flex items-center gap-2">
+            <input class="flex-1 p-3 rounded-lg border-outline-variant bg-surface-container-low text-body-md focus:ring-primary focus:border-primary" type="date"/>
+            <span class="text-on-surface-variant">~</span>
+            <input class="flex-1 p-3 rounded-lg border-outline-variant bg-surface-container-low text-body-md focus:ring-primary focus:border-primary" type="date"/>
+          </div>
+        </div>
+        <div class="flex flex-col gap-2">
+          <label class="font-label-md text-label-md text-on-surface-variant">수납 상태</label>
+          <select class="p-3 rounded-lg border-outline-variant bg-surface-container-low text-body-md focus:ring-primary focus:border-primary appearance-none">
+            <option value="all">전체 내역</option>
+            <option value="pending">미납 (Pending)</option>
+            <option value="completed">완납 (Completed)</option>
+          </select>
+        </div>
+        <div class="flex flex-col gap-2">
+          <label class="font-label-md text-label-md text-on-surface-variant">고객명/증권번호</label>
+          <input class="p-3 rounded-lg border-outline-variant bg-surface-container-low text-body-md focus:ring-primary focus:border-primary" placeholder="검색어 입력" type="text"/>
+        </div>
+        <button class="h-[52px] bg-primary text-on-primary font-label-md text-label-md rounded-lg flex items-center justify-center gap-2 hover:bg-on-tertiary-fixed-variant transition-colors active:scale-95 shadow-md">
+          <span class="material-symbols-outlined">search</span>
+          조회하기
+        </button>
+      </div>
+    </section>
+    <!-- Table Section -->
+    <section class="glass-panel rounded-lg overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+          <tr class="bg-surface-container-low text-on-surface-variant font-label-md text-label-md">
+            <th class="px-6 py-4 border-b border-glass-border">납부일</th>
+            <th class="px-6 py-4 border-b border-glass-border">납부 ID</th>
+            <th class="px-6 py-4 border-b border-glass-border">고객명</th>
+            <th class="px-6 py-4 border-b border-glass-border">보험 상품명</th>
+            <th class="px-6 py-4 border-b border-glass-border">증권번호</th>
+            <th class="px-6 py-4 border-b border-glass-border">납부금액</th>
+            <th class="px-6 py-4 border-b border-glass-border">수단</th>
+            <th class="px-6 py-4 border-b border-glass-border">상태</th>
+            <th class="px-6 py-4 border-b border-glass-border">관리</th>
+          </tr>
+          </thead>
+          <tbody class="divide-y divide-glass-border">
+          <!-- Row 1 -->
+          <tr class="hover:bg-surface-container-lowest transition-colors group">
+            <td class="px-6 py-5 font-body-md text-body-md">2023.10.24</td>
+            <td class="px-6 py-5 font-body-md text-body-md text-on-surface-variant">TX-90123</td>
+            <td class="px-6 py-5 font-body-md text-body-md font-medium">이정민</td>
+            <td class="px-6 py-5 font-body-md text-body-md">종합 건강 실손 보험</td>
+            <td class="px-6 py-5 font-body-md text-body-md text-on-surface-variant">KIND-9021</td>
+            <td class="px-6 py-5 font-body-md text-body-md font-bold text-primary">₩125,000</td>
+            <td class="px-6 py-5">
+              <span class="px-3 py-1 rounded-full bg-surface-container text-on-surface-variant text-caption font-caption">카드</span>
+            </td>
+            <td class="px-6 py-5">
+              <span class="px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container text-caption font-caption font-bold">완납</span>
+            </td>
+            <td class="px-6 py-5">
+              <button class="text-primary hover:underline font-label-md text-label-md">상세보기</button>
+            </td>
+          </tr>
+          <!-- Row 2 -->
+          <tr class="hover:bg-surface-container-lowest transition-colors group">
+            <td class="px-6 py-5 font-body-md text-body-md">2023.10.23</td>
+            <td class="px-6 py-5 font-body-md text-body-md text-on-surface-variant">TX-90122</td>
+            <td class="px-6 py-5 font-body-md text-body-md font-medium">박서준</td>
+            <td class="px-6 py-5 font-body-md text-body-md">초간편 운전자 보험</td>
+            <td class="px-6 py-5 font-body-md text-body-md text-on-surface-variant">KIND-5541</td>
+            <td class="px-6 py-5 font-body-md text-body-md font-bold text-primary">₩45,000</td>
+            <td class="px-6 py-5">
+              <span class="px-3 py-1 rounded-full bg-surface-container text-on-surface-variant text-caption font-caption">계좌이체</span>
+            </td>
+            <td class="px-6 py-5">
+              <span class="px-3 py-1 rounded-full bg-error-container text-on-error-container text-caption font-caption font-bold">미납</span>
+            </td>
+            <td class="px-6 py-5">
+              <button class="text-primary hover:underline font-label-md text-label-md">상세보기</button>
+            </td>
+          </tr>
+          <!-- Row 3 -->
+          <tr class="hover:bg-surface-container-lowest transition-colors group">
+            <td class="px-6 py-5 font-body-md text-body-md">2023.10.22</td>
+            <td class="px-6 py-5 font-body-md text-body-md text-on-surface-variant">TX-90121</td>
+            <td class="px-6 py-5 font-body-md text-body-md font-medium">최지우</td>
+            <td class="px-6 py-5 font-body-md text-body-md">무배당 연금보험</td>
+            <td class="px-6 py-5 font-body-md text-body-md text-on-surface-variant">KIND-1002</td>
+            <td class="px-6 py-5 font-body-md text-body-md font-bold text-primary">₩350,000</td>
+            <td class="px-6 py-5">
+              <span class="px-3 py-1 rounded-full bg-surface-container text-on-surface-variant text-caption font-caption">간편결제</span>
+            </td>
+            <td class="px-6 py-5">
+              <span class="px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container text-caption font-caption font-bold">완납</span>
+            </td>
+            <td class="px-6 py-5">
+              <button class="text-primary hover:underline font-label-md text-label-md">상세보기</button>
+            </td>
+          </tr>
+          <!-- Row 4 -->
+          <tr class="hover:bg-surface-container-lowest transition-colors group">
+            <td class="px-6 py-5 font-body-md text-body-md">2023.10.22</td>
+            <td class="px-6 py-5 font-body-md text-body-md text-on-surface-variant">TX-90120</td>
+            <td class="px-6 py-5 font-body-md text-body-md font-medium">정해인</td>
+            <td class="px-6 py-5 font-body-md text-body-md">화재 배상 책임 보험</td>
+            <td class="px-6 py-5 font-body-md text-body-md text-on-surface-variant">KIND-7782</td>
+            <td class="px-6 py-5 font-body-md text-body-md font-bold text-primary">₩88,200</td>
+            <td class="px-6 py-5">
+              <span class="px-3 py-1 rounded-full bg-surface-container text-on-surface-variant text-caption font-caption">카드</span>
+            </td>
+            <td class="px-6 py-5">
+              <span class="px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container text-caption font-caption font-bold">완납</span>
+            </td>
+            <td class="px-6 py-5">
+              <button class="text-primary hover:underline font-label-md text-label-md">상세보기</button>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- Pagination -->
+      <div class="p-6 bg-surface-container-low flex items-center justify-between">
+        <span class="font-caption text-caption text-on-surface-variant">전체 1,248건 중 1-10건 표시</span>
+        <div class="flex items-center gap-2">
+          <button class="w-8 h-8 flex items-center justify-center rounded-md border border-outline-variant hover:bg-surface-container-high transition-colors"><span class="material-symbols-outlined text-[18px]">chevron_left</span></button>
+          <button class="w-8 h-8 flex items-center justify-center rounded-md bg-primary text-on-primary font-label-md">1</button>
+          <button class="w-8 h-8 flex items-center justify-center rounded-md border border-outline-variant hover:bg-surface-container-high transition-colors font-label-md">2</button>
+          <button class="w-8 h-8 flex items-center justify-center rounded-md border border-outline-variant hover:bg-surface-container-high transition-colors font-label-md">3</button>
+          <button class="w-8 h-8 flex items-center justify-center rounded-md border border-outline-variant hover:bg-surface-container-high transition-colors font-label-md">4</button>
+          <button class="w-8 h-8 flex items-center justify-center rounded-md border border-outline-variant hover:bg-surface-container-high transition-colors font-label-md">5</button>
+          <button class="w-8 h-8 flex items-center justify-center rounded-md border border-outline-variant hover:bg-surface-container-high transition-colors"><span class="material-symbols-outlined text-[18px]">chevron_right</span></button>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+<script>
+  // Collapsible Sidebar Logic
+  const sidebar = document.getElementById('sidebar');
+  const mainContent = document.getElementById('main-content');
+  const sidebarToggle = document.getElementById('sidebarToggle');
+  const sidebarLabels = sidebar.querySelectorAll('span.font-label-md');
+  let isCollapsed = false;
+
+  sidebarToggle.addEventListener('click', () => {
+    isCollapsed = !isCollapsed;
+    if (isCollapsed) {
+      sidebar.style.width = '80px';
+      mainContent.style.marginLeft = '80px';
+      sidebarToggle.innerHTML = '<span class="material-symbols-outlined">last_page</span>';
+      sidebarLabels.forEach(label => label.classList.add('hidden'));
+    } else {
+      sidebar.style.width = '16rem';
+      mainContent.style.marginLeft = '16rem';
+      sidebarToggle.innerHTML = '<span class="material-symbols-outlined">first_page</span><span class="font-label-md">접기</span>';
+      sidebarLabels.forEach(label => label.classList.remove('hidden'));
+    }
+  });
+
+  // Add some micro-interactions
+  document.querySelectorAll('tr').forEach(row => {
+    row.addEventListener('click', () => {
+      row.classList.add('scale-[0.995]', 'opacity-80');
+      setTimeout(() => row.classList.remove('scale-[0.995]', 'opacity-80'), 100);
+    });
+  });
+</script>
+</body></html>

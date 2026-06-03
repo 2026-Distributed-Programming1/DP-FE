@@ -1,0 +1,333 @@
+.page {
+  padding: 32px;
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Header */
+.pageHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.headerTitle {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 600;
+  color: #191c1e;
+  line-height: 1.25;
+}
+
+.subtitle {
+  font-size: 16px;
+  color: #6f7a72;
+}
+
+.backBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  border: 1px solid #bbcabf;
+  border-radius: 9999px;
+  background: transparent;
+  color: #005136;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+.backBtn:hover {
+  background: #f2f4f6;
+}
+.backBtn:active {
+  transform: scale(0.97);
+}
+
+/* Main Grid */
+.grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+/* Detail Card (left) */
+.detailCard {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 108, 73, 0.08);
+  border-radius: 1rem;
+  padding: 40px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.detailCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(0, 108, 73, 0.08);
+}
+
+.cardTitle {
+  font-size: 24px;
+  font-weight: 700;
+  color: #005136;
+}
+
+.contractStatus {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #2b6954;
+}
+
+/* Fields */
+.fieldGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px 48px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fieldLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6f7a72;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.fieldValue {
+  font-size: 18px;
+  font-weight: 500;
+  color: #191c1e;
+  line-height: 1.5;
+}
+
+.mono {
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.amountValue {
+  font-size: 36px;
+  font-weight: 800;
+  color: #005136;
+  line-height: 1.2;
+}
+
+.installmentRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.installmentBadge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 9999px;
+  background: #b0f0d5;
+  color: #0b513d;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.errorText {
+  color: #ba1a1a;
+}
+
+/* Right Panel */
+.rightPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Status Card */
+.statusCard {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 108, 73, 0.08);
+  border-radius: 1rem;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.statusIcon {
+  width: 64px;
+  height: 64px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  margin-bottom: 16px;
+}
+
+.iconPending {
+  background: #fef9c3;
+}
+
+.iconApproved {
+  background: #b0f0d5;
+}
+
+.statusLabel {
+  font-size: 24px;
+  font-weight: 500;
+  color: #191c1e;
+  margin-bottom: 8px;
+}
+
+.statusDesc {
+  font-size: 16px;
+  color: #6f7a72;
+  line-height: 1.6;
+  margin-bottom: 32px;
+}
+
+.actionBtns {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.btnPrimary {
+  width: 100%;
+  padding: 14px;
+  background: #005136;
+  color: #fff;
+  border: none;
+  border-radius: 9999px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 108, 73, 0.25);
+  transition: background 0.2s, transform 0.1s;
+}
+.btnPrimary:hover {
+  background: #002113;
+}
+.btnPrimary:active {
+  transform: scale(0.97);
+}
+
+.btnOutline {
+  width: 100%;
+  padding: 14px;
+  background: transparent;
+  color: #005136;
+  border: 2px solid #005136;
+  border-radius: 9999px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+.btnOutline:hover {
+  background: #f2f4f6;
+}
+.btnOutline:active {
+  transform: scale(0.97);
+}
+
+.btnLink {
+  background: none;
+  border: none;
+  color: #005136;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 0 0;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  transition: color 0.2s;
+}
+.btnLink:hover {
+  color: #002113;
+}
+
+/* Notice Card */
+.noticeCard {
+  background: rgba(0, 108, 73, 0.07);
+  border: 1px solid rgba(0, 108, 73, 0.15);
+  border-radius: 1rem;
+  padding: 24px;
+  overflow: hidden;
+  position: relative;
+}
+
+.noticeContent {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.noticeIcon {
+  font-size: 20px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.noticeTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: #002113;
+  margin-bottom: 4px;
+}
+
+.noticeText {
+  font-size: 12px;
+  color: #002113;
+  opacity: 0.85;
+  line-height: 1.6;
+}
+
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding: 16px;
+  }
+  .fieldGrid {
+    grid-template-columns: 1fr;
+  }
+  .detailCard {
+    padding: 24px;
+  }
+}

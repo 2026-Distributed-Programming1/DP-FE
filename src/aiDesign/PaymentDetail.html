@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ko"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface": "#191c1e",
+                        "on-tertiary-fixed": "#002113",
+                        "on-secondary": "#ffffff",
+                        "glass-border": "rgba(0, 108, 73, 0.08)",
+                        "on-secondary-fixed-variant": "#0b513d",
+                        "surface-container": "#eceef0",
+                        "primary-fixed": "#9df4c8",
+                        "outline-variant": "#bbcabf",
+                        "outline": "#6f7a72",
+                        "inverse-surface": "#2d3133",
+                        "on-primary-container": "#93eabe",
+                        "error-container": "#ffdad6",
+                        "surface-bright": "#f7f9fb",
+                        "primary-container": "#006c49",
+                        "tertiary-fixed": "#6ffbbe",
+                        "error": "#ba1a1a",
+                        "tertiary-fixed-dim": "#4edea3",
+                        "on-primary-fixed": "#002113",
+                        "on-tertiary-container": "#63f1b4",
+                        "on-background": "#191c1e",
+                        "primary-fixed-dim": "#81d8ad",
+                        "on-secondary-fixed": "#002117",
+                        "tertiary": "#005136",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-primary": "#81d8ad",
+                        "on-secondary-container": "#326f5a",
+                        "surface-container-highest": "#e0e3e5",
+                        "glass-bg": "rgba(255, 255, 255, 0.75)",
+                        "secondary-container": "#b0f0d5",
+                        "secondary-fixed": "#b0f0d5",
+                        "primary": "#005136",
+                        "inverse-on-surface": "#eff1f3",
+                        "surface-tint": "#006c49",
+                        "surface-container-low": "#f2f4f6",
+                        "surface": "#f7f9fb",
+                        "surface-container-high": "#e6e8ea",
+                        "secondary": "#2b6954",
+                        "surface-dim": "#d8dadc",
+                        "on-surface-variant": "#3f4943",
+                        "tertiary-container": "#006c49",
+                        "on-tertiary-fixed-variant": "#005236",
+                        "on-error-container": "#93000a",
+                        "surface-variant": "#e0e3e5",
+                        "on-tertiary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "background": "#f7f9fb",
+                        "on-primary": "#ffffff",
+                        "secondary-fixed-dim": "#95d3ba",
+                        "on-primary-fixed-variant": "#005236"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "40px",
+                        "gutter": "24px",
+                        "margin-mobile": "16px",
+                        "unit": "8px",
+                        "container-max-width": "1280px",
+                        "nav-height": "80px"
+                    },
+                    "fontFamily": {
+                        "caption": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "caption": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "0em", "fontWeight": "500"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "letterSpacing": "0.01em", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "letterSpacing": "0.01em", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 108, 73, 0.08);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+        .glass-panel:hover {
+            box-shadow: 0 30px 60px -15px rgba(0, 108, 73, 0.12);
+            transform: translateY(-4px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #f7f9fb;
+            color: #191c1e;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full h-[80px] z-50 flex items-center justify-between px-margin-desktop bg-glass-bg border-b border-glass-border backdrop-blur-md shadow-sm">
+    <div class="flex items-center gap-4">
+        <span class="font-headline-md text-headline-md font-bold text-primary">Kindred Assurance</span>
+    </div>
+    <div class="flex items-center gap-6">
+        <div class="hidden md:flex items-center gap-8 text-on-surface-variant font-body-md">
+            <span class="cursor-pointer hover:text-primary transition-colors">내 보험</span>
+            <span class="cursor-pointer hover:text-primary transition-colors">보상 청구</span>
+            <span class="cursor-pointer hover:text-primary transition-colors">자산 관리</span>
+            <span class="cursor-pointer text-primary font-bold border-b-2 border-primary">관리 도구</span>
+        </div>
+        <div class="flex items-center gap-3">
+            <button class="p-2 rounded-full hover:bg-surface-container-low transition-colors active:scale-95">
+                <span class="material-symbols-outlined text-primary" data-icon="notifications">notifications</span>
+            </button>
+            <div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center overflow-hidden">
+                <img alt="User profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOU16rPMadBDr7JXjWIap_Dq2EewNfgY0NKicDNRUdZ_dumTvqvLOBcCKJSPDEeS8n_bYOXH_Buza5UzMfDbRgKPPlw3VvNJO0hxq8LS2SDUWo6uCmzpLOz5AUj5_9X9cpnTGUIkSZQ_EGc7eJENGeOTM3C0MaDPMjumcvv14-fta0LmyBsvkktO5JyA6Tok-XXat52-g_uTMnlBfT8QU26FqX09m0RPUiKpAk10ZepGReWm3HS_yxXOf-LpeVn9a0Jkq12_pCgDs"/>
+            </div>
+        </div>
+    </div>
+</nav>
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full pt-[80px] flex flex-col z-40 transition-all duration-300 w-64 bg-surface-container-lowest border-r border-glass-border shadow-md">
+    <div class="p-6 flex flex-col gap-1">
+        <h2 class="font-headline-md text-headline-md text-primary font-bold">Kindred</h2>
+        <p class="font-label-md text-label-md text-on-surface-variant opacity-70">Management Suite</p>
+    </div>
+    <nav class="flex-1 px-4 py-2 space-y-1">
+        <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-r-full transition-all duration-300" href="#">
+            <span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+            <span class="font-label-md text-label-md">Dashboard</span>
+        </a>
+        <a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-r-full font-bold" href="#">
+            <span class="material-symbols-outlined" data-icon="policy">policy</span>
+            <span class="font-label-md text-label-md">Policies</span>
+        </a>
+        <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-r-full transition-all" href="#">
+            <span class="material-symbols-outlined" data-icon="description">description</span>
+            <span class="font-label-md text-label-md">Claims</span>
+        </a>
+        <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-r-full transition-all" href="#">
+            <span class="material-symbols-outlined" data-icon="group">group</span>
+            <span class="font-label-md text-label-md">Agents</span>
+        </a>
+        <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-r-full transition-all" href="#">
+            <span class="material-symbols-outlined" data-icon="gavel">gavel</span>
+            <span class="font-label-md text-label-md">Underwriting</span>
+        </a>
+        <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-r-full transition-all" href="#">
+            <span class="material-symbols-outlined" data-icon="assessment">assessment</span>
+            <span class="font-label-md text-label-md">Reports</span>
+        </a>
+    </nav>
+</aside>
+<!-- Main Content Canvas -->
+<main class="pl-64 pt-[80px] min-h-screen">
+    <div class="max-w-[1280px] mx-auto px-margin-desktop py-10">
+        <!-- Header Section -->
+        <header class="flex items-center justify-between mb-10">
+            <div class="flex items-center gap-4">
+                <img alt="Calculator Icon" class="w-16 h-16 object-contain" src="https://lh3.googleusercontent.com/aida/AP1WRLsm0ru-5o2qyhJ75x-oSIlOHJB9UnPyG2Bv-CQOp4wCEb20TCe2GgUpvLI3KGuHHNeD7xM-WvPzm-SzkcdlANJ_gTkWtktRgtdK4bIf0w8lLRJT1ByEnltYSHpYkznJVAoFLoz8VYxB5tZQ0zZ71V_lXEEPlDisOaH3PgD49FTpYOMFBjMYnntKAamAcZqH-26WFCntovEPSlDsTmcjXP7bxxyEnI69Xb7kM4Ob309A3SXWdEndDqfhRMg"/>
+                <div>
+                    <h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">수납 상세 정보</h1>
+                    <p class="font-body-md text-body-md text-on-surface-variant">납입 내역 확인 및 결제 상태 업데이트</p>
+                </div>
+            </div>
+            <button class="flex items-center gap-2 px-6 py-2.5 rounded-full border border-outline-variant text-primary font-label-md hover:bg-surface-container-low transition-all active:scale-95">
+                <span class="material-symbols-outlined text-[20px]" data-icon="arrow_back">arrow_back</span>
+                목록으로 돌아가기
+            </button>
+        </header>
+        <!-- Grid Layout -->
+        <div class="grid grid-cols-12 gap-gutter items-start">
+            <!-- Left Panel: Payment Details -->
+            <section class="col-span-12 lg:col-span-8 glass-panel p-10 rounded-lg">
+                <div class="flex items-center justify-between mb-8 pb-4 border-b border-glass-border">
+                    <h3 class="font-headline-md text-headline-md text-primary font-bold">결제 정보 상세</h3>
+                    <div class="flex items-center gap-2 text-secondary font-label-md">
+                        <span class="material-symbols-outlined text-[18px]" data-icon="verified">verified</span>
+                        보험계약 정상
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-y-8 gap-x-12">
+                    <div class="space-y-1">
+                        <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">고객 성함</p>
+                        <p class="font-body-lg text-body-lg font-semibold">김한결</p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">보험 상품명</p>
+                        <p class="font-body-lg text-body-lg font-semibold">Kindred 든든 건강보험 v4</p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">증권 번호</p>
+                        <p class="font-body-lg text-body-lg font-mono">KA-2024-00192837</p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">납입 일자</p>
+                        <p class="font-body-lg text-body-lg">2024년 05월 20일</p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">수납 일련번호</p>
+                        <p class="font-body-lg text-body-lg">PAY-992-X2</p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">결제 수단</p>
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-on-surface-variant" data-icon="credit_card">credit_card</span>
+                            <p class="font-body-lg text-body-lg">신용카드 (현대 4421-****)</p>
+                        </div>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">실제 납부 금액</p>
+                        <p class="font-display-lg text-display-lg text-primary font-extrabold">₩ 128,500</p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">납입 회차</p>
+                        <div class="flex items-center gap-2">
+                            <p class="font-body-lg text-body-lg">48회차</p>
+                            <span class="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container text-caption font-semibold">정기납</span>
+                        </div>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">연체 이자</p>
+                        <p class="font-body-lg text-body-lg text-error font-semibold">₩ 0 (미발생)</p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">승인 번호</p>
+                        <p class="font-body-lg text-body-lg">AUTH-8827103</p>
+                    </div>
+                </div>
+            </section>
+            <!-- Right Panel: Actions -->
+            <aside class="col-span-12 lg:col-span-4 space-y-6">
+                <!-- Status Card -->
+                <div class="glass-panel p-8 rounded-lg flex flex-col items-center text-center">
+                    <div class="w-16 h-16 rounded-full bg-yellow-100 flex items-center justify-center mb-4">
+                        <span class="material-symbols-outlined text-yellow-700 text-[32px]" data-icon="pending">pending</span>
+                    </div>
+                    <h4 class="font-headline-md text-headline-md text-on-surface mb-2">승인 대기 중</h4>
+                    <p class="font-body-md text-body-md text-on-surface-variant mb-8">해당 결제 내역은 현재 데이터 검증 단계에 있습니다. 원장 반영을 확인해 주세요.</p>
+                    <div class="w-full space-y-3">
+                        <button class="w-full py-4 bg-primary text-on-primary rounded-full font-label-md hover:bg-tertiary transition-colors shadow-lg active:scale-95">
+                            승인 및 원장 업데이트
+                        </button>
+                        <button class="w-full py-4 border-2 border-primary text-primary rounded-full font-label-md hover:bg-surface-container-low transition-colors active:scale-95">
+                            수납 반려
+                        </button>
+                        <a class="block pt-4 text-primary font-label-md underline underline-offset-4 hover:text-tertiary" href="#">
+                            결제 이력 상세보기
+                        </a>
+                    </div>
+                </div>
+                <!-- Notice Card -->
+                <div class="bg-primary-container p-6 rounded-lg text-on-primary-container relative overflow-hidden shadow-inner">
+                    <div class="relative z-10 flex gap-4">
+                        <span class="material-symbols-outlined" data-icon="info" style="font-variation-settings: 'FILL' 1;">info</span>
+                        <div>
+                            <p class="font-label-md text-label-md font-bold mb-1">시스템 알림</p>
+                            <p class="font-caption text-caption opacity-90">원장 업데이트 완료 시, 고객님께 카카오 알림톡 및 LMS가 자동으로 발송됩니다.</p>
+                        </div>
+                    </div>
+                    <div class="absolute -right-4 -bottom-4 opacity-10">
+                        <span class="material-symbols-outlined text-[100px]" data-icon="campaign">campaign</span>
+                    </div>
+                </div>
+            </aside>
+        </div>
+        <!-- Decorative Glow Backgrounds -->
+        <div class="fixed top-1/4 right-0 w-96 h-96 bg-primary opacity-[0.03] blur-[120px] rounded-full -z-10"></div>
+        <div class="fixed bottom-0 left-1/4 w-96 h-96 bg-secondary opacity-[0.03] blur-[120px] rounded-full -z-10"></div>
+    </div>
+</main>
+<script>
+    // Micro-interactions
+    document.querySelectorAll('button').forEach(btn => {
+        btn.addEventListener('mouseenter', () => {
+            // Potential ripple or scale logic
+        });
+    });
+
+    // Simulating loading state or subtle entry animation
+    window.addEventListener('DOMContentLoaded', () => {
+        document.querySelector('main').style.opacity = '0';
+        document.querySelector('main').style.transition = 'opacity 0.6s ease-out';
+        setTimeout(() => {
+            document.querySelector('main').style.opacity = '1';
+        }, 50);
+    });
+</script>
+</body></html>

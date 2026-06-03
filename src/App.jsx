@@ -18,6 +18,8 @@ import InsuranceProductPage from './pages/insuranceProducts/InsuranceProductPage
 import EducationPreparationPage from './pages/educationPlans/EducationPreparationPage';
 import EducationExecutionPage from './pages/educationPlans/EducationExecutionPage';
 import LoginPage from './pages/auth/LoginPage';
+import PaymentHistoryPage from './pages/paymentHistory/PaymentHistoryPage';
+import PaymentDetailPage from './pages/paymentHistory/PaymentDetailPage';
 
 function PrivateRoute({ user, children }) {
   if (!user) return <Navigate to="/login" replace />;
@@ -99,6 +101,14 @@ export default function App() {
         <Route
           path="/education-executions"
           element={<PrivateRoute user={user}><EducationExecutionPage /></PrivateRoute>}
+        />
+        <Route
+          path="/payment-records"
+          element={<PrivateRoute user={user}><PaymentHistoryPage /></PrivateRoute>}
+        />
+        <Route
+          path="/payment-records/:id"
+          element={<PrivateRoute user={user}><PaymentDetailPage /></PrivateRoute>}
         />
       </Routes>
     </BrowserRouter>

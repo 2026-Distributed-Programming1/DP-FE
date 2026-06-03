@@ -1,0 +1,454 @@
+<!DOCTYPE html><html class="light" lang="ko"><head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Kindred Assurance - 영업 조직 평가 및 성과급 관리</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#006c49",
+                        "on-primary": "#ffffff",
+                        "primary-container": "#10b981",
+                        "on-primary-container": "#00422b",
+                        "secondary": "#2b6954",
+                        "on-secondary": "#ffffff",
+                        "secondary-container": "#adedd3",
+                        "on-secondary-container": "#306d58",
+                        "tertiary": "#416656",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#84ab98",
+                        "on-tertiary-container": "#1b3f31",
+                        "error": "#ba1a1a",
+                        "on-error": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#93000a",
+                        "background": "#f7f9fb",
+                        "on-background": "#191c1e",
+                        "surface": "#f7f9fb",
+                        "on-surface": "#191c1e",
+                        "surface-variant": "#e0e3e5",
+                        "on-surface-variant": "#3c4a42",
+                        "outline": "#6c7a71",
+                        "outline-variant": "#bbcabf",
+                        "glass-bg": "rgba(255, 255, 255, 0.75)",
+                        "glass-border": "rgba(0, 108, 73, 0.08)"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "nav-height": "80px",
+                        "margin-desktop": "40px",
+                        "container-max-width": "1280px",
+                        "margin-mobile": "16px",
+                        "gutter": "24px",
+                        "unit": "8px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "caption": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "letterSpacing": "0.01em", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "0em", "fontWeight": "500"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "caption": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "letterSpacing": "0.01em", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fb;
+            color: #191c1e;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #bbcabf;
+            border-radius: 10px;
+        }
+        #sidebar {
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #sidebar.collapsed {
+            width: 80px;
+        }
+        #sidebar.collapsed .sidebar-text,
+        #sidebar.collapsed .sidebar-header-text,
+        #sidebar.collapsed .sidebar-cta-text {
+            display: none;
+        }
+        #sidebar.collapsed .px-4 {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        #sidebar.collapsed .sidebar-cta {
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
+        #main-content {
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body class="bg-background overflow-hidden h-screen flex">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full flex flex-col bg-surface border-r border-outline-variant w-64 z-40 transition-all duration-300 ease-in-out" id="sidebar">
+    <div class="px-6 py-8 mb-4 flex items-center justify-between">
+        <div class="sidebar-header-text overflow-hidden whitespace-nowrap">
+            <h1 class="text-label-md font-bold text-primary flex items-center gap-2">
+                <span class="material-symbols-outlined">shield_with_heart</span>
+                Kindred Assurance
+            </h1>
+            <p class="text-xs text-outline mt-1">Admin Portal</p>
+        </div>
+        <button class="p-2 hover:bg-surface-variant rounded-lg" onclick="toggleSidebar()">
+            <span class="material-symbols-outlined" id="sidebar-toggle-icon">menu_open</span>
+        </button>
+    </div>
+    <nav class="flex-1 flex flex-col gap-1 overflow-y-auto custom-scrollbar">
+        <a class="flex items-center gap-3 p-3 mx-2 text-on-surface-variant hover:bg-surface-variant/50 rounded-lg transition-all duration-200" href="#">
+            <span class="material-symbols-outlined">dashboard</span>
+            <span class="font-label-md sidebar-text whitespace-nowrap">Dashboard</span>
+        </a>
+        <a class="flex items-center gap-3 p-3 mx-2 bg-primary-container text-on-primary-container rounded-lg transition-all duration-200 shadow-sm" href="#">
+            <span class="material-symbols-outlined">trending_up</span>
+            <span class="font-label-md sidebar-text font-bold whitespace-nowrap">Sales Management</span>
+        </a>
+        <a class="flex items-center gap-3 p-3 mx-2 text-on-surface-variant hover:bg-surface-variant/50 rounded-lg transition-all duration-200" href="#">
+            <span class="material-symbols-outlined">description</span>
+            <span class="font-label-md sidebar-text whitespace-nowrap">Underwriting</span>
+        </a>
+        <a class="flex items-center gap-3 p-3 mx-2 text-on-surface-variant hover:bg-surface-variant/50 rounded-lg transition-all duration-200" href="#">
+            <span class="material-symbols-outlined">security</span>
+            <span class="font-label-md sidebar-text whitespace-nowrap">Risk Assessment</span>
+        </a>
+        <div class="mt-auto px-4 sidebar-cta pb-4">
+            <button class="w-full bg-primary text-on-primary py-3 rounded-lg font-label-md hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined text-[20px]">analytics</span>
+                <span class="sidebar-cta-text whitespace-nowrap">Generate Report</span>
+            </button>
+        </div>
+        <a class="flex items-center gap-3 p-3 mx-2 mb-4 text-on-surface-variant hover:bg-surface-variant/50 rounded-lg transition-all duration-200" href="#">
+            <span class="material-symbols-outlined">settings</span>
+            <span class="font-label-md sidebar-text whitespace-nowrap">Settings</span>
+        </a>
+    </nav>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-64 flex-1 h-full overflow-y-auto custom-scrollbar bg-background" id="main-content">
+    <!-- TopNavBar -->
+    <header class="sticky top-0 z-30 w-full h-nav-height bg-glass-bg border-b border-glass-border backdrop-blur-md flex justify-between items-center px-8">
+        <h2 class="text-headline-md font-bold text-on-surface">영업 조직 평가 및 성과급 관리</h2>
+        <div class="flex items-center gap-6">
+            <div class="relative hidden lg:block">
+                <input class="w-64 pl-10 pr-4 py-2 bg-surface-variant/50 border-none rounded-full text-sm focus:ring-2 focus:ring-primary/20" placeholder="검색..." type="text">
+                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-lg">search</span>
+            </div>
+            <div class="flex items-center gap-4 border-l border-outline-variant pl-6">
+                <button class="text-on-surface-variant hover:text-primary transition-colors">
+                    <span class="material-symbols-outlined">notifications</span>
+                </button>
+                <button class="text-on-surface-variant hover:text-primary transition-colors">
+                    <span class="material-symbols-outlined">help</span>
+                </button>
+                <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden border border-outline-variant">
+                    <img alt="User profile avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAgpow57VMOqowWY_L78LIn-YPD8G90Aed3IWw-55zGIY8lG3LEiepv3V2iEhUCMD5EOZ6f-LKDF7_xUX0QCV56dTeJ7J9BkAzcMjzDl4WUouboDxosTO4EDKFMGIBRsJtqfsKk7YR3yB3zniUJ2tqBnIaBUvIiJpPM4NJxzBc9CT3BUrdK6WpIpLhHUkh-1oUkyzUbUNditJclxEVTdScJoFUjSkjqnnRyC0ZYIKvAMi3YtZ_4BvsfRpyj3G5-H0MJEjRyCPEG6PU">
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="p-8 max-w-container-max-width mx-auto space-y-8">
+        <!-- Filter Section -->
+        <div class="flex flex-wrap items-end gap-4 bg-white p-6 rounded-2xl border border-outline-variant shadow-sm">
+            <div class="space-y-1.5 flex-1 min-w-[200px]">
+                <label class="text-caption font-bold text-outline uppercase tracking-wider">평가 기간 (Period)</label>
+                <select class="w-full border-outline-variant rounded-lg text-sm bg-surface-variant/20 focus:border-primary focus:ring-0">
+                    <option>2024년 4분기</option>
+                    <option>2024년 3분기</option>
+                    <option>2024년 2분기</option>
+                    <option>2024년 1분기</option>
+                </select>
+            </div>
+            <div class="space-y-1.5 flex-1 min-w-[200px]">
+                <label class="text-caption font-bold text-outline uppercase tracking-wider">채널 유형 (Channel Type)</label>
+                <select class="w-full border-outline-variant rounded-lg text-sm bg-surface-variant/20 focus:border-primary focus:ring-0">
+                    <option>전체 채널</option>
+                    <option>직영 영업소</option>
+                    <option>대리점 (GA)</option>
+                    <option>온라인 채널</option>
+                </select>
+            </div>
+            <button class="bg-primary text-on-primary px-6 py-2 rounded-lg font-bold text-sm hover:opacity-90 transition-opacity flex items-center gap-2 h-[42px]">
+                <span class="material-symbols-outlined text-sm">filter_alt</span>
+                적용하기
+            </button>
+        </div>
+        <!-- Summary KPI Section -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white p-6 rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+                <div class="relative z-10">
+                    <p class="text-caption font-semibold text-outline">전체 매출액</p>
+                    <h3 class="text-headline-lg font-extrabold mt-2 text-on-surface">₩1,420,000,000</h3>
+                    <div class="mt-4 flex items-center text-primary text-caption font-bold">
+                        <span class="material-symbols-outlined text-sm mr-1">arrow_upward</span>
+                        12.5% 증가
+                        <span class="ml-2 font-normal text-outline">vs 지난 분기</span>
+                    </div>
+                </div>
+                <div class="absolute -right-4 -bottom-4 w-32 h-32 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <img alt="coins icon" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuABRO1Jy3P9gl4yhNh2zu_ryf-hJ8Prli45bPXIqTwgN0Qpw8WsaMos4nx9603gGs5OT6oq2qgp0IgSSgAUCOTpUvRxMsJ87CzfvPLByLhcn7Y8y3RDiRn_AXQqc5gXOG3FoE_GhijVFOB-YMsGULCDpHp0Bi47vT6c4Ny23n8k3eL_CDDWBiCgH474S-FIAohi9U1laLp9PemTK_7m_oUsBf1B9E0_Trx3lOwceDGgwOzukI7DVsBRPg9_k8L6cKxiS3lRd1p0EYE">
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+                <div class="relative z-10">
+                    <p class="text-caption font-semibold text-outline">목표 달성률</p>
+                    <h3 class="text-headline-lg font-extrabold mt-2 text-on-surface">94.2%</h3>
+                    <div class="mt-4 w-full bg-surface-variant h-2 rounded-full overflow-hidden">
+                        <div class="bg-primary h-full w-[94.2%] rounded-full"></div>
+                    </div>
+                </div>
+                <div class="absolute -right-4 -bottom-4 w-32 h-32 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <img alt="gold trophy icon" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDCjOSCrLCtNYH3ph6gJ9q8iDzEfQrny0M7qD-ZUKz_3Qcv3-NOteW5SGIId3uAryXMZp33VLuweHK27KrLpA-qNcTWvS8v6OdcBRKkDGYSY9-cfVTeYpi4ZJ4P-n2Qo-05whUnq5XCCvPPIiswnlLxLjZg9pr3duTNuTEQqP2m-v_92T8yaxDccHruxlYQ4a77Ong8aaryP9xBU5LZiwveeNafaK4R-QznYhddSYkAlK7iIyn3aX2vQiqWDzewpjvfFsUBaGGTFKM">
+                </div>
+            </div>
+            <div class="bg-primary text-on-primary p-6 rounded-xl border border-primary shadow-lg shadow-primary/20 hover:-translate-y-1 transition-transform cursor-default">
+                <p class="text-caption font-semibold text-on-primary/80">활성 계약 수</p>
+                <h3 class="text-headline-lg font-extrabold mt-2">5,842 건</h3>
+                <div class="mt-4 flex items-center text-caption font-bold bg-white/20 w-fit px-3 py-1 rounded-full">
+                    <span class="material-symbols-outlined text-sm mr-1">verified</span>
+                    업계 평균 대비 +8%
+                </div>
+            </div>
+        </div>
+        <!-- Performance Table Section -->
+        <div class="bg-white rounded-2xl border border-outline-variant shadow-sm overflow-hidden">
+            <div class="px-8 py-6 border-b border-outline-variant flex justify-between items-center">
+                <h3 class="text-headline-md font-bold">채널별 세부 성과 현황</h3>
+                <button class="text-label-md text-primary font-bold flex items-center gap-1 hover:underline">
+                    <span class="material-symbols-outlined text-sm">download</span>
+                    Excel 다운로드
+                </button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                    <tr class="bg-surface-variant/20 border-b border-outline-variant">
+                        <th class="px-8 py-4 text-caption font-bold text-outline uppercase">채널 명 (Channel Name)</th>
+                        <th class="px-6 py-4 text-caption font-bold text-outline uppercase">유형 (Type)</th>
+                        <th class="px-6 py-4 text-caption font-bold text-outline uppercase">매출액 (Revenue)</th>
+                        <th class="px-6 py-4 text-caption font-bold text-outline uppercase text-center">계약 건수</th>
+                        <th class="px-6 py-4 text-caption font-bold text-outline uppercase text-right">달성률 (Target %)</th>
+                        <th class="px-8 py-4 text-caption font-bold text-outline uppercase text-center">등급 (Grade)</th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y divide-outline-variant/30">
+                    <tr class="hover:bg-surface-variant/10 transition-colors group">
+                        <td class="px-8 py-5 font-semibold text-on-surface">강남 중앙 지점</td>
+                        <td class="px-6 py-5 text-label-md text-on-surface-variant">직영 영업소</td>
+                        <td class="px-6 py-5 text-label-md font-medium">₩245,000,000</td>
+                        <td class="px-6 py-5 text-label-md text-center">842</td>
+                        <td class="px-6 py-5 text-right font-bold text-primary">102%</td>
+                        <td class="px-8 py-5 text-center">
+                            <span class="inline-block px-3 py-1 rounded-md bg-primary-container/20 text-primary font-bold text-caption">S</span>
+                        </td>
+                    </tr>
+                    <tr class="hover:bg-surface-variant/10 transition-colors">
+                        <td class="px-8 py-5 font-semibold text-on-surface">한마음 보험 대리점</td>
+                        <td class="px-6 py-5 text-label-md text-on-surface-variant">GA</td>
+                        <td class="px-6 py-5 text-label-md font-medium">₩182,500,000</td>
+                        <td class="px-6 py-5 text-label-md text-center">615</td>
+                        <td class="px-6 py-5 text-right font-bold text-primary">88%</td>
+                        <td class="px-8 py-5 text-center">
+                            <span class="inline-block px-3 py-1 rounded-md bg-secondary-container text-on-secondary-container font-bold text-caption">A</span>
+                        </td>
+                    </tr>
+                    <tr class="hover:bg-surface-variant/10 transition-colors">
+                        <td class="px-8 py-5 font-semibold text-on-surface">부산 영도 영업소</td>
+                        <td class="px-6 py-5 text-label-md text-on-surface-variant">직영 영업소</td>
+                        <td class="px-6 py-5 text-label-md font-medium">₩94,000,000</td>
+                        <td class="px-6 py-5 text-label-md text-center">210</td>
+                        <td class="px-6 py-5 text-right font-bold text-error">65%</td>
+                        <td class="px-8 py-5 text-center">
+                            <span class="inline-block px-3 py-1 rounded-md bg-error-container text-error font-bold text-caption">D</span>
+                        </td>
+                    </tr>
+                    <tr class="hover:bg-surface-variant/10 transition-colors">
+                        <td class="px-8 py-5 font-semibold text-on-surface">온라인 파트너즈</td>
+                        <td class="px-6 py-5 text-label-md text-on-surface-variant">온라인 채널</td>
+                        <td class="px-6 py-5 text-label-md font-medium">₩310,200,000</td>
+                        <td class="px-6 py-5 text-label-md text-center">1,204</td>
+                        <td class="px-6 py-5 text-right font-bold text-primary">92%</td>
+                        <td class="px-8 py-5 text-center">
+                            <span class="inline-block px-3 py-1 rounded-md bg-primary-container/20 text-primary font-bold text-caption">S</span>
+                        </td>
+                    </tr>
+                    <tr class="hover:bg-surface-variant/10 transition-colors">
+                        <td class="px-8 py-5 font-semibold text-on-surface">대전 유성 대리점</td>
+                        <td class="px-6 py-5 text-label-md text-on-surface-variant">GA</td>
+                        <td class="px-6 py-5 text-label-md font-medium">₩112,000,000</td>
+                        <td class="px-6 py-5 text-label-md text-center">390</td>
+                        <td class="px-6 py-5 text-right font-bold text-orange-500">74%</td>
+                        <td class="px-8 py-5 text-center">
+                            <span class="inline-block px-3 py-1 rounded-md bg-orange-100 text-orange-700 font-bold text-caption">C</span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="px-8 py-4 bg-surface-variant/10 border-t border-outline-variant flex items-center justify-between">
+                <p class="text-caption text-outline font-medium">총 124개의 결과 중 1-5개 표시</p>
+                <div class="flex gap-2">
+                    <button class="p-1 rounded border border-outline-variant hover:bg-white transition-colors">
+                        <span class="material-symbols-outlined text-sm">chevron_left</span>
+                    </button>
+                    <button class="p-1 rounded border border-outline-variant hover:bg-white transition-colors">
+                        <span class="material-symbols-outlined text-sm">chevron_right</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Footer -->
+    <footer class="w-full py-12 px-8 flex flex-col md:flex-row justify-between items-center max-w-container-max-width mx-auto bg-surface-variant/20 border-t border-outline-variant mt-12">
+        <div class="mb-6 md:mb-0">
+            <p class="text-label-md font-bold text-on-surface">Kindred Assurance</p>
+            <p class="text-caption text-outline mt-1">© 2024 Kindred Assurance. All rights reserved.</p>
+        </div>
+        <div class="flex gap-8">
+            <a class="text-outline hover:text-primary transition-opacity opacity-80 hover:opacity-100 text-caption" href="#">Privacy Policy</a>
+            <a class="text-outline hover:text-primary transition-opacity opacity-80 hover:opacity-100 text-caption" href="#">Terms of Service</a>
+            <a class="text-outline hover:text-primary transition-opacity opacity-80 hover:opacity-100 text-caption" href="#">Contact Us</a>
+        </div>
+    </footer>
+</main>
+<!-- Side Over Panel: Evaluation Registration -->
+<div class="fixed right-0 top-0 h-full w-96 bg-white shadow-2xl border-l border-outline-variant transform translate-x-full transition-transform duration-300 ease-out z-50 flex flex-col" id="evaluation-panel">
+    <div class="p-6 border-b border-outline-variant flex justify-between items-center bg-surface-variant/20">
+        <div>
+            <h3 class="text-headline-md font-bold text-on-surface">평가 등록 (Registration)</h3>
+            <p class="text-caption text-outline">선택된 조직에 대한 최종 평가를 입력하세요.</p>
+        </div>
+        <button class="p-2 hover:bg-white rounded-full transition-colors" onclick="togglePanel()">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+    </div>
+    <div class="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar">
+        <!-- Selected Info -->
+        <div class="p-4 bg-primary/5 rounded-xl border border-primary/10">
+            <p class="text-[10px] font-bold text-primary uppercase tracking-widest mb-1">SELECTED CHANNEL</p>
+            <p class="text-label-md font-bold text-on-surface">부산 영도 영업소</p>
+            <p class="text-caption text-outline">최근 평가: 2024.09.30 (C등급)</p>
+        </div>
+        <!-- Grade Selection -->
+        <div class="space-y-3">
+            <label class="text-label-md font-bold text-on-surface flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-lg">workspace_premium</span>
+                평가 등급 선택
+            </label>
+            <div class="grid grid-cols-5 gap-2">
+                <button class="py-3 border-2 border-primary bg-primary/10 text-primary font-bold rounded-xl transition-all">S</button>
+                <button class="py-3 border-2 border-outline-variant hover:border-primary/40 text-outline font-bold rounded-xl transition-all">A</button>
+                <button class="py-3 border-2 border-outline-variant hover:border-primary/40 text-outline font-bold rounded-xl transition-all">B</button>
+                <button class="py-3 border-2 border-outline-variant hover:border-primary/40 text-outline font-bold rounded-xl transition-all">C</button>
+                <button class="py-3 border-2 border-outline-variant hover:border-primary/40 text-outline font-bold rounded-xl transition-all">D</button>
+            </div>
+        </div>
+        <!-- Comment Area -->
+        <div class="space-y-3">
+            <label class="text-label-md font-bold text-on-surface flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-lg">edit_note</span>
+                평가 의견 (Comments)
+            </label>
+            <textarea class="w-full border-outline-variant rounded-xl text-sm p-4 bg-surface-variant/20 focus:ring-primary focus:border-primary" placeholder="등급 산정 사유 및 향후 개선사항을 입력하세요..." rows="6"></textarea>
+        </div>
+        <!-- Bonus Calculation Simulation -->
+        <div class="p-6 bg-surface-variant/30 rounded-xl space-y-4">
+            <h4 class="text-label-md font-bold text-on-surface">예상 성과급 계산</h4>
+            <div class="flex justify-between text-caption">
+                <span class="text-outline">기본 지급률</span>
+                <span class="font-medium">100%</span>
+            </div>
+            <div class="flex justify-between text-caption">
+                <span class="text-outline">등급 가산 (S)</span>
+                <span class="font-medium text-primary">+40%</span>
+            </div>
+            <div class="pt-4 border-t border-outline-variant flex justify-between">
+                <span class="font-bold">최종 지급액</span>
+                <span class="font-extrabold text-on-surface text-label-md">₩4,200,000</span>
+            </div>
+        </div>
+    </div>
+    <div class="p-6 border-t border-outline-variant bg-white mt-auto">
+        <button class="w-full bg-primary text-on-primary py-4 rounded-xl font-bold hover:opacity-90 transition-all shadow-lg shadow-primary/20 active:scale-95 duration-200">
+            평가 결과 저장 및 제출
+        </button>
+        <p class="text-[10px] text-center text-outline mt-4">제출 후에는 관리자의 승인 전까지만 수정이 가능합니다.</p>
+    </div>
+</div>
+<!-- Floating Action Button (FAB) -->
+<button class="fixed bottom-8 right-8 w-16 h-16 bg-primary text-on-primary rounded-full shadow-xl flex items-center justify-center hover:scale-110 active:scale-90 transition-all z-40 group" onclick="togglePanel()">
+    <span class="material-symbols-outlined text-2xl group-hover:rotate-90 transition-transform">add</span>
+</button>
+<script>
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        const toggleIcon = document.getElementById('sidebar-toggle-icon');
+
+        sidebar.classList.toggle('collapsed');
+
+        if (sidebar.classList.contains('collapsed')) {
+            mainContent.style.marginLeft = '80px';
+            toggleIcon.textContent = 'menu';
+        } else {
+            mainContent.style.marginLeft = '256px';
+            toggleIcon.textContent = 'menu_open';
+        }
+    }
+
+    function togglePanel() {
+        const panel = document.getElementById('evaluation-panel');
+        if (panel.classList.contains('translate-x-full')) {
+            panel.classList.remove('translate-x-full');
+            panel.classList.add('translate-x-0');
+        } else {
+            panel.classList.remove('translate-x-0');
+            panel.classList.add('translate-x-full');
+        }
+    }
+
+    // Initialize panel state and viewport responsive sidebar
+    document.addEventListener('DOMContentLoaded', () => {
+        if (window.innerWidth < 1024) {
+            toggleSidebar();
+        }
+    });
+</script>
+</body></html>

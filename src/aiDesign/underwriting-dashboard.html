@@ -1,0 +1,410 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Underwriting Dashboard | Kindred Assurance</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-container": "#006c49",
+                        "surface-variant": "#e0e3e5",
+                        "outline": "#6f7a72",
+                        "inverse-surface": "#2d3133",
+                        "on-primary-fixed-variant": "#005236",
+                        "on-surface-variant": "#3f4943",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#005236",
+                        "secondary-fixed": "#b0f0d5",
+                        "outline-variant": "#bbcabf",
+                        "surface-container-highest": "#e0e3e5",
+                        "glass-bg": "rgba(255, 255, 255, 0.75)",
+                        "on-primary-fixed": "#002113",
+                        "on-background": "#191c1e",
+                        "tertiary": "#005136",
+                        "primary-fixed-dim": "#81d8ad",
+                        "primary": "#005136",
+                        "secondary-fixed-dim": "#95d3ba",
+                        "on-secondary-fixed": "#002117",
+                        "surface": "#f7f9fb",
+                        "inverse-on-surface": "#eff1f3",
+                        "surface-dim": "#d8dadc",
+                        "on-tertiary-container": "#63f1b4",
+                        "surface-tint": "#006c49",
+                        "on-secondary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "surface-container-low": "#f2f4f6",
+                        "error-container": "#ffdad6",
+                        "error": "#ba1a1a",
+                        "primary-fixed": "#9df4c8",
+                        "glass-border": "rgba(0, 108, 73, 0.08)",
+                        "on-secondary-fixed-variant": "#0b513d",
+                        "inverse-primary": "#81d8ad",
+                        "surface-container-lowest": "#ffffff",
+                        "background": "#f7f9fb",
+                        "on-surface": "#191c1e",
+                        "on-secondary-container": "#326f5a",
+                        "tertiary-fixed": "#6ffbbe",
+                        "on-primary": "#ffffff",
+                        "secondary-container": "#b0f0d5",
+                        "on-error": "#ffffff",
+                        "surface-container": "#eceef0",
+                        "tertiary-container": "#006c49",
+                        "surface-bright": "#f7f9fb",
+                        "on-tertiary-fixed": "#002113",
+                        "surface-container-high": "#e6e8ea",
+                        "tertiary-fixed-dim": "#4edea3",
+                        "on-primary-container": "#93eabe",
+                        "secondary": "#2b6954"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "nav-height": "80px",
+                        "margin-desktop": "40px",
+                        "gutter": "24px",
+                        "unit": "8px",
+                        "container-max-width": "1280px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "caption": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "0em", "fontWeight": "500"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "letterSpacing": "0.01em", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "caption": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "letterSpacing": "0.01em", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .glass-panel {
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        .glass-stroke {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        #sidebar {
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #sidebar.collapsed {
+            width: 80px;
+        }
+        #sidebar.collapsed .sidebar-text,
+        #sidebar.collapsed .sidebar-header-text,
+        #sidebar.collapsed .sidebar-cta {
+            display: none;
+        }
+        #main-content {
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body class="bg-background font-body-md text-on-background min-h-screen">
+<!-- TopNavBar -->
+<header class="fixed top-0 left-0 w-full z-50 h-nav-height glass-panel glass-stroke">
+    <div class="flex justify-between items-center w-full px-gutter max-w-container-max mx-auto h-full">
+        <div class="text-headline-md font-headline-md font-bold text-primary">Kindred Assurance</div>
+        <nav class="hidden md:flex gap-8">
+            <a class="text-label-md font-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Home</a>
+            <a class="text-label-md font-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Policies</a>
+            <a class="text-label-md font-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Claims</a>
+            <a class="text-label-md font-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Sales</a>
+            <a class="text-label-md font-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Support</a>
+        </nav>
+        <div class="flex items-center gap-4">
+            <button class="p-2 rounded-full hover:bg-surface-variant/50 transition-colors">
+                <span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+            </button>
+            <button class="p-2 rounded-full hover:bg-surface-variant/50 transition-colors">
+                <span class="material-symbols-outlined text-on-surface-variant">help</span>
+            </button>
+            <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-container">
+                <img alt="User profile avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_lUiEC-iBpbcI-YI6O7HoIiFwgXkOe5fuTJ_TsMCkHlPeF_YKV6M_2U_bLAFLhXuC-4dupWUM5B6FEQ3ZM0N1TcXO04nzWJWaOsISMm8-Sdlp2ZJJ1sXT9B2mAXx5mj_lW6FLw7xiEVuzzFY1p6V6c6HiZXbRgR1WDyqXvL9IdUUPXfKT_GrtpRAAquEieqIg8QvZdtH5NIwhckLZVatlxd1Iq4WVTUtPQ9wHOQUioES1OgU6VIFJ4XwWap3bxdOBytubkV7qAPI">
+            </div>
+        </div>
+    </div>
+</header>
+<div class="flex pt-nav-height min-h-screen">
+    <!-- SideNavBar (Renewed with Emerald Green Points & Toggle) -->
+    <aside class="fixed left-0 top-nav-height h-[calc(100vh-80px)] w-64 bg-surface border-r border-outline-variant py-gutter flex flex-col z-40" id="sidebar">
+        <div class="px-6 mb-8 flex items-center justify-between">
+            <div class="sidebar-header-text">
+                <div class="text-label-md font-label-md font-bold text-primary uppercase tracking-wider">Admin Portal</div>
+                <div class="text-caption font-caption text-on-surface-variant opacity-70">Kindred Assurance</div>
+            </div>
+            <button class="p-2 hover:bg-surface-variant rounded-lg" onclick="toggleSidebar()">
+                <span class="material-symbols-outlined" id="toggle-icon">menu_open</span>
+            </button>
+        </div>
+        <nav class="flex flex-col gap-1 px-2 flex-grow">
+            <a class="flex items-center gap-4 text-on-surface-variant px-4 py-3 hover:bg-secondary-container/20 rounded-full transition-all" href="#">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span class="text-label-md font-label-md sidebar-text">Dashboard</span>
+            </a>
+            <a class="flex items-center gap-4 bg-primary text-on-primary px-4 py-3 rounded-full transition-all shadow-sm" href="#">
+                <span class="material-symbols-outlined">description</span>
+                <span class="text-label-md font-label-md sidebar-text">Underwriting</span>
+            </a>
+            <a class="flex items-center gap-4 text-on-surface-variant px-4 py-3 hover:bg-secondary-container/20 rounded-full transition-all" href="#">
+                <span class="material-symbols-outlined">trending_up</span>
+                <span class="text-label-md font-label-md sidebar-text">Sales Management</span>
+            </a>
+            <a class="flex items-center gap-4 text-on-surface-variant px-4 py-3 hover:bg-secondary-container/20 rounded-full transition-all" href="#">
+                <span class="material-symbols-outlined">security</span>
+                <span class="text-label-md font-label-md sidebar-text">Risk Assessment</span>
+            </a>
+            <a class="flex items-center gap-4 text-on-surface-variant px-4 py-3 hover:bg-secondary-container/20 rounded-full transition-all" href="#">
+                <span class="material-symbols-outlined">settings</span>
+                <span class="text-label-md font-label-md sidebar-text">Settings</span>
+            </a>
+        </nav>
+        <div class="px-4 mb-4 sidebar-cta">
+            <button class="w-full bg-primary-container text-on-primary-container py-3 rounded-lg font-label-md hover:brightness-110 transition-all flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined text-[20px]">add_circle</span>
+                <span>Quick Report</span>
+            </button>
+        </div>
+        <div class="pt-4 border-t border-outline-variant/30">
+            <a class="flex items-center gap-4 text-on-surface-variant px-4 py-3 hover:bg-error-container/10 rounded-full transition-all" href="#">
+                <span class="material-symbols-outlined text-error">logout</span>
+                <span class="text-label-md font-label-md sidebar-text">Logout</span>
+            </a>
+        </div>
+    </aside>
+    <!-- Main Content Area -->
+    <main class="flex-1 ml-64 p-8 bg-[#f7f9fb]" id="main-content">
+        <div class="max-w-container-max mx-auto">
+            <div class="flex justify-between items-end mb-10">
+                <div>
+                    <h1 class="font-headline-lg text-headline-lg text-on-surface mb-2">Underwriting Dashboard</h1>
+                    <p class="font-body-md text-body-md text-on-surface-variant">Reviewing real-time policy applications and risk profiles.</p>
+                </div>
+                <div class="flex gap-3">
+                    <button class="px-6 py-3 bg-primary text-on-primary rounded-full font-label-md text-label-md flex items-center gap-2 shadow-lg hover:brightness-110 transition-all">
+                        <span class="material-symbols-outlined">add</span>
+                        New Assessment
+                    </button>
+                </div>
+            </div>
+            <!-- Bento Grid Layout -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <!-- Status Cards -->
+                <div class="glass-panel rounded-lg p-6 flex items-center gap-6 shadow-sm">
+                    <div class="w-16 h-16 flex items-center justify-center">
+                        <img alt="Status icon" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2dJGa3ZonSEK-PiV8LrBN8eqajFmk1SEkN8l3Bs7Rx5mo_e_-yf9hvswCQVCgIVGuRCKimfxJJ6fedtTf1LNP0lmpcWehwKbW5GkQO2O_UIU3YVMPtdeDH2lsxVCXZhgHeRKhR0iqJ7Se45UY6HHZTQYxgoefFmhT0J4dp7_2PIUYxHj8Lezu00GbIYWI4mhg44moCGg2a5iLDTeHrF8tw3ePCpcETp4ErDPJJ4vpLuBHRsr1bPOmuKrX0Vxsxqy3cGUK9LocTGU">
+                    </div>
+                    <div>
+                        <div class="text-display-lg font-display-lg leading-none">24</div>
+                        <div class="text-label-md font-label-md text-on-surface-variant">Wait Queue</div>
+                    </div>
+                </div>
+                <div class="glass-panel rounded-lg p-6 flex items-center gap-6 shadow-sm border-l-4 border-primary">
+                    <div class="w-16 h-16 flex items-center justify-center">
+                        <img alt="Approval icon" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfAw_63vms2p9zZzpNp86LYuANJWkxhejtvNTLql3KMPqsw4YsaeDuVhpRypSecVgGVYao2f326Jsq1976apYkqTT6U3UUIUmFp0hhQ60i66NHJj2k6UQ1vhj8RjDdnTx6nJLksURg1t6ZhIs9Qcv9c9m2Y8JZnLdoRq8LS9nT8php3Uq6yubI6awP5K4shoLE-M1I-F8qFC5S0XgI_nSdYQweNEWTvq7zC0kX1Tk86KfC3ht0m_CXHLvqe0ZP07x3rVjI3RE8pJ4">
+                    </div>
+                    <div>
+                        <div class="text-display-lg font-display-lg leading-none text-primary">142</div>
+                        <div class="text-label-md font-label-md text-on-surface-variant">Approved Today</div>
+                    </div>
+                </div>
+                <div class="glass-panel rounded-lg p-6 flex items-center gap-6 shadow-sm">
+                    <div class="w-16 h-16 flex items-center justify-center">
+                        <img alt="Risk icon" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRwWhyBygxzjGtzdyMecAwaUDOl-39c1ceN7kvNWFjpGp9VlM3bes5T7KYLg6kxvtsMDixZF_hu3hPZdw9mECnJBDebFR9N5eRmf7SSDGifN-fnbXevkXfn7Esex-uDMH_p4pFqnZOAudjcWVFSgMVEMlmaxzHwsbTpRct_hldpTpTMPPj3GrtXjDcD2GJJlJf_h8lE5IbvecZFj4ylRqKCIc58qZDBvct4h5DgoI_zYZKPHCjpptBQCeJpbVwFK1Y2ZCvd06nZ8A">
+                    </div>
+                    <div>
+                        <div class="text-display-lg font-display-lg leading-none text-error">8</div>
+                        <div class="text-label-md font-label-md text-on-surface-variant">High Risk Flagged</div>
+                    </div>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+                <!-- Recent Activity -->
+                <div class="xl:col-span-2 glass-panel rounded-lg p-8 shadow-sm">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="font-headline-md text-headline-md">Active Applications</h2>
+                        <button class="text-primary font-label-md text-label-md hover:underline">View All</button>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-4 bg-surface-container-lowest rounded-lg border border-outline-variant hover:border-primary transition-colors">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 flex items-center justify-center">
+                                    <img alt="Car icon" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuATtyLy1M6JhwyHnXSz-Lm-Oelaqup9OOCfaOqcS8JcbxnMOpRK_n-HjQebkYgc7q4_UEEs5PqdkSo8UwR4DJjJEaegYDk6AvKMRVSoQZ-6iwE-vmdfELfqIvzsMj3mWxebAJzyHakdgH-BkUJye1gL8ZUcc1CzhdiNMBtF4oeK2HmGIWXAjhd6xm6eEl9rBlQMNUzEkHvzdb5yXBnqMS6ARbQHqkUKg1PwA8iNWL1B96P-MjytUDvYi__uchBaF6SEsGMXY2u3xlA">
+                                </div>
+                                <div>
+                                    <div class="font-label-md text-label-md">Model S-3 Auto Policy</div>
+                                    <div class="text-caption text-on-surface-variant">Applicant: Elena Rodriguez • 15m ago</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-6">
+                                <div class="hidden sm:block">
+                                    <div class="text-right text-label-md font-label-md">$1,240.00</div>
+                                    <div class="text-right text-caption text-on-surface-variant">Premium</div>
+                                </div>
+                                <span class="px-3 py-1 bg-secondary-container text-on-secondary-container text-caption font-label-md rounded-full">In Review</span>
+                                <button class="p-2 text-on-surface-variant hover:text-primary transition-colors">
+                                    <span class="material-symbols-outlined">more_vert</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between p-4 bg-surface-container-lowest rounded-lg border border-outline-variant hover:border-primary transition-colors">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 flex items-center justify-center">
+                                    <img alt="Heart icon" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRwWhyBygxzjGtzdyMecAwaUDOl-39c1ceN7kvNWFjpGp9VlM3bes5T7KYLg6kxvtsMDixZF_hu3hPZdw9mECnJBDebFR9N5eRmf7SSDGifN-fnbXevkXfn7Esex-uDMH_p4pFqnZOAudjcWVFSgMVEMlmaxzHwsbTpRct_hldpTpTMPPj3GrtXjDcD2GJJlJf_h8lE5IbvecZFj4ylRqKCIc58qZDBvct4h5DgoI_zYZKPHCjpptBQCeJpbVwFK1Y2ZCvd06nZ8A">
+                                </div>
+                                <div>
+                                    <div class="font-label-md text-label-md">Kindred Health Plus</div>
+                                    <div class="text-caption text-on-surface-variant">Applicant: Thomas Miller • 2h ago</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-6">
+                                <div class="hidden sm:block">
+                                    <div class="text-right text-label-md font-label-md">$450.00</div>
+                                    <div class="text-right text-caption text-on-surface-variant">Premium</div>
+                                </div>
+                                <span class="px-3 py-1 bg-primary-container/20 text-primary text-caption font-label-md rounded-full">Low Risk</span>
+                                <button class="p-2 text-on-surface-variant hover:text-primary transition-colors">
+                                    <span class="material-symbols-outlined">more_vert</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between p-4 bg-surface-container-lowest rounded-lg border border-outline-variant hover:border-primary transition-colors">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 flex items-center justify-center">
+                                    <img alt="Savings icon" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfAw_63vms2p9zZzpNp86LYuANJWkxhejtvNTLql3KMPqsw4YsaeDuVhpRypSecVgGVYao2f326Jsq1976apYkqTT6U3UUIUmFp0hhQ60i66NHJj2k6UQ1vhj8RjDdnTx6nJLksURg1t6ZhIs9Qcv9c9m2Y8JZnLdoRq8LS9nT8php3Uq6yubI6awP5K4shoLE-M1I-F8qFC5S0XgI_nSdYQweNEWTvq7zC0kX1Tk86KfC3ht0m_CXHLvqe0ZP07x3rVjI3RE8pJ4">
+                                </div>
+                                <div>
+                                    <div class="font-label-md text-label-md">Wealth Guard Savings</div>
+                                    <div class="text-caption text-on-surface-variant">Applicant: Sarah Chen • 4h ago</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-6">
+                                <div class="hidden sm:block">
+                                    <div class="text-right text-label-md font-label-md">$2,500.00</div>
+                                    <div class="text-right text-caption text-on-surface-variant">Premium</div>
+                                </div>
+                                <span class="px-3 py-1 bg-error-container text-on-error-container text-caption font-label-md rounded-full">Action Needed</span>
+                                <button class="p-2 text-on-surface-variant hover:text-primary transition-colors">
+                                    <span class="material-symbols-outlined">more_vert</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Risk Analysis Sidebar -->
+                <div class="glass-panel rounded-lg p-8 shadow-sm flex flex-col gap-6">
+                    <h2 class="font-headline-md text-headline-md">Market Trends</h2>
+                    <div class="p-6 rounded-lg bg-primary text-on-primary shadow-inner">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-label-md font-label-md">Approval Rate</span>
+                            <span class="text-headline-md font-headline-md">92%</span>
+                        </div>
+                        <div class="w-full bg-white/20 h-2 rounded-full overflow-hidden">
+                            <div class="bg-white h-full w-[92%] rounded-full shadow-[0_0_10px_rgba(255,255,255,0.5)]"></div>
+                        </div>
+                        <p class="text-caption mt-4 opacity-90">+4% since last quarter. Higher efficiency in automated screening.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-label-md font-label-md text-on-surface-variant mb-4 uppercase tracking-tighter">System Health</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                                    <span class="text-body-md font-body-md">AI Model Beta-9</span>
+                                </div>
+                                <span class="text-caption font-label-md text-primary">Operational</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                                    <span class="text-body-md font-body-md">Data Sync Engine</span>
+                                </div>
+                                <span class="text-caption font-label-md text-primary">Stable</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-auto">
+                        <div class="bg-surface-container rounded-lg p-4 flex gap-4 items-center">
+                            <span class="material-symbols-outlined text-primary text-[32px]">tips_and_updates</span>
+                            <div>
+                                <div class="text-label-md font-label-md">Smart Tip</div>
+                                <div class="text-caption text-on-surface-variant leading-tight">Focus on pending auto policies first to meet daily goals.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+<!-- Footer -->
+<footer class="bg-surface-container-highest border-t border-outline-variant mt-auto">
+    <div class="w-full py-12 px-gutter flex flex-col md:flex-row justify-between items-center max-w-container-max mx-auto">
+        <div class="mb-6 md:mb-0">
+            <div class="text-headline-sm font-headline-sm font-bold text-on-surface mb-2">Kindred Assurance</div>
+            <p class="text-label-sm font-label-sm text-on-surface-variant opacity-70">© 2024 Kindred Assurance. All rights reserved.</p>
+        </div>
+        <div class="flex flex-wrap justify-center gap-8">
+            <a class="text-label-sm font-label-sm text-on-surface-variant hover:text-primary hover:underline transition-colors" href="#">Privacy Policy</a>
+            <a class="text-label-sm font-label-sm text-on-surface-variant hover:text-primary hover:underline transition-colors" href="#">Terms of Service</a>
+            <a class="text-label-sm font-label-sm text-on-surface-variant hover:text-primary hover:underline transition-colors" href="#">Cookie Settings</a>
+            <a class="text-label-sm font-label-sm text-on-surface-variant hover:text-primary hover:underline transition-colors" href="#">Contact Us</a>
+        </div>
+    </div>
+</footer>
+<script>
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        const toggleIcon = document.getElementById('toggle-icon');
+
+        sidebar.classList.toggle('collapsed');
+
+        if (sidebar.classList.contains('collapsed')) {
+            mainContent.style.marginLeft = '80px';
+            toggleIcon.textContent = 'menu';
+        } else {
+            mainContent.style.marginLeft = '256px';
+            toggleIcon.textContent = 'menu_open';
+        }
+    }
+
+    // Micro-interaction for list item hover
+    document.querySelectorAll('.flex-1 .p-4').forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            card.style.transform = 'translateY(-2px)';
+            card.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+        });
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'translateY(0px)';
+        });
+    });
+</script>
+</body></html>

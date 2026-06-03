@@ -1,0 +1,402 @@
+<!DOCTYPE html><html class="light" lang="ko"><head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Kindred Assurance - 영업 활동 관리</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#006c49",
+                        "on-primary": "#ffffff",
+                        "primary-container": "#10b981",
+                        "on-primary-container": "#00422b",
+                        "secondary": "#2b6954",
+                        "on-secondary": "#ffffff",
+                        "secondary-container": "#adedd3",
+                        "on-secondary-container": "#306d58",
+                        "tertiary": "#416656",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#84ab98",
+                        "on-tertiary-container": "#1b3f31",
+                        "error": "#ba1a1a",
+                        "on-error": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#93000a",
+                        "background": "#f7f9fb",
+                        "on-background": "#191c1e",
+                        "surface": "#f7f9fb",
+                        "on-surface": "#191c1e",
+                        "surface-variant": "#e0e3e5",
+                        "on-surface-variant": "#3c4a42",
+                        "outline": "#6c7a71",
+                        "outline-variant": "#bbcabf",
+                        "glass-bg": "rgba(255, 255, 255, 0.75)",
+                        "glass-border": "rgba(0, 108, 73, 0.08)"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "nav-height": "80px",
+                        "margin-desktop": "40px",
+                        "container-max-width": "1280px",
+                        "margin-mobile": "16px",
+                        "gutter": "24px",
+                        "unit": "8px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "caption": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "letterSpacing": "0.01em", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "0em", "fontWeight": "500"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "caption": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "letterSpacing": "0.01em", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(0, 108, 73, 0.1);
+            border-radius: 10px;
+        }
+        #sidebar {
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #sidebar.collapsed {
+            width: 80px;
+        }
+        #sidebar.collapsed .sidebar-text,
+        #sidebar.collapsed .sidebar-header-text,
+        #sidebar.collapsed .sidebar-cta {
+            display: none;
+        }
+        #main-content {
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md min-h-screen">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 w-full z-50 bg-glass-bg border-b border-glass-border backdrop-blur-md shadow-sm h-nav-height">
+    <div class="flex justify-between items-center px-margin-desktop h-nav-height w-full max-w-container-max-width mx-auto">
+        <div class="flex items-center gap-8">
+            <span class="font-headline-md text-headline-md text-primary font-bold">Kindred Assurance</span>
+            <nav class="hidden md:flex gap-6 items-center h-full font-body-md text-body-md">
+                <a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Product</a>
+                <a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Claims</a>
+                <a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Service</a>
+                <a class="text-on-surface-variant hover:text-primary transition-colors" href="#">About</a>
+                <a class="text-primary border-b-2 border-primary font-bold pb-1" href="#">Sales</a>
+            </nav>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="relative hidden lg:block">
+                <input class="bg-surface-variant/50 border-none rounded-full py-2 px-10 focus:ring-2 focus:ring-primary w-64 text-label-md" placeholder="검색..." type="text">
+                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+            </div>
+            <button class="p-2 hover:bg-surface-variant/50 rounded-full transition-all duration-300">
+                <span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+            </button>
+            <button class="p-2 hover:bg-surface-variant/50 rounded-full transition-all duration-300">
+                <span class="material-symbols-outlined text-on-surface-variant">settings</span>
+            </button>
+            <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center overflow-hidden border border-primary/10">
+                <span class="material-symbols-outlined text-primary">account_circle</span>
+            </div>
+        </div>
+    </div>
+</header>
+<!-- Side Navigation Bar -->
+<aside class="h-screen w-64 fixed left-0 top-0 bg-surface border-r border-outline-variant shadow-md flex flex-col py-unit space-y-2 z-40 overflow-y-auto pt-24" id="sidebar">
+    <div class="px-4 mb-4 flex items-center justify-between">
+        <div class="sidebar-header-text">
+            <h2 class="font-headline-md text-primary font-bold text-lg">Admin Console</h2>
+            <p class="text-caption text-outline">Kindred Assurance</p>
+        </div>
+        <button class="p-2 hover:bg-surface-variant rounded-lg" onclick="toggleSidebar()">
+            <span class="material-symbols-outlined">menu_open</span>
+        </button>
+    </div>
+    <div class="flex flex-col gap-1 flex-grow">
+        <a class="flex items-center gap-3 p-3 mx-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-all duration-200" href="#">
+            <span class="material-symbols-outlined">dashboard</span>
+            <span class="font-label-md sidebar-text">Dashboard</span>
+        </a>
+        <a class="flex items-center gap-3 p-3 mx-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-all duration-200" href="#">
+            <span class="material-symbols-outlined">verified_user</span>
+            <span class="font-label-md sidebar-text">Underwriting</span>
+        </a>
+        <a class="flex items-center gap-3 p-3 mx-2 bg-primary-container text-on-primary-container rounded-lg transition-all duration-200" href="#">
+            <span class="material-symbols-outlined">payments</span>
+            <span class="font-label-md sidebar-text font-bold">Sales</span>
+        </a>
+        <a class="flex items-center gap-3 p-3 mx-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-all duration-200" href="#">
+            <span class="material-symbols-outlined">group_add</span>
+            <span class="font-label-md sidebar-text">Recruitment</span>
+        </a>
+        <a class="flex items-center gap-3 p-3 mx-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-all duration-200" href="#">
+            <span class="material-symbols-outlined">support_agent</span>
+            <span class="font-label-md sidebar-text">Support</span>
+        </a>
+        <a class="flex items-center gap-3 p-3 mx-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-all duration-200" href="#">
+            <span class="material-symbols-outlined">school</span>
+            <span class="font-label-md sidebar-text">Education</span>
+        </a>
+    </div>
+    <div class="px-4 sidebar-cta">
+        <button class="w-full bg-primary text-on-primary py-3 rounded-lg font-label-md hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined text-[20px]">analytics</span>
+            <span>Generate Report</span>
+        </button>
+    </div>
+    <div class="pt-4 mt-auto border-t border-outline-variant/50">
+        <a class="flex items-center gap-3 p-3 mx-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-all duration-200" href="#">
+            <span class="material-symbols-outlined text-error">logout</span>
+            <span class="font-label-md sidebar-text">Logout</span>
+        </a>
+    </div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 pt-nav-height min-h-screen" id="main-content">
+    <div class="p-8 max-w-container-max-width mx-auto">
+        <!-- Header Section -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-6">
+            <div>
+                <h1 class="font-headline-lg text-headline-lg text-on-surface">영업 활동 관리</h1>
+                <p class="text-on-surface-variant mt-1">실시간 채널별 성과 및 목표 달성 현황을 분석합니다.</p>
+            </div>
+            <!-- Filters Glass Panel -->
+            <div class="glass-panel rounded-lg p-4 flex flex-wrap gap-4 items-center shadow-sm">
+                <div class="flex flex-col">
+                    <label class="text-caption text-outline mb-1 px-2">기간 설정</label>
+                    <select class="bg-white/50 border-none rounded-full px-4 py-2 text-label-md focus:ring-2 focus:ring-primary min-w-[140px]">
+                        <option>최근 30일</option>
+                        <option>이번 분기</option>
+                        <option>올해 전체</option>
+                    </select>
+                </div>
+                <div class="flex flex-col">
+                    <label class="text-caption text-outline mb-1 px-2">채널 유형</label>
+                    <select class="bg-white/50 border-none rounded-full px-4 py-2 text-label-md focus:ring-2 focus:ring-primary min-w-[140px]">
+                        <option>전체 채널</option>
+                        <option>직영 영업</option>
+                        <option>대리점</option>
+                        <option>온라인</option>
+                    </select>
+                </div>
+                <button class="bg-primary text-on-primary rounded-full px-6 py-2 h-10 mt-auto flex items-center gap-2 hover:opacity-90 transition-opacity">
+                    <span class="material-symbols-outlined text-[20px]">filter_list</span>
+                    <span>필터 적용</span>
+                </button>
+            </div>
+        </div>
+        <!-- Dashboard Bento Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
+            <!-- Performance Table Card (Large) -->
+            <div class="lg:col-span-8 glass-panel rounded-lg p-6 overflow-hidden flex flex-col shadow-sm">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="font-headline-md text-headline-md">채널별 성과 리포트</h2>
+                    <button class="text-primary flex items-center gap-1 font-label-md hover:underline">
+                        <span class="material-symbols-outlined text-[20px]">download</span> 엑셀 다운로드
+                    </button>
+                </div>
+                <div class="overflow-x-auto custom-scrollbar">
+                    <table class="w-full text-left border-separate border-spacing-y-3">
+                        <thead>
+                        <tr class="text-outline uppercase text-caption tracking-wider">
+                            <th class="pb-2 px-4">채널명</th>
+                            <th class="pb-2 px-4">방문 수</th>
+                            <th class="pb-2 px-4">계약 수</th>
+                            <th class="pb-2 px-4">전환율</th>
+                            <th class="pb-2 px-4 text-center">목표 상태</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr class="bg-white/40 hover:bg-white/60 transition-colors group">
+                            <td class="py-4 px-4 rounded-l-lg font-medium text-on-surface">강남 직영점</td>
+                            <td class="py-4 px-4">1,240</td>
+                            <td class="py-4 px-4">312</td>
+                            <td class="py-4 px-4">25.1%</td>
+                            <td class="py-4 px-4 rounded-r-lg text-center">
+                                <span class="px-3 py-1 bg-primary/10 text-primary rounded-full text-caption font-bold">Good</span>
+                            </td>
+                        </tr>
+                        <tr class="bg-white/40 hover:bg-white/60 transition-colors group">
+                            <td class="py-4 px-4 rounded-l-lg font-medium text-on-surface">분당 대리점</td>
+                            <td class="py-4 px-4">980</td>
+                            <td class="py-4 px-4">145</td>
+                            <td class="py-4 px-4">14.7%</td>
+                            <td class="py-4 px-4 rounded-r-lg text-center">
+                                <span class="px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full text-caption font-bold">Active</span>
+                            </td>
+                        </tr>
+                        <tr class="bg-white/40 hover:bg-white/60 transition-colors group">
+                            <td class="py-4 px-4 rounded-l-lg font-medium text-on-surface">온라인 다이렉트</td>
+                            <td class="py-4 px-4">4,520</td>
+                            <td class="py-4 px-4">210</td>
+                            <td class="py-4 px-4">4.6%</td>
+                            <td class="py-4 px-4 rounded-r-lg text-center">
+                                <span class="px-3 py-1 bg-error-container text-error rounded-full text-caption font-bold">At Risk</span>
+                            </td>
+                        </tr>
+                        <tr class="bg-white/40 hover:bg-white/60 transition-colors group">
+                            <td class="py-4 px-4 rounded-l-lg font-medium text-on-surface">부산 서면 본부</td>
+                            <td class="py-4 px-4">650</td>
+                            <td class="py-4 px-4">28</td>
+                            <td class="py-4 px-4">4.3%</td>
+                            <td class="py-4 px-4 rounded-r-lg text-center">
+                                <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-caption font-bold">Critical</span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- Visual Assets Bento Cards -->
+            <div class="lg:col-span-4 flex flex-col gap-6">
+                <!-- Calculator Card -->
+                <div class="glass-panel rounded-lg p-6 relative overflow-hidden group h-full min-h-[220px] shadow-sm">
+                    <div class="z-10 relative">
+                        <p class="text-on-surface-variant font-label-md mb-2">예상 수익 계산기</p>
+                        <h3 class="font-headline-md text-headline-md text-on-surface">실시간 손익 시뮬레이션</h3>
+                        <button class="mt-4 text-primary font-bold flex items-center gap-1 group-hover:gap-2 transition-all">
+                            시작하기 <span class="material-symbols-outlined">arrow_forward</span>
+                        </button>
+                    </div>
+                    <img alt="3D Calculator" class="absolute -right-4 -bottom-4 w-40 h-40 object-contain transition-transform group-hover:scale-110 duration-500" src="https://lh3.googleusercontent.com/aida/AP1WRLsm0ru-5o2qyhJ75x-oSIlOHJB9UnPyG2Bv-CQOp4wCEb20TCe2GgUpvLI3KGuHHNeD7xM-WvPzm-SzkcdlANJ_gTkWtktRgtdK4bIf0w8lLRJT1ByEnltYSHpYkznJVAoFLoz8VYxB5tZQ0zZ71V_lXEEPlDisOaH3PgD49FTpYOMFBjMYnntKAamAcZqH-26WFCntovEPSlDsTmcjXP7bxxyEnI69Xb7kM4Ob309A3SXWdEndDqfhRMg">
+                </div>
+                <!-- Car/Lease Card -->
+                <div class="glass-panel rounded-lg p-6 relative overflow-hidden group h-full min-h-[220px] shadow-sm">
+                    <div class="z-10 relative">
+                        <p class="text-on-surface-variant font-label-md mb-2">차량 보험 연계</p>
+                        <h3 class="font-headline-md text-headline-md text-on-surface">신규 영업 기회</h3>
+                        <div class="mt-4 inline-flex items-center px-3 py-1 bg-primary text-on-primary rounded-full text-caption">
+                            24개의 신규 잠재고객
+                        </div>
+                    </div>
+                    <img alt="3D Blue Car" class="absolute -right-8 -bottom-4 w-48 h-48 object-contain transition-transform group-hover:-translate-x-4 duration-700" src="https://lh3.googleusercontent.com/aida/AP1WRLvNnSn1VqpBMXRimXTjt_eYXsYxMlQgNlb0F5ol7_ZxeyQWKnI9aMENsX9PIZzTwEiAutdkEB_9OSupqLDXRA_HldVv9Wx7KLRa9Ox7e0-zvFchJ_W-sUZbk9e-uworZOFE-OolAHORTIfxuxKqAEIfruU4kYKxjVhylOrvEYo4FUqxt2e2rXVCdi1M61qh4DOGA9I_OzhHruWWwFXXduOt-XEOpcdy2sciZXM_aNxVKkbrMQ6LG0xFuw">
+                </div>
+            </div>
+        </div>
+        <!-- Summary Statistics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Avg Conversion -->
+            <div class="glass-panel rounded-lg p-6 flex items-center gap-4 hover:shadow-lg transition-shadow shadow-sm">
+                <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary">
+                    <span class="material-symbols-outlined text-[28px]">percent</span>
+                </div>
+                <div>
+                    <p class="text-caption text-outline uppercase font-bold tracking-wider">평균 전환율</p>
+                    <h4 class="text-headline-md font-bold text-on-surface">12.2%</h4>
+                    <p class="text-caption text-primary flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[14px]">trending_up</span> 전월비 2.4%↑
+                    </p>
+                </div>
+            </div>
+            <!-- Total Contracts -->
+            <div class="glass-panel rounded-lg p-6 flex items-center gap-4 hover:shadow-lg transition-shadow shadow-sm">
+                <div class="w-12 h-12 bg-secondary-container rounded-full flex items-center justify-center text-on-secondary-container">
+                    <span class="material-symbols-outlined text-[28px]">assignment_turned_in</span>
+                </div>
+                <div>
+                    <p class="text-caption text-outline uppercase font-bold tracking-wider">총 계약 수</p>
+                    <h4 class="text-headline-md font-bold text-on-surface">1,024건</h4>
+                    <p class="text-caption text-outline-variant">목표 대비 85% 달성</p>
+                </div>
+            </div>
+            <!-- Active Sales Agents -->
+            <div class="glass-panel rounded-lg p-6 flex items-center gap-4 hover:shadow-lg transition-shadow shadow-sm">
+                <div class="w-12 h-12 bg-tertiary-container rounded-full flex items-center justify-center text-on-tertiary-container">
+                    <span class="material-symbols-outlined text-[28px]">groups</span>
+                </div>
+                <div>
+                    <p class="text-caption text-outline uppercase font-bold tracking-wider">활동 설계사</p>
+                    <h4 class="text-headline-md font-bold text-on-surface">256명</h4>
+                    <p class="text-caption text-outline-variant">온라인 접속 142명</p>
+                </div>
+            </div>
+            <!-- Risk Alerts -->
+            <div class="glass-panel rounded-lg p-6 flex items-center gap-4 hover:shadow-lg transition-shadow shadow-sm">
+                <div class="w-12 h-12 bg-error-container rounded-full flex items-center justify-center text-error">
+                    <span class="material-symbols-outlined text-[28px]">warning</span>
+                </div>
+                <div>
+                    <p class="text-caption text-outline uppercase font-bold tracking-wider">리스크 경보</p>
+                    <h4 class="text-headline-md font-bold text-on-surface">3개 채널</h4>
+                    <p class="text-caption text-error">즉각적 조치 필요</p>
+                </div>
+            </div>
+        </div>
+        <!-- Footer Spacing -->
+        <div class="h-12"></div>
+    </div>
+</main>
+<!-- Floating Action Button -->
+<button class="fixed bottom-8 right-8 w-16 h-16 bg-primary text-on-primary rounded-full shadow-xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-50">
+    <span class="material-symbols-outlined text-[32px]">add</span>
+</button>
+<script>
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        const menuIcon = document.querySelector('[onclick="toggleSidebar()"] span');
+
+        sidebar.classList.toggle('collapsed');
+
+        if (sidebar.classList.contains('collapsed')) {
+            mainContent.style.marginLeft = '80px';
+            menuIcon.textContent = 'menu';
+        } else {
+            mainContent.style.marginLeft = '256px';
+            menuIcon.textContent = 'menu_open';
+        }
+    }
+
+    // Micro-interactions and subtle effects
+    document.querySelectorAll('.glass-panel').forEach(panel => {
+        panel.addEventListener('mousemove', (e) => {
+            const rect = panel.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            panel.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.7) 70%)`;
+        });
+
+        panel.addEventListener('mouseleave', () => {
+            panel.style.background = 'rgba(255, 255, 255, 0.7)';
+        });
+    });
+</script>
+</body></html>

@@ -1,0 +1,444 @@
+<!DOCTYPE html><html class="light" lang="ko"><head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>교육 계획 및 진행 관리 | Kindred Assurance</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#005136",
+                        "on-primary": "#ffffff",
+                        "primary-container": "#006c49",
+                        "on-primary-container": "#93eabe",
+                        "secondary": "#2b6954",
+                        "surface": "#f7f9fb",
+                        "surface-container": "#eceef0",
+                        "surface-container-low": "#f2f4f6",
+                        "surface-container-high": "#e6e8ea",
+                        "surface-container-highest": "#e0e3e5",
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface": "#191c1e",
+                        "on-surface-variant": "#3f4943",
+                        "outline": "#6f7a72",
+                        "outline-variant": "#bbcabf",
+                        "glass-bg": "rgba(255, 255, 255, 0.75)",
+                        "glass-border": "rgba(0, 108, 73, 0.08)",
+                        "emerald-green": "#10b981"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "nav-height": "80px",
+                        "container-max-width": "1280px",
+                        "margin-desktop": "40px",
+                        "unit": "8px",
+                        "margin-mobile": "16px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "label-md": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #bbcabf;
+            border-radius: 10px;
+        }
+        .sidebar-transition {
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        /* Fix for potential vertical text layout issues in flex containers */
+        .nowrap {
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased min-h-screen">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 w-full h-nav-height bg-glass-bg dark:bg-inverse-surface/90 border-b border-glass-border backdrop-blur-md shadow-sm z-50">
+    <div class="flex justify-between items-center px-margin-desktop h-nav-height w-full max-w-container-max-width mx-auto">
+        <div class="flex items-center gap-8">
+            <div class="font-headline-md text-headline-md text-primary dark:text-primary-fixed font-bold">
+                Kindred Assurance
+            </div>
+            <nav class="hidden md:flex gap-6 items-center font-body-md text-body-md">
+                <a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Product</a>
+                <a class="text-primary dark:text-primary-fixed border-b-2 border-primary dark:border-primary-fixed font-bold pb-1" href="#">Claims</a>
+                <a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Service</a>
+                <a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">About</a>
+            </nav>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="relative hidden lg:block">
+                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+                <input class="pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-full text-sm w-64 focus:ring-2 focus:ring-primary/20 transition-all" placeholder="검색..." type="text">
+            </div>
+            <button class="p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-all duration-300">
+                <span class="material-symbols-outlined">notifications</span>
+            </button>
+            <button class="p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-all duration-300">
+                <span class="material-symbols-outlined">settings</span>
+            </button>
+            <div class="w-10 h-10 rounded-full bg-primary/10 overflow-hidden border border-outline-variant cursor-pointer scale-95 active:scale-90 transition-transform">
+                <img alt="User profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAgpow57VMOqowWY_L78LIn-YPD8G90Aed3IWw-55zGIY8lG3LEiepv3V2iEhUCMD5EOZ6f-LKDF7_xUX0QCV56dTeJ7J9BkAzcMjzDl4WUouboDxosTO4EDKFMGIBRsJtqfsKk7YR3yB3zniUJ2tqBnIaBUvIiJpPM4NJxzBc9CT3BUrdK6WpIpLhHUkh-1oUkyzUbUNditJclxEVTdScJoFUjSkjqnnRyC0ZYIKvAMi3YtZ_4BvsfRpyj3G5-H0MJEjRyCPEG6PU">
+            </div>
+        </div>
+    </div>
+</header>
+<div class="flex pt-nav-height min-h-screen">
+    <!-- Side Navigation Bar -->
+    <aside class="sidebar-transition w-64 bg-surface dark:bg-inverse-surface border-r border-outline-variant dark:border-outline fixed left-0 top-0 h-screen py-unit flex flex-col z-40 overflow-hidden" id="sidebar">
+        <div class="pt-24 px-6 mb-8 flex items-center justify-between">
+            <div class="flex items-center gap-3 sidebar-content">
+                <div class="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-primary">admin_panel_settings</span>
+                </div>
+                <div class="sidebar-text overflow-hidden">
+                    <h3 class="text-sm font-bold text-primary truncate nowrap">Admin Console</h3>
+                    <p class="text-[10px] text-on-surface-variant uppercase tracking-wider truncate nowrap">Kindred Assurance</p>
+                </div>
+            </div>
+            <button class="p-1 hover:bg-surface-container rounded-lg" onclick="toggleSidebar()">
+                <span class="material-symbols-outlined text-on-surface-variant" id="collapse-icon">menu_open</span>
+            </button>
+        </div>
+        <nav class="flex flex-col gap-1 px-2 flex-1 overflow-y-auto custom-scrollbar">
+            <a class="text-on-surface-variant hover:bg-surface-container mx-2 rounded-lg py-3 px-4 flex items-center gap-3 transition-all cursor-pointer active:opacity-80" href="#">
+                <span class="material-symbols-outlined shrink-0">dashboard</span>
+                <span class="text-sm font-medium sidebar-text nowrap">Dashboard</span>
+            </a>
+            <a class="text-on-surface-variant hover:bg-surface-container mx-2 rounded-lg py-3 px-4 flex items-center gap-3 transition-all cursor-pointer active:opacity-80" href="#">
+                <span class="material-symbols-outlined shrink-0">verified_user</span>
+                <span class="text-sm font-medium sidebar-text nowrap">Underwriting</span>
+            </a>
+            <a class="text-on-surface-variant hover:bg-surface-container mx-2 rounded-lg py-3 px-4 flex items-center gap-3 transition-all cursor-pointer active:opacity-80" href="#">
+                <span class="material-symbols-outlined shrink-0">payments</span>
+                <span class="text-sm font-medium sidebar-text nowrap">Sales</span>
+            </a>
+            <a class="text-on-surface-variant hover:bg-surface-container mx-2 rounded-lg py-3 px-4 flex items-center gap-3 transition-all cursor-pointer active:opacity-80" href="#">
+                <span class="material-symbols-outlined shrink-0">group_add</span>
+                <span class="text-sm font-medium sidebar-text nowrap">Recruitment</span>
+            </a>
+            <a class="text-on-surface-variant hover:bg-surface-container mx-2 rounded-lg py-3 px-4 flex items-center gap-3 transition-all cursor-pointer active:opacity-80" href="#">
+                <span class="material-symbols-outlined shrink-0">support_agent</span>
+                <span class="text-sm font-medium sidebar-text nowrap">Support</span>
+            </a>
+            <a class="bg-primary-container text-on-primary-container rounded-lg mx-2 py-3 px-4 flex items-center gap-3 transition-all cursor-pointer active:opacity-80" href="#">
+                <span class="material-symbols-outlined shrink-0">school</span>
+                <span class="text-sm font-bold sidebar-text nowrap">Education</span>
+            </a>
+        </nav>
+        <div class="mt-auto px-2 pb-6 border-t border-outline-variant pt-4">
+            <a class="text-on-surface-variant hover:bg-surface-container mx-2 rounded-lg py-3 px-4 flex items-center gap-3 transition-all cursor-pointer active:opacity-80" href="#">
+                <span class="material-symbols-outlined shrink-0">logout</span>
+                <span class="text-sm font-medium sidebar-text nowrap">Logout</span>
+            </a>
+        </div>
+    </aside>
+    <!-- Main Content -->
+    <main class="sidebar-transition flex-1 ml-64 p-8 overflow-y-auto custom-scrollbar" id="main-content">
+        <!-- Hero Title Section -->
+        <div class="mb-10 flex justify-between items-end max-w-7xl mx-auto">
+            <div>
+                <h1 class="text-4xl font-extrabold text-on-surface mb-2 tracking-tight">교육 계획 및 진행 관리</h1>
+                <p class="text-on-surface-variant">임직원의 성장을 위한 체계적인 교육 시스템</p>
+            </div>
+            <div class="flex gap-3">
+                <button class="bg-emerald-green text-white px-6 py-3 rounded-full font-bold flex items-center gap-2 hover:opacity-90 transition-all shadow-lg shadow-emerald-green/20">
+                    <span class="material-symbols-outlined text-[20px]">add</span>
+                    신규 교육 등록
+                </button>
+            </div>
+        </div>
+        <!-- Dashboard Grid -->
+        <div class="grid grid-cols-12 gap-8 max-w-7xl mx-auto">
+            <!-- Left Column: Registration Form & Visual -->
+            <div class="col-span-12 lg:col-span-5 flex flex-col gap-8">
+                <!-- Visual Asset Card -->
+                <div class="bg-white p-8 rounded-3xl border border-outline-variant flex items-center justify-between relative overflow-hidden group shadow-sm">
+                    <div class="z-10">
+                        <h2 class="text-2xl font-bold text-on-surface mb-2">지식의 도약</h2>
+                        <p class="text-on-surface-variant text-sm leading-relaxed nowrap">새로운 교육 계획을 수립하고<br>팀의 역량을 강화하세요.</p>
+                    </div>
+                    <div class="relative w-32 h-32 shrink-0">
+                        <img alt="Education icon" class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida/AP1WRLvn7m6Qiah6dRgko3mcjvCyms1vXOVvDWsK-x9xeqsJG3-6x6dQK-6RWOT-MrQmETHAkx54O5Ipr0oeNkK0w43Scosw-hZZy4jPoowR2bDBO3so2vzrfjZtS9DcY1ul8n_qcI44jAks2LITKD_UFry6oE60zusApHM7wsD9tSBlAiE2Df7J4e1-M1KURqBTEHurV-Xias3DoiqvU_aCZfdQxoj63_uYs6bQjqcXVhTF9FN0a7SRUsU-Jw">
+                    </div>
+                </div>
+                <!-- Registration Form -->
+                <div class="bg-white p-8 rounded-3xl border border-outline-variant shadow-sm">
+                    <h3 class="text-lg font-bold mb-6 flex items-center gap-2 text-on-surface nowrap">
+                        <span class="material-symbols-outlined text-emerald-green">edit_note</span>
+                        교육 계획 등록
+                    </h3>
+                    <form class="space-y-5">
+                        <div>
+                            <label class="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2 ml-1">교육 명칭</label>
+                            <input class="w-full bg-surface-container-low border-outline-variant rounded-xl focus:ring-emerald-green focus:border-emerald-green px-4 py-3" placeholder="예: 2024 상반기 보안 직무 교육" type="text">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2 ml-1">교육 기간</label>
+                                <input class="w-full bg-surface-container-low border-outline-variant rounded-xl focus:ring-emerald-green focus:border-emerald-green px-4 py-3" type="date">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2 ml-1">예산 (KRW)</label>
+                                <input class="w-full bg-surface-container-low border-outline-variant rounded-xl focus:ring-emerald-green focus:border-emerald-green px-4 py-3 text-right" placeholder="0" type="number">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2 ml-1">교육 자료</label>
+                            <div class="border-2 border-dashed border-outline-variant rounded-xl p-6 text-center cursor-pointer hover:bg-primary/5 transition-colors group">
+                                <span class="material-symbols-outlined text-on-surface-variant group-hover:text-emerald-green mb-2 text-3xl">upload_file</span>
+                                <p class="text-xs text-on-surface-variant group-hover:text-emerald-green nowrap">파일을 끌어오거나 클릭하여 업로드</p>
+                            </div>
+                        </div>
+                        <button class="w-full bg-emerald-green text-white py-4 rounded-xl font-bold mt-4 hover:shadow-lg hover:shadow-emerald-green/20 transition-all" type="button">등록 완료</button>
+                    </form>
+                </div>
+            </div>
+            <!-- Right Column: Calendar & Attendance -->
+            <div class="col-span-12 lg:col-span-7 flex flex-col gap-8">
+                <!-- Calendar/Upcoming Section -->
+                <div class="bg-white p-8 rounded-3xl border border-outline-variant shadow-sm">
+                    <div class="flex justify-between items-center mb-8 flex-wrap gap-4">
+                        <h3 class="text-lg font-bold flex items-center gap-2 text-on-surface nowrap">
+                            <span class="material-symbols-outlined text-emerald-green">calendar_month</span>
+                            예정된 교육 일정
+                        </h3>
+                        <div class="flex gap-4 items-center bg-surface-container-low px-4 py-2 rounded-full border border-outline-variant">
+                            <button class="hover:text-emerald-green transition-colors flex items-center"><span class="material-symbols-outlined text-[20px]">chevron_left</span></button>
+                            <span class="text-sm font-bold text-on-surface nowrap">2024년 10월</span>
+                            <button class="hover:text-emerald-green transition-colors flex items-center"><span class="material-symbols-outlined text-[20px]">chevron_right</span></button>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex items-center p-5 bg-surface-container-low rounded-2xl border-l-4 border-emerald-green group hover:shadow-md transition-all">
+                            <div class="bg-white rounded-xl w-14 h-14 flex flex-col items-center justify-center mr-5 shadow-sm shrink-0">
+                                <span class="text-[10px] font-bold text-on-surface-variant uppercase">OCT</span>
+                                <span class="text-xl font-black text-emerald-green leading-none">12</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="font-bold text-on-surface truncate nowrap">신입 사원 온보딩 기술 교육</h4>
+                                <p class="text-xs text-on-surface-variant mt-1 truncate nowrap">오전 10:00 - 오후 04:00 • 대회의실 A</p>
+                            </div>
+                            <div class="flex -space-x-2 shrink-0 ml-2">
+                                <img alt="trainee" class="w-8 h-8 rounded-full border-2 border-white" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCPW33u-pkdfHuw5TO4GVfxFBdE7R7sbmGAUPqpdTtMpChiZvf2704JgXzDMT8hDoy15Ii7FEPzRUDkvvPK1et2xQYeIY14MQBw58BO842gcgspR9_wPCqCmWEPwdKl-NiCnPSVQdKAkDCsMzitpch_3GuP3I5sFu65wkVCZwnpQMiin9muOWWtr15Rph2AoK8Ep4rrrPkCKmc3U85OL_9LpfulYqYKFhQusREbIekvVe_XcPSTssM6AoIEpb_zMQWWVvDKGvAIs8U">
+                                <img alt="trainee" class="w-8 h-8 rounded-full border-2 border-white" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDeGkiTaX05NH02_qxKhhflQQ6pW_QFuV1KzsULFqrrrFoxaJD82xniCrehwP79SP2sZ86hpYKDWWhx_ZV9JDHSrgH88Gn761SLIiTaFsPWelFtABgu7IFdlzylW_LdHizXjsp6spgEWgo8eblkyIqiuJUd7xeB5tQhdGYtqARt27P2OqYKPPOhbvsv-s9gsLVdgpj8Rk9fbW7y2Ey9rOw88wkt7u7_i5aiPf7AE8QK0k-LzHliFvpzntSyB5kJLjk5UtC2rqs3wkk">
+                                <div class="w-8 h-8 rounded-full border-2 border-white bg-primary-container text-[10px] flex items-center justify-center font-bold text-on-primary-container">+8</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center p-5 bg-white border border-outline-variant rounded-2xl border-l-4 border-outline-variant hover:shadow-md transition-all">
+                            <div class="bg-surface-container-low rounded-xl w-14 h-14 flex flex-col items-center justify-center mr-5 shadow-sm shrink-0">
+                                <span class="text-[10px] font-bold text-on-surface-variant uppercase">OCT</span>
+                                <span class="text-xl font-black text-on-surface-variant leading-none">15</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="font-bold text-on-surface truncate nowrap">보험 심사 리스크 관리 심화 과정</h4>
+                                <p class="text-xs text-on-surface-variant mt-1 truncate nowrap">오후 02:00 - 오후 05:00 • 온라인 교육</p>
+                            </div>
+                            <span class="bg-primary/5 text-primary px-4 py-1 rounded-full text-[11px] font-bold shrink-0 nowrap ml-2">진행 예정</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Attendance Management Section -->
+                <div class="bg-white rounded-3xl border border-outline-variant shadow-sm overflow-hidden flex flex-col">
+                    <div class="p-6 border-b border-outline-variant flex justify-between items-center bg-surface-container-low flex-wrap gap-4">
+                        <h3 class="text-lg font-bold flex items-center gap-2 text-on-surface nowrap">
+                            <span class="material-symbols-outlined text-emerald-green">groups</span>
+                            실시간 출석 관리
+                        </h3>
+                        <div class="relative">
+                            <span class="material-symbols-outlined text-on-surface-variant hover:text-emerald-green transition-colors cursor-pointer">search</span>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto custom-scrollbar">
+                        <table class="w-full text-left">
+                            <thead class="bg-surface-container-low border-b border-outline-variant">
+                            <tr>
+                                <th class="px-8 py-5 text-xs font-bold text-on-surface-variant uppercase tracking-wider nowrap">대상자</th>
+                                <th class="px-6 py-5 text-xs font-bold text-on-surface-variant uppercase tracking-wider nowrap">부서</th>
+                                <th class="px-6 py-5 text-xs font-bold text-on-surface-variant uppercase tracking-wider nowrap">교육 상태</th>
+                                <th class="px-8 py-5 text-xs font-bold text-on-surface-variant uppercase tracking-wider text-right nowrap">출결 체크</th>
+                            </tr>
+                            </thead>
+                            <tbody class="divide-y divide-outline-variant">
+                            <tr class="hover:bg-primary/5 transition-colors">
+                                <td class="px-8 py-5">
+                                    <div class="flex items-center gap-3">
+                                        <img alt="profile" class="w-10 h-10 rounded-full border border-outline-variant shrink-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDxURyninVQxdIPAWuaWofKMdxocUDKzRYhUQXe4BOAnCzWZS0GEKh0a111HYgUbMvPsQYqCgodS3qbxsrzZ0nKiidTmHLglfycHZo0wOUUBFjwAW18z50ej32jrx5BL3B4ytMPVvHmsyuNQp1FO-UOSk3XzXfViIGC76BVwl90MarMhIIpICZ3Dswxn6V-RHyWjALMadus85t1wyQrxDVZXmQwviT2fJ2BUxlk-99nRrjQ-lfVKMTaXwcCYVqPJYg-pnxkoUsUdps">
+                                        <div class="min-w-0">
+                                            <div class="text-sm font-bold text-on-surface truncate nowrap">김민준</div>
+                                            <div class="text-[10px] text-on-surface-variant truncate nowrap">mj.kim@kindred.com</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-5 text-sm font-medium text-on-surface nowrap">영업 지원팀</td>
+                                <td class="px-6 py-5">
+                                    <div class="flex items-center gap-2 nowrap">
+                                        <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+                                        <span class="text-sm font-medium">참여 중</span>
+                                    </div>
+                                </td>
+                                <td class="px-8 py-5 text-right nowrap">
+                                    <div class="inline-flex rounded-full border border-outline-variant overflow-hidden p-1 bg-surface-container-low">
+                                        <button class="px-5 py-1.5 text-xs font-bold bg-emerald-green text-white rounded-full shadow-sm nowrap">출석</button>
+                                        <button class="px-5 py-1.5 text-xs font-bold text-on-surface-variant hover:text-emerald-green transition-colors rounded-full nowrap">결석</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-primary/5 transition-colors">
+                                <td class="px-8 py-5">
+                                    <div class="flex items-center gap-3">
+                                        <img alt="profile" class="w-10 h-10 rounded-full border border-outline-variant shrink-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDUwFPt7FkgAYr3pbdJr7Y8t1w8pYG9dYP1m9zn5UPqGfNLZek32QYx1CTokDq0nXSeARHF-PCr1yz9wbRPHz4l97kXkNuVuL1_Gwhkat9kN-p-GCAkBgEjTaT1AysFV8cJb9kcupsNIYplRqcSJfRV5kJGe15I_LeMMevHDXFYyZ-aYv1l4QpsbtnUqlbqzqkfnoQCNp2TSgFT6tr0JKG5SvtaiYEeYLYZGENoY_Lg0nTZ4Z3Q8dvX-Rwtu2cIdgUySwahW_t4UDM">
+                                        <div class="min-w-0">
+                                            <div class="text-sm font-bold text-on-surface truncate nowrap">이서연</div>
+                                            <div class="text-[10px] text-on-surface-variant truncate nowrap">sy.lee@kindred.com</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-5 text-sm font-medium text-on-surface nowrap">리스크 심사팀</td>
+                                <td class="px-6 py-5">
+                                    <div class="flex items-center gap-2 nowrap">
+                                        <span class="w-2 h-2 rounded-full bg-amber-400 shrink-0"></span>
+                                        <span class="text-sm font-medium">지각</span>
+                                    </div>
+                                </td>
+                                <td class="px-8 py-5 text-right nowrap">
+                                    <div class="inline-flex rounded-full border border-outline-variant overflow-hidden p-1 bg-surface-container-low">
+                                        <button class="px-5 py-1.5 text-xs font-bold text-on-surface-variant hover:text-emerald-green transition-colors rounded-full nowrap">출석</button>
+                                        <button class="px-5 py-1.5 text-xs font-bold text-on-surface-variant hover:text-emerald-green transition-colors rounded-full nowrap">결석</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-primary/5 transition-colors">
+                                <td class="px-8 py-5">
+                                    <div class="flex items-center gap-3">
+                                        <img alt="profile" class="w-10 h-10 rounded-full border border-outline-variant shrink-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBbPoL2I3SBtvbPw020et1LWASzBApaGLozGQGlyNa7PpoGhxPw-FQsnSAU07Jxjbk4_4-khMhdfk7rFMwv57w0lBKmNktBoQeWGmYT4Jv1HjuyA94p9Y1Vf_7gBDt_vXtM0pHu50LXKKCrwG1ZoOPqqxvZkWREn_JOGSJ4jDgy9gCZ9uzlrybmMtnM8MTyxCycRgJ9wYTChfX1nMsEhoIV7vHV0tiZhqf9GPf3n22Glzp6Vf9l95fDPdxgxsesYw0YjDgL-TOLODQ">
+                                        <div class="min-w-0">
+                                            <div class="text-sm font-bold text-on-surface truncate nowrap">박지훈</div>
+                                            <div class="text-[10px] text-on-surface-variant truncate nowrap">jh.park@kindred.com</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-5 text-sm font-medium text-on-surface nowrap">고객 만족센터</td>
+                                <td class="px-6 py-5">
+                                    <div class="flex items-center gap-2 nowrap">
+                                        <span class="w-2 h-2 rounded-full bg-slate-300 shrink-0"></span>
+                                        <span class="text-sm font-medium">미참석</span>
+                                    </div>
+                                </td>
+                                <td class="px-8 py-5 text-right nowrap">
+                                    <div class="inline-flex rounded-full border border-outline-variant overflow-hidden p-1 bg-surface-container-low">
+                                        <button class="px-5 py-1.5 text-xs font-bold text-on-surface-variant hover:text-emerald-green transition-colors rounded-full nowrap">출석</button>
+                                        <button class="px-5 py-1.5 text-xs font-bold bg-red-500 text-white rounded-full shadow-sm nowrap">결석</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="p-6 bg-surface-container-low text-center border-t border-outline-variant">
+                        <button class="text-sm font-bold text-emerald-green hover:underline nowrap">전체 명단 보기 (42명)</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest dark:bg-inverse-surface border-t border-glass-border w-full py-12 px-margin-desktop mt-auto">
+    <div class="max-w-container-max-width mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+        <div class="flex flex-col items-center md:items-start">
+            <span class="font-label-md text-label-md font-black text-on-surface dark:text-surface-bright">Kindred Assurance</span>
+            <p class="font-caption text-caption text-on-surface-variant dark:text-surface-variant mt-1">© 2024 Kindred Assurance. All rights reserved.</p>
+        </div>
+        <div class="flex flex-wrap justify-center gap-8 font-caption text-caption">
+            <a class="text-on-surface-variant dark:text-surface-variant hover:text-primary transition-colors" href="#">Terms of Service</a>
+            <a class="text-on-surface-variant dark:text-surface-variant hover:text-primary transition-colors" href="#">Privacy Policy</a>
+            <a class="text-on-surface-variant dark:text-surface-variant hover:text-primary transition-colors" href="#">Contact Us</a>
+        </div>
+    </div>
+</footer>
+<script>
+    // Sidebar toggle logic
+    let isSidebarCollapsed = false;
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('main-content');
+    const sidebarTexts = document.querySelectorAll('.sidebar-text');
+    const collapseIcon = document.getElementById('collapse-icon');
+
+    function toggleSidebar() {
+        isSidebarCollapsed = !isSidebarCollapsed;
+        if (isSidebarCollapsed) {
+            sidebar.classList.remove('w-64');
+            sidebar.classList.add('w-20');
+            mainContent.classList.remove('ml-64');
+            mainContent.classList.add('ml-20');
+            sidebarTexts.forEach(el => el.classList.add('hidden'));
+            collapseIcon.innerText = 'menu';
+        } else {
+            sidebar.classList.remove('w-20');
+            sidebar.classList.add('w-64');
+            mainContent.classList.remove('ml-20');
+            mainContent.classList.add('ml-64');
+            sidebarTexts.forEach(el => el.classList.remove('hidden'));
+            collapseIcon.innerText = 'menu_open';
+        }
+    }
+
+    // Attendance toggle logic
+    const attendBtns = document.querySelectorAll('.inline-flex button');
+    attendBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const parent = this.parentElement;
+            parent.querySelectorAll('button').forEach(b => {
+                b.classList.remove('bg-emerald-green', 'bg-red-500', 'text-white', 'shadow-sm');
+                b.classList.add('text-on-surface-variant');
+            });
+
+            this.classList.remove('text-on-surface-variant');
+            this.classList.add('text-white', 'shadow-sm');
+            if (this.innerText === '출석') {
+                this.classList.add('bg-emerald-green');
+            } else if (this.innerText === '결석') {
+                this.classList.add('bg-red-500');
+            }
+        });
+    });
+
+    // Hover animation for visual cards
+    document.querySelectorAll('.bg-white.rounded-3xl').forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            card.style.transform = 'translateY(-2px)';
+            card.style.transition = 'all 0.3s ease-out';
+        });
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'translateY(0)';
+        });
+    });
+</script>
+</body></html>

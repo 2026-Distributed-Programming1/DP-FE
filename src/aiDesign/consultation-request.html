@@ -1,0 +1,366 @@
+<!DOCTYPE html><html lang="ko"><head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Kindred Assurance - 상담 예약 신청</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#006c49",
+                        "on-primary": "#ffffff",
+                        "primary-container": "#10b981",
+                        "on-primary-container": "#00422b",
+                        "secondary": "#2b6954",
+                        "on-secondary": "#ffffff",
+                        "secondary-container": "#adedd3",
+                        "on-secondary-container": "#306d58",
+                        "tertiary": "#416656",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#84ab98",
+                        "on-tertiary-container": "#1b3f31",
+                        "error": "#ba1a1a",
+                        "on-error": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#93000a",
+                        "background": "#f7f9fb",
+                        "on-background": "#191c1e",
+                        "surface": "#f7f9fb",
+                        "on-surface": "#191c1e",
+                        "surface-variant": "#e0e3e5",
+                        "on-surface-variant": "#3c4a42",
+                        "outline": "#6c7a71",
+                        "outline-variant": "#bbcabf",
+                        "glass-bg": "rgba(255, 255, 255, 0.7)",
+                        "glass-border": "rgba(0, 108, 73, 0.08)"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "nav-height": "80px",
+                        "margin-desktop": "40px",
+                        "container-max-width": "1280px",
+                        "margin-mobile": "16px",
+                        "gutter": "24px",
+                        "unit": "8px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "caption": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "0em", "fontWeight": "500" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "caption": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "letterSpacing": "0.01em", "fontWeight": "400" }]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .emerald-gradient {
+            background: linear-gradient(135deg, #10b981 0%, #006c49 100%);
+        }
+        .glow-emerald {
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+        }
+        #sidebar {
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #sidebar.collapsed {
+            width: 80px;
+        }
+        #sidebar.collapsed .sidebar-text,
+        #sidebar.collapsed .sidebar-header-text,
+        #sidebar.collapsed .sidebar-cta {
+            display: none;
+        }
+        #main-content {
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #10b981 !important;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md min-h-screen">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 w-full z-50 bg-glass-bg border-b border-glass-border backdrop-blur-md shadow-sm h-nav-height">
+    <div class="flex justify-between items-center px-margin-desktop h-nav-height w-full max-w-container-max-width mx-auto">
+        <div class="flex items-center gap-8">
+            <span class="font-headline-md text-headline-md text-primary font-bold">Kindred Assurance</span>
+            <nav class="hidden md:flex gap-6 items-center h-full font-body-md text-body-md">
+                <a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Home</a>
+                <a class="text-primary border-b-2 border-primary font-bold pb-1" href="#">Policies</a>
+                <a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Claims</a>
+                <a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Sales</a>
+                <a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Support</a>
+            </nav>
+        </div>
+        <div class="flex items-center gap-4">
+            <button class="p-2 hover:bg-surface-variant/50 rounded-full transition-all duration-300">
+                <span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+            </button>
+            <button class="p-2 hover:bg-surface-variant/50 rounded-full transition-all duration-300">
+                <span class="material-symbols-outlined text-on-surface-variant">settings</span>
+            </button>
+            <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center overflow-hidden border border-primary/10">
+                <span class="material-symbols-outlined text-primary">account_circle</span>
+            </div>
+        </div>
+    </div>
+</header>
+<!-- Side Navigation Bar -->
+<aside class="h-screen w-64 fixed left-0 top-0 bg-surface border-r border-outline-variant shadow-md flex flex-col py-unit space-y-2 z-40 overflow-y-auto pt-24" id="sidebar">
+    <div class="px-4 mb-4 flex items-center justify-between">
+        <div class="sidebar-header-text">
+            <h2 class="font-headline-md text-primary font-bold text-lg">Admin Console</h2>
+            <p class="text-caption text-outline">Kindred Assurance</p>
+        </div>
+        <button class="p-2 hover:bg-surface-variant rounded-lg" onclick="toggleSidebar()">
+            <span class="material-symbols-outlined">menu_open</span>
+        </button>
+    </div>
+    <div class="flex flex-col gap-1 flex-grow">
+        <a class="flex items-center gap-3 p-3 mx-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-all duration-200" href="#">
+            <span class="material-symbols-outlined">dashboard</span>
+            <span class="font-label-md sidebar-text">Dashboard</span>
+        </a>
+        <a class="flex items-center gap-3 p-3 mx-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-all duration-200" href="#">
+            <span class="material-symbols-outlined">verified_user</span>
+            <span class="font-label-md sidebar-text">Underwriting</span>
+        </a>
+        <a class="flex items-center gap-3 p-3 mx-2 bg-primary-container text-on-primary-container rounded-lg transition-all duration-200 shadow-sm" href="#">
+            <span class="material-symbols-outlined">assignment</span>
+            <span class="font-label-md sidebar-text font-bold">Applications</span>
+        </a>
+        <a class="flex items-center gap-3 p-3 mx-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-all duration-200" href="#">
+            <span class="material-symbols-outlined">payments</span>
+            <span class="font-label-md sidebar-text">Sales</span>
+        </a>
+        <a class="flex items-center gap-3 p-3 mx-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-all duration-200" href="#">
+            <span class="material-symbols-outlined">group_add</span>
+            <span class="font-label-md sidebar-text">Recruitment</span>
+        </a>
+        <a class="flex items-center gap-3 p-3 mx-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-all duration-200" href="#">
+            <span class="material-symbols-outlined">support_agent</span>
+            <span class="font-label-md sidebar-text">Support</span>
+        </a>
+    </div>
+    <div class="px-4 sidebar-cta">
+        <button class="w-full bg-primary text-on-primary py-3 rounded-lg font-label-md hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined text-[20px]">analytics</span>
+            <span>Summary View</span>
+        </button>
+    </div>
+    <div class="pt-4 mt-auto border-t border-outline-variant/50">
+        <a class="flex items-center gap-3 p-3 mx-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-all duration-200" href="#">
+            <span class="material-symbols-outlined text-error">logout</span>
+            <span class="font-label-md sidebar-text">Logout</span>
+        </a>
+    </div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 pt-nav-height min-h-screen" id="main-content">
+    <div class="p-8 md:p-10 max-w-container-max-width mx-auto">
+        <div class="flex flex-col lg:flex-row gap-gutter">
+            <!-- Left Column: Form Section -->
+            <div class="flex-1">
+                <div class="glass-panel p-8 md:p-10 rounded-xl shadow-sm relative overflow-hidden">
+                    <header class="mb-10 relative z-10">
+                        <h1 class="font-headline-lg text-headline-lg text-on-surface mb-2">상담 예약 신청</h1>
+                        <p class="text-on-surface-variant font-body-md">전문 상담사와 함께 귀하의 미래를 설계하세요.</p>
+                    </header>
+                    <!-- Progress Indicator -->
+                    <div class="flex items-center mb-12 relative z-10">
+                        <div class="flex flex-col items-center flex-1">
+                            <div class="w-10 h-10 rounded-full emerald-gradient text-white flex items-center justify-center font-bold mb-2 glow-emerald">1</div>
+                            <span class="text-label-md font-label-md text-primary">기본 정보</span>
+                        </div>
+                        <div class="flex-1 h-[2px] bg-primary/20 -mt-6"></div>
+                        <div class="flex flex-col items-center flex-1">
+                            <div class="w-10 h-10 rounded-full bg-surface-container text-on-surface-variant flex items-center justify-center font-bold mb-2">2</div>
+                            <span class="text-label-md font-label-md text-on-surface-variant">일정 선택</span>
+                        </div>
+                        <div class="flex-1 h-[2px] bg-surface-container -mt-6"></div>
+                        <div class="flex flex-col items-center flex-1">
+                            <div class="w-10 h-10 rounded-full bg-surface-container text-on-surface-variant flex items-center justify-center font-bold mb-2">3</div>
+                            <span class="text-label-md font-label-md text-on-surface-variant">신청 완료</span>
+                        </div>
+                    </div>
+                    <!-- Consultation Form -->
+                    <form class="space-y-6 relative z-10">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Consultation Type -->
+                            <div class="space-y-2">
+                                <label class="text-label-md font-label-md text-on-surface-variant ml-1">상담 유형</label>
+                                <select class="w-full bg-white border border-outline-variant rounded-full h-14 px-6 text-body-md appearance-none cursor-pointer">
+                                    <option value="">상담 항목을 선택하세요</option>
+                                    <option value="life">종신/생명 보험</option>
+                                    <option value="health">건강/의료 보험</option>
+                                    <option value="auto">자동차/화재 보험</option>
+                                    <option value="pension">연금/저축 상담</option>
+                                </select>
+                            </div>
+                            <!-- Phone Number -->
+                            <div class="space-y-2">
+                                <label class="text-label-md font-label-md text-on-surface-variant ml-1">연락처</label>
+                                <input class="w-full bg-white border border-outline-variant rounded-full h-14 px-6 text-body-md" placeholder="010-0000-0000" type="tel">
+                            </div>
+                        </div>
+                        <!-- Date/Time Grid -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-2">
+                                <label class="text-label-md font-label-md text-on-surface-variant ml-1">상담 희망 일자</label>
+                                <div class="relative">
+                                    <input class="w-full bg-white border border-outline-variant rounded-full h-14 px-6 text-body-md pr-12" type="date">
+                                    <span class="material-symbols-outlined absolute right-5 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">calendar_today</span>
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-label-md font-label-md text-on-surface-variant ml-1">상담 희망 시간</label>
+                                <select class="w-full bg-white border border-outline-variant rounded-full h-14 px-6 text-body-md appearance-none">
+                                    <option>오전 10:00 - 12:00</option>
+                                    <option>오후 13:00 - 15:00</option>
+                                    <option>오후 15:00 - 17:00</option>
+                                    <option>오후 17:00 이후</option>
+                                </select>
+                            </div>
+                        </div>
+                        <!-- Address Search -->
+                        <div class="space-y-2">
+                            <label class="text-label-md font-label-md text-on-surface-variant ml-1">방문/거주 주소</label>
+                            <div class="flex gap-2">
+                                <input class="flex-1 bg-white border border-outline-variant rounded-full h-14 px-6 text-body-md" placeholder="우편번호 찾기" readonly="" type="text">
+                                <button class="px-6 rounded-full bg-secondary-container text-on-secondary-container font-label-md hover:bg-secondary-container/80 transition-all active:scale-95 whitespace-nowrap" type="button">주소 검색</button>
+                            </div>
+                            <input class="w-full bg-white border border-outline-variant rounded-full h-14 px-6 text-body-md mt-2" placeholder="상세 주소를 입력하세요" type="text">
+                        </div>
+                        <!-- Comments -->
+                        <div class="space-y-2">
+                            <label class="text-label-md font-label-md text-on-surface-variant ml-1">추가 요청 사항</label>
+                            <textarea class="w-full bg-white border border-outline-variant rounded-xl p-6 text-body-md resize-none" placeholder="상담 전 미리 전달하실 내용을 적어주세요." rows="4"></textarea>
+                        </div>
+                        <div class="pt-6">
+                            <button class="w-full h-16 rounded-full emerald-gradient text-white font-headline-md shadow-lg glow-emerald hover:opacity-90 transition-all active:scale-[0.98] flex items-center justify-center gap-2" type="submit">
+                                다음 단계로 이동
+                                <span class="material-symbols-outlined">arrow_forward</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- Right Column: Sidebar / Visual -->
+            <div class="lg:w-96 flex flex-col gap-gutter">
+                <!-- Info Card -->
+                <div class="glass-panel p-8 rounded-xl relative overflow-hidden group shadow-sm">
+                    <div class="relative z-10">
+                        <div class="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                            <span class="material-symbols-outlined text-primary text-3xl">verified_user</span>
+                        </div>
+                        <h3 class="font-headline-md text-headline-md text-on-surface mb-3">안심 상담 서비스</h3>
+                        <p class="text-on-surface-variant font-body-md leading-relaxed">
+                            Kindred Assurance의 모든 상담은 엄격한 보안 프로토콜을 준수하며, 귀하의 정보는 암호화되어 보호됩니다.
+                        </p>
+                    </div>
+                    <!-- Decorative Background Element -->
+                    <div class="absolute -bottom-10 -right-10 opacity-20 group-hover:scale-110 transition-transform duration-500">
+                        <img alt="Friendly Piggy Bank" class="w-40 h-40 object-contain" src="https://lh3.googleusercontent.com/aida/AP1WRLsu3AV-5nXxMMdv35vnxjerr_ImacYfbu0RMMWfgehZ35bJoBuNn19HEjLy2fOT8u19Gl3dSxypUo1kuo5iiDSyG_irk59IKZdLH6FdBHmBZ4laHCJqFtUy1Kio9zubQe1ENGYr6jioMkZeyQMBh8Yl64vqj_jwpSbPy2kaNQeNX6PMyDWQf-AstjiTYhswRA98oai3khIXNxC7GmnG-rb6cImkNnDCVDT8eYb5dV71O6n_WO4Q2MsXHKo">
+                    </div>
+                </div>
+                <!-- Bento Card: Fast Contact -->
+                <div class="glass-panel p-8 rounded-xl border-l-4 border-primary shadow-sm">
+                    <h4 class="font-label-md text-label-md text-primary mb-4 uppercase tracking-wider">상담 센터 운영</h4>
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-4">
+                            <span class="material-symbols-outlined text-on-surface-variant">schedule</span>
+                            <div>
+                                <p class="font-body-md text-on-surface font-semibold">평일 09:00 - 18:00</p>
+                                <p class="text-caption text-on-surface-variant">주말 및 공휴일 휴무</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <span class="material-symbols-outlined text-on-surface-variant">call</span>
+                            <div>
+                                <p class="font-body-md text-on-surface font-semibold">1588-0000</p>
+                                <p class="text-caption text-on-surface-variant">빠른 유선 상담 신청</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Visual Accent: Trust Badge -->
+                <div class="relative h-64 rounded-xl overflow-hidden shadow-sm">
+                    <img class="w-full h-full object-cover" data-alt="A clean, minimalist high-end office lobby with large glass windows and soft emerald green lighting accents. The atmosphere is professional, serene, and modern, reflecting trust and premium insurance services. High-key lighting highlights smooth surfaces and digital glass interfaces, creating a sophisticated workspace environment with a deep focus on transparency." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwYERiwP8tfgw9S2iSiQHaG5rEnUDNqiunsNaa3XCegOfUplrcD4FIhivYk3aFG1yzhrIrOi8qPBf3s2LHlODN1CLvMum0GrBtJQPSZ6W488sEQPUkgwpOAp_7AGoe7hVrc3jQkZkM5ST_ClNRLUWGRSQtERzeNUS0EGT89Zi9yQ3nO0vjaAt7b7jkWMkXBK7ff4N4eMUcULndYhc82Af0P0mg9msvg9NZ-Snh-5vRjG1mnMOqsMeMFdRDk6B5bmK3LT_vg0heS5E">
+                    <div class="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent flex items-end p-8">
+                        <p class="text-white font-headline-md">10만 명 이상의 고객이 선택한 프리미엄 케어</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<!-- Floating Action Button (FAB) for Help -->
+<button class="fixed bottom-10 right-margin-desktop w-16 h-16 rounded-full emerald-gradient shadow-2xl flex items-center justify-center text-white hover:scale-110 transition-transform z-50">
+    <span class="material-symbols-outlined text-[32px]">add</span>
+</button>
+<script>
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        const menuIcon = document.querySelector('[onclick="toggleSidebar()"] span');
+
+        sidebar.classList.toggle('collapsed');
+
+        if (sidebar.classList.contains('collapsed')) {
+            mainContent.style.marginLeft = '80px';
+            menuIcon.textContent = 'menu';
+        } else {
+            mainContent.style.marginLeft = '256px';
+            menuIcon.textContent = 'menu_open';
+        }
+    }
+
+    // Simple micro-interaction for form focus effects
+    document.querySelectorAll('input, select, textarea').forEach(el => {
+        el.addEventListener('focus', () => {
+            const label = el.parentElement.querySelector('label');
+            if(label) label.classList.add('text-primary');
+        });
+        el.addEventListener('blur', () => {
+            const label = el.parentElement.querySelector('label');
+            if(label) label.classList.remove('text-primary');
+        });
+    });
+</script>
+</body></html>

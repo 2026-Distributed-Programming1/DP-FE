@@ -1,0 +1,444 @@
+<!DOCTYPE html><html class="light" lang="ko"><head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>InsurFlow | 혁신적인 보험 서비스</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error-container": "#ffdad6",
+                        "secondary": "#2b6954",
+                        "on-primary-fixed": "#002113",
+                        "secondary-fixed-dim": "#95d3ba",
+                        "inverse-on-surface": "#eff1f3",
+                        "error": "#ba1a1a",
+                        "inverse-surface": "#2d3133",
+                        "on-tertiary-fixed-variant": "#005236",
+                        "on-primary": "#ffffff",
+                        "surface-dim": "#d8dadc",
+                        "surface-container": "#eceef0",
+                        "tertiary-container": "#006c49",
+                        "inverse-primary": "#81d8ad",
+                        "tertiary": "#005136",
+                        "surface-tint": "#006c49",
+                        "on-tertiary": "#ffffff",
+                        "outline-variant": "#bbcabf",
+                        "primary-container": "#006c49",
+                        "on-secondary-container": "#326f5a",
+                        "surface-container-low": "#f2f4f6",
+                        "secondary-container": "#b0f0d5",
+                        "primary-fixed": "#9df4c8",
+                        "on-background": "#191c1e",
+                        "surface-variant": "#e0e3e5",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "surface-container-high": "#e6e8ea",
+                        "on-surface": "#191c1e",
+                        "outline": "#6f7a72",
+                        "tertiary-fixed": "#6ffbbe",
+                        "surface": "#f7f9fb",
+                        "background": "#f7f9fb",
+                        "on-primary-fixed-variant": "#005236",
+                        "on-secondary-fixed-variant": "#0b513d",
+                        "on-tertiary-container": "#63f1b4",
+                        "on-primary-container": "#93eabe",
+                        "on-tertiary-fixed": "#002113",
+                        "glass-bg": "rgba(255, 255, 255, 0.75)",
+                        "primary-fixed-dim": "#81d8ad",
+                        "on-error": "#ffffff",
+                        "secondary-fixed": "#b0f0d5",
+                        "tertiary-fixed-dim": "#4edea3",
+                        "glass-border": "rgba(0, 108, 73, 0.08)",
+                        "surface-bright": "#f7f9fb",
+                        "primary": "#005136",
+                        "on-surface-variant": "#3f4943",
+                        "on-secondary-fixed": "#002117",
+                        "on-error-container": "#93000a",
+                        "surface-container-highest": "#e0e3e5"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "nav-height": "80px",
+                        "container-max-width": "1280px",
+                        "margin-desktop": "40px",
+                        "unit": "8px",
+                        "margin-mobile": "16px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Inter"],
+                        "caption": ["Inter"],
+                        "label-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "display-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "caption": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "letterSpacing": "0.01em", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "0em", "fontWeight": "500"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "letterSpacing": "0.01em", "fontWeight": "400"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f7f9fb;
+            min-height: 100vh;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 108, 73, 0.08);
+        }
+        .glass-card-hover:hover {
+            transform: translateY(-8px);
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 30px 60px -15px rgba(0, 108, 73, 0.12);
+        }
+        .emerald-glow {
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.08);
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #bbcabf; border-radius: 10px; }
+    </style>
+</head>
+<body class="font-body-md text-on-surface bg-background">
+<!-- Top Navigation Bar -->
+<nav class="fixed top-0 left-0 w-full z-50 bg-glass-bg border-b border-glass-border backdrop-blur-md shadow-sm h-nav-height">
+    <div class="flex justify-between items-center px-margin-desktop h-nav-height w-full max-w-container-max-width mx-auto">
+        <div class="flex items-center gap-12">
+            <a class="font-headline-md text-headline-md text-primary font-bold tracking-tighter flex items-center gap-2" href="#" style="transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);">
+                <img alt="Logo" class="w-8 h-8 object-contain" src="https://lh3.googleusercontent.com/aida/AP1WRLsmNNa-gmnudZi7KUcLz5K0-Gz5EMX-gUfLJAwbqt8eEuc1NzQcwZcdSRO8A6-M5sSbMkxInxMgwKh1H_khx2wWGgcb3q0OTdS2Q2oJD-ilG0aHxNqAxAXtN3KwY1xnII34eeYPl92QtsFA8a12CAPN4xb5i0gLrtGDh0bgnUVU3xuKHw_u6SPPb9bFUz-jOF2UR2TG_4IvlCzq_7_81vy3sR5QLudLT_td3J7Y6PEZOH7tQAWkUgigo2k">
+                InsurFlow
+            </a>
+            <div class="hidden xl:flex items-center h-nav-height gap-12">
+                <a class="text-primary border-b-2 border-primary font-bold h-full flex items-center tracking-wider px-2" href="#" style="transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);">보험상품</a>
+                <a class="text-on-surface-variant hover:text-primary transition-colors h-full flex items-center tracking-wider px-2" href="#" style="transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);">보상서비스</a>
+                <a class="text-on-surface-variant hover:text-primary transition-colors h-full flex items-center tracking-wider px-2" href="#" style="transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);">마이페이지</a>
+                <a class="text-on-surface-variant hover:text-primary transition-colors h-full flex items-center tracking-wider px-2" href="#" style="transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);">고객센터</a>
+                <a class="text-on-surface-variant hover:text-primary transition-colors h-full flex items-center tracking-wider px-2" href="#" style="transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);">혜택/이벤트</a>
+            </div>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="hidden lg:flex items-center bg-surface-container-low rounded-full px-4 py-2 border border-outline-variant/30 focus-within:border-primary/40 transition-all">
+                <span class="material-symbols-outlined text-outline text-[20px] mr-2">search</span>
+                <input class="bg-transparent border-none focus:ring-0 text-sm w-48 placeholder:text-outline-variant" placeholder="검색어를 입력하세요" type="text">
+            </div>
+            <div class="flex items-center gap-2">
+                <button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-low p-2 rounded-full transition-all duration-300 relative" style="transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);">
+                    notifications
+                    <span class="absolute top-2.5 right-2.5 w-1.5 h-1.5 bg-error rounded-full"></span>
+                </button>
+                <button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-low p-2 rounded-full transition-all duration-300" style="transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);">
+                    settings
+                </button>
+            </div>
+            <button class="px-6 py-2 bg-primary text-on-primary rounded-full font-label-md text-sm hover:opacity-90 active:scale-95 transition-all" style="transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);">로그인</button>
+            <img alt="User profile" class="w-10 h-10 rounded-full border border-outline-variant/30 object-cover cursor-pointer hover:opacity-80 transition-opacity" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB8sJcA5dbPSOm_XDyyZmSCV2oYrEQoRBozeAPp7k_f8z8fH22bFUC4QYu5SijVYhw-gAz7eKnzEV8Aaya1AR-AyzMOfpD_cW7o-fSN8ghECxVH7u3oq_jDOtu6Fs_IGezRLEATbCjKX-zD3N-UwrGrQzfx_m_08nWyVAHCK7RcIAFPdx9PGLovEzMjAhusw-OTN27cxQWmaxSEYvnImgb1qQGjkJC1llZvH7546na_d8xQlz8pxHAKnEXCIETjqOEKenh42hG1zOA">
+        </div>
+    </div>
+</nav>
+<!-- Main Content -->
+<main class="pt-[120px] pb-20 px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto">
+    <!-- Hero Section -->
+    <header class="mb-16">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-8">
+            <div class="flex-1">
+                <div class="inline-flex items-center gap-2 px-3 py-1 bg-primary-container/10 text-primary rounded-full font-label-md text-xs mb-6 border border-primary-container/20">
+                    <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+                    인슈플로우와 함께하는 똑똑한 보험 관리
+                </div>
+                <h1 class="font-display-lg text-display-lg text-on-surface mb-6 tracking-tight leading-tight">
+                    당신의 일상이 <br><span class="text-primary">더욱 안전해지도록</span>
+                </h1>
+                <p class="font-body-lg text-body-lg text-on-surface-variant max-w-xl mb-8">
+                    라이프스타일에 맞춘 최적의 보험 솔루션을 만나보세요.
+                    복잡한 보험도 인슈플로우라면 투명하고 간편합니다.
+                </p>
+            </div>
+            <div class="hidden lg:block w-1/3">
+                <div class="glass-panel p-8 rounded-xl emerald-glow">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-2xl bg-primary-container/20 flex items-center justify-center">
+                            <img alt="Shield" class="w-10 h-10 object-contain" src="https://lh3.googleusercontent.com/aida/AP1WRLsmNNa-gmnudZi7KUcLz5K0-Gz5EMX-gUfLJAwbqt8eEuc1NzQcwZcdSRO8A6-M5sSbMkxInxMgwKh1H_khx2wWGgcb3q0OTdS2Q2oJD-ilG0aHxNqAxAXtN3KwY1xnII34eeYPl92QtsFA8a12CAPN4xb5i0gLrtGDh0bgnUVU3xuKHw_u6SPPb9bFUz-jOF2UR2TG_4IvlCzq_7_81vy3sR5QLudLT_td3J7Y6PEZOH7tQAWkUgigo2k">
+                        </div>
+                        <div>
+                            <p class="text-xs text-outline mb-1">나의 보험 요약</p>
+                            <p class="font-bold text-xl">총 4건 가입 중</p>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-on-surface-variant">이번 달 보험료</span>
+                            <span class="font-bold text-lg">245,000원</span>
+                        </div>
+                        <div class="w-full bg-surface-container h-2 rounded-full overflow-hidden">
+                            <div class="bg-primary w-3/4 h-full rounded-full"></div>
+                        </div>
+                        <button class="w-full py-3 bg-surface-container-highest/60 hover:bg-primary hover:text-on-primary text-primary text-sm font-bold rounded-full transition-all" style="transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);">보장 분석 받기</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- Quick Menu Section -->
+    <section class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-20">
+        <button class="glass-panel p-8 rounded-xl flex flex-col items-center gap-4 glass-card-hover group" style="transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);">
+            <div class="w-20 h-20 bg-primary-container/10 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <img alt="Calculator" class="w-14 h-14 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLG91mBGHCoeGiFLpMRWYuQSA0zKeQ5M_WzlT9kPM5M9AWRM24OsgCveTHKphXpkT6WLqbi6vPU4a-PUo8uJztF6QBQM6zs6X3GXWVu3EIjqlzchb4S5RF68abjH2Dkfx7UXooHAfPpPCApXza-XLY5TxOK5DqbX_XCfS8Skg5rBqqS7JjPcHrdigIenlymjOYFPQbN1qy2v0MvD0rxUsBiMOS6cDvo5R-7-1cC5hVCZCQ6aJK1w9vWndyOsFHExp2wtBf89q7mik">
+            </div>
+            <span class="font-bold text-on-surface">보험료 계산</span>
+        </button>
+        <button class="glass-panel p-8 rounded-xl flex flex-col items-center gap-4 glass-card-hover group" style="transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);">
+            <div class="w-20 h-20 bg-secondary-container/10 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <img alt="Accident" class="w-14 h-14 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAtAP2oEpqvXHi_fBPXVoow-mNxYoWZV6soXh13kgLvm_43Wxd4DxSBnppsZ0XzKoHJUojEjgiWJMs7Y0N04gtKt3bYGU2pwcr0IgXKd7iU81OoDitH1CPcszGCbwLboFE7rhD4DYt2x9IcyM653Q9PTqEZ_SpPoTor1qcgci16WyvHjomrWuE4N9lqoGG4ipo-OKE1zAFA-CApWa-CCPgWGBN-C9Jb9bJ_RHuZ1jQRwRYsdtMteS179uVXro7-IkA_DJN6VOz8VCo">
+            </div>
+            <span class="font-bold text-on-surface">사고 접수</span>
+        </button>
+        <button class="glass-panel p-8 rounded-xl flex flex-col items-center gap-4 glass-card-hover group" style="transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);">
+            <div class="w-20 h-20 bg-tertiary-container/10 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <img alt="Claim" class="w-14 h-14 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRwWhyBygxzjGtzdyMecAwaUDOl-39c1ceN7kvNWFjpGp9VlM3bes5T7KYLg6kxvtsMDixZF_hu3hPZdw9mECnJBDebFR9N5eRmf7SSDGifN-fnbXevkXfn7Esex-uDMH_p4pFqnZOAudjcWVFSgMVEMlmaxzHwsbTpRct_hldpTpTMPPj3GrtXjDcD2GJJlJf_h8lE5IbvecZFj4ylRqKCIc58qZDBvct4h5DgoI_zYZKPHCjpptBQCeJpbVwFK1Y2ZCvd06nZ8A">
+            </div>
+            <span class="font-bold text-on-surface">보험금 청구</span>
+        </button>
+        <button class="glass-panel p-8 rounded-xl flex flex-col items-center gap-4 glass-card-hover group" style="transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);">
+            <div class="w-20 h-20 bg-surface-container-highest/40 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <img alt="Contract" class="w-14 h-14 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2dJGa3ZonSEK-PiV8LrBN8eqajFmk1SEkN8l3Bs7Rx5mo_e_-yf9hvswCQVCgIVGuRCKimfxJJ6fedtTf1LNP0lmpcWehwKbW5GkQO2O_UIU3YVMPtdeDH2lsxVCXZhgHeRKhR0iqJ7Se45UY6HHZTQYxgoefFmhT0J4dp7_2PIUYxHj8Lezu00GbIYWI4mhg44moCGg2a5iLDTeHrF8tw3ePCpcETp4ErDPJJ4vpLuBHRsr1bPOmuKrX0Vxsxqy3cGUK9LocTGU">
+            </div>
+            <span class="font-bold text-on-surface">계약 조회</span>
+        </button>
+    </section>
+    <!-- Filter Bar -->
+    <section class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+        <h2 class="font-headline-lg text-headline-lg">맞춤형 추천 상품</h2>
+        <div class="flex items-center gap-2 p-1 bg-surface-container/40 rounded-full border border-outline-variant/30">
+            <button class="px-6 py-2 bg-primary text-on-primary rounded-full font-label-md text-sm" style="transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);">전체</button>
+            <button class="px-6 py-2 hover:bg-surface-container-lowest text-on-surface-variant rounded-full font-label-md text-sm transition-colors" style="transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);">건강</button>
+            <button class="px-6 py-2 hover:bg-surface-container-lowest text-on-surface-variant rounded-full font-label-md text-sm transition-colors" style="transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);">운전자</button>
+            <button class="px-6 py-2 hover:bg-surface-container-lowest text-on-surface-variant rounded-full font-label-md text-sm transition-colors" style="transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);">생활</button>
+        </div>
+    </section>
+    <!-- Product Cards Grid -->
+    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
+        <!-- Premium Health -->
+        <div class="glass-panel glass-card-hover rounded-xl p-10 transition-all flex flex-col group border-outline-variant/30 relative overflow-hidden" style="transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);">
+            <div class="flex justify-between items-start mb-10">
+                <div class="w-28 h-28 flex items-center justify-center">
+                    <img alt="Health Icon" class="w-full h-full object-contain drop-shadow-2xl" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRwWhyBygxzjGtzdyMecAwaUDOl-39c1ceN7kvNWFjpGp9VlM3bes5T7KYLg6kxvtsMDixZF_hu3hPZdw9mECnJBDebFR9N5eRmf7SSDGifN-fnbXevkXfn7Esex-uDMH_p4pFqnZOAudjcWVFSgMVEMlmaxzHwsbTpRct_hldpTpTMPPj3GrtXjDcD2GJJlJf_h8lE5IbvecZFj4ylRqKCIc58qZDBvct4h5DgoI_zYZKPHCjpptBQCeJpbVwFK1Y2ZCvd06nZ8A">
+                </div>
+                <span class="px-4 py-1.5 bg-primary text-on-primary rounded-full text-xs font-bold shadow-lg shadow-primary/20">추천 상품</span>
+            </div>
+            <h3 class="font-headline-md text-headline-md mb-3">프리미엄 건강보험</h3>
+            <p class="text-on-surface-variant text-body-md mb-8 flex-grow leading-relaxed">암, 뇌, 심장 3대 질병 진단비부터 수술비, 입원비까지 빈틈없이 보장합니다.</p>
+            <div class="pt-8 border-t border-outline-variant/20">
+                <div class="flex justify-between items-center mb-6">
+                    <span class="text-caption text-outline">월 예상 보험료</span>
+                    <span class="font-headline-md text-primary font-bold">42,500원 ~</span>
+                </div>
+                <button class="w-full py-4 bg-primary text-on-primary rounded-full font-bold hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-primary/15" style="transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);">자세히 보기</button>
+            </div>
+        </div>
+        <!-- Safe Driver -->
+        <div class="glass-panel glass-card-hover rounded-xl p-10 transition-all flex flex-col group border-outline-variant/30" style="transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);">
+            <div class="flex justify-between items-start mb-10">
+                <div class="w-28 h-28 flex items-center justify-center">
+                    <img alt="Driver Icon" class="w-full h-full object-contain drop-shadow-2xl" src="https://lh3.googleusercontent.com/aida-public/AB6AXuATtyLy1M6JhwyHnXSz-Lm-Oelaqup9OOCfaOqcS8JcbxnMOpRK_n-HjQebkYgc7q4_UEEs5PqdkSo8UwR4DJjJEaegYDk6AvKMRVSoQZ-6iwE-vmdfELfqIvzsMj3mWxebAJzyHakdgH-BkUJye1gL8ZUcc1CzhdiNMBtF4oeK2HmGIWXAjhd6xm6eEl9rBlQMNUzEkHvzdb5yXBnqMS6ARbQHqkUKg1PwA8iNWL1B96P-MjytUDvYi__uchBaF6SEsGMXY2u3xlA">
+                </div>
+            </div>
+            <h3 class="font-headline-md text-headline-md mb-3">안심 운전자보험</h3>
+            <p class="text-on-surface-variant text-body-md mb-8 flex-grow leading-relaxed">교통사고 처리 지원금은 물론 변호사 선임 비용까지 실속 있게 챙기세요.</p>
+            <div class="pt-8 border-t border-outline-variant/20">
+                <div class="flex justify-between items-center mb-6">
+                    <span class="text-caption text-outline">월 예상 보험료</span>
+                    <span class="font-headline-md text-primary font-bold">12,000원 ~</span>
+                </div>
+                <button class="w-full py-4 bg-surface-container-highest text-on-surface rounded-full font-bold hover:bg-primary hover:text-on-primary transition-all" style="transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);">자세히 보기</button>
+            </div>
+        </div>
+        <!-- Home Shield -->
+        <div class="glass-panel glass-card-hover rounded-xl p-10 transition-all flex flex-col group border-outline-variant/30" style="transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);">
+            <div class="flex justify-between items-start mb-10">
+                <div class="w-28 h-28 flex items-center justify-center">
+                    <img alt="Home Icon" class="w-full h-full object-contain drop-shadow-2xl" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2dJGa3ZonSEK-PiV8LrBN8eqajFmk1SEkN8l3Bs7Rx5mo_e_-yf9hvswCQVCgIVGuRCKimfxJJ6fedtTf1LNP0lmpcWehwKbW5GkQO2O_UIU3YVMPtdeDH2lsxVCXZhgHeRKhR0iqJ7Se45UY6HHZTQYxgoefFmhT0J4dp7_2PIUYxHj8Lezu00GbIYWI4mhg44moCGg2a5iLDTeHrF8tw3ePCpcETp4ErDPJJ4vpLuBHRsr1bPOmuKrX0Vxsxqy3cGUK9LocTGU">
+                </div>
+            </div>
+            <h3 class="font-headline-md text-headline-md mb-3">홈 실드 주택보험</h3>
+            <p class="text-on-surface-variant text-body-md mb-8 flex-grow leading-relaxed">화재, 누수는 물론 우리 집 가전제품 수리비까지 일상 속 위험을 대비합니다.</p>
+            <div class="pt-8 border-t border-outline-variant/20">
+                <div class="flex justify-between items-center mb-6">
+                    <span class="text-caption text-outline">월 예상 보험료</span>
+                    <span class="font-headline-md text-primary font-bold">8,900원 ~</span>
+                </div>
+                <button class="w-full py-4 bg-surface-container-highest text-on-surface rounded-full font-bold hover:bg-primary hover:text-on-primary transition-all" style="transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);">자세히 보기</button>
+            </div>
+        </div>
+    </section>
+    <!-- Enterprise Section -->
+    <section class="glass-panel rounded-xl overflow-hidden mb-20 border-outline-variant/30">
+        <div class="p-8 border-b border-outline-variant/30 flex justify-between items-center bg-surface-container/20">
+            <div>
+                <h2 class="font-headline-lg text-headline-lg mb-1">법인 전용 플랜</h2>
+                <p class="text-sm text-on-surface-variant">기업을 위한 최적의 리스크 관리 솔루션</p>
+            </div>
+            <button class="text-primary font-label-md flex items-center gap-1 hover:underline" style="transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);">상품 비교하기 <span class="material-symbols-outlined text-sm">open_in_new</span></button>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left min-w-[600px]">
+                <thead>
+                <tr class="bg-surface-container/10">
+                    <th class="px-8 py-4 font-label-md text-xs text-outline uppercase tracking-wider">상품명</th>
+                    <th class="px-8 py-4 font-label-md text-xs text-outline uppercase tracking-wider">대상</th>
+                    <th class="px-8 py-4 font-label-md text-xs text-outline uppercase tracking-wider text-right">최대 보장</th>
+                    <th class="px-8 py-4 font-label-md text-xs text-outline uppercase tracking-wider">특징</th>
+                    <th class="px-8 py-4 font-label-md text-xs text-outline uppercase tracking-wider text-center">신청</th>
+                </tr>
+                </thead>
+                <tbody class="divide-y divide-outline-variant/20">
+                <tr class="hover:bg-surface-container/30 transition-colors">
+                    <td class="px-8 py-6">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                                <img alt="Business" class="w-6 h-6 object-contain" src="https://lh3.googleusercontent.com/aida/AP1WRLsmNNa-gmnudZi7KUcLz5K0-Gz5EMX-gUfLJAwbqt8eEuc1NzQcwZcdSRO8A6-M5sSbMkxInxMgwKh1H_khx2wWGgcb3q0OTdS2Q2oJD-ilG0aHxNqAxAXtN3KwY1xnII34eeYPl92QtsFA8a12CAPN4xb5i0gLrtGDh0bgnUVU3xuKHw_u6SPPb9bFUz-jOF2UR2TG_4IvlCzq_7_81vy3sR5QLudLT_td3J7Y6PEZOH7tQAWkUgigo2k">
+                            </div>
+                            <span class="font-semibold text-sm">글로벌 임원 케어</span>
+                        </div>
+                    </td>
+                    <td class="px-8 py-6 text-sm">C-Level 경영진</td>
+                    <td class="px-8 py-6 text-right font-bold text-sm text-primary">50억원</td>
+                    <td class="px-8 py-6">
+                        <span class="px-3 py-1 bg-secondary-container/30 text-on-secondary-container rounded-full text-[10px] font-bold">해외 긴급구조 포함</span>
+                    </td>
+                    <td class="px-8 py-6 text-center">
+                        <button class="text-primary material-symbols-outlined hover:translate-x-1 transition-transform" style="transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);">arrow_forward</button>
+                    </td>
+                </tr>
+                <tr class="hover:bg-surface-container/30 transition-colors">
+                    <td class="px-8 py-6">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                                <img alt="Startup" class="w-6 h-6 object-contain" src="https://lh3.googleusercontent.com/aida/AP1WRLsmNNa-gmnudZi7KUcLz5K0-Gz5EMX-gUfLJAwbqt8eEuc1NzQcwZcdSRO8A6-M5sSbMkxInxMgwKh1H_khx2wWGgcb3q0OTdS2Q2oJD-ilG0aHxNqAxAXtN3KwY1xnII34eeYPl92QtsFA8a12CAPN4xb5i0gLrtGDh0bgnUVU3xuKHw_u6SPPb9bFUz-jOF2UR2TG_4IvlCzq_7_81vy3sR5QLudLT_td3J7Y6PEZOH7tQAWkUgigo2k">
+                            </div>
+                            <span class="font-semibold text-sm">스타트업 단체보험</span>
+                        </div>
+                    </td>
+                    <td class="px-8 py-6 text-sm">50인 미만 중소기업</td>
+                    <td class="px-8 py-6 text-right font-bold text-sm text-primary">12억원</td>
+                    <td class="px-8 py-6">
+                        <span class="px-3 py-1 bg-secondary-container/30 text-on-secondary-container rounded-full text-[10px] font-bold">간편 가입 프로세스</span>
+                    </td>
+                    <td class="px-8 py-6 text-center">
+                        <button class="text-primary material-symbols-outlined hover:translate-x-1 transition-transform" style="transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);">arrow_forward</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+    <!-- Promo Banner -->
+    <section class="relative h-[240px] rounded-xl overflow-hidden flex items-center p-12 mb-20 bg-primary">
+        <div class="absolute inset-0 bg-gradient-to-r from-primary via-primary/95 to-primary/80"></div>
+        <div class="relative z-10 max-w-lg">
+            <h2 class="font-headline-lg text-headline-lg text-white mb-3">지금 갈아타면 <span class="text-primary-fixed underline underline-offset-4">최대 25%</span> 할인</h2>
+            <p class="text-white/80 font-body-md mb-8 text-sm">기존 보험보다 더 넓은 보장, 더 저렴한 보험료를 확인하세요.</p>
+            <button class="px-8 py-3 bg-white text-primary rounded-full font-bold hover:scale-105 transition-all shadow-xl" style="transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);">내 절약 금액 계산하기</button>
+        </div>
+        <div class="absolute right-12 top-1/2 -translate-y-1/2 hidden md:block">
+            <img alt="Promo Icon" class="w-40 h-40 object-contain drop-shadow-2xl animate-bounce" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfAw_63vms2p9zZzpNp86LYuANJWkxhejtvNTLql3KMPqsw4YsaeDuVhpRypSecVgGVYao2f326Jsq1976apYkqTT6U3UUIUmFp0hhQ60i66NHJj2k6UQ1vhj8RjDdnTx6nJLksURg1t6ZhIs9Qcv9c9m2Y8JZnLdoRq8LS9nT8php3Uq6yubI6awP5K4shoLE-M1I-F8qFC5S0XgI_nSdYQweNEWTvq7zC0kX1Tk86KfC3ht0m_CXHLvqe0ZP07x3rVjI3RE8pJ4" style="animation-duration: 3s;">
+        </div>
+    </section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-16 px-margin-desktop bg-surface-container/30 border-t border-glass-border">
+    <div class="max-w-container-max-width mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-12 mb-12">
+            <div class="col-span-1 md:col-span-2">
+<span class="font-headline-md text-primary font-bold mb-4 block flex items-center gap-2">
+<img alt="Logo" class="w-6 h-6" src="https://lh3.googleusercontent.com/aida/AP1WRLsmNNa-gmnudZi7KUcLz5K0-Gz5EMX-gUfLJAwbqt8eEuc1NzQcwZcdSRO8A6-M5sSbMkxInxMgwKh1H_khx2wWGgcb3q0OTdS2Q2oJD-ilG0aHxNqAxAXtN3KwY1xnII34eeYPl92QtsFA8a12CAPN4xb5i0gLrtGDh0bgnUVU3xuKHw_u6SPPb9bFUz-jOF2UR2TG_4IvlCzq_7_81vy3sR5QLudLT_td3J7Y6PEZOH7tQAWkUgigo2k">
+                        InsurFlow
+                    </span>
+                <p class="text-sm text-outline leading-relaxed max-w-sm mb-6">
+                    인슈플로우는 투명한 디지털 보험 문화를 선도합니다.
+                    복잡한 보험의 구조를 개선하여 고객에게 가장 유리한 가치를 제공합니다.
+                </p>
+                <div class="flex gap-4">
+                    <button class="w-10 h-10 rounded-full border border-outline-variant/30 flex items-center justify-center hover:bg-primary hover:text-white transition-all" style="transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);"><span class="material-symbols-outlined text-sm">share</span></button>
+                    <button class="w-10 h-10 rounded-full border border-outline-variant/30 flex items-center justify-center hover:bg-primary hover:text-white transition-all" style="transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);"><span class="material-symbols-outlined text-sm">thumb_up</span></button>
+                </div>
+            </div>
+            <div>
+                <h4 class="font-bold text-on-surface mb-6">주요 서비스</h4>
+                <ul class="space-y-3">
+                    <li class=""><a class="text-sm text-outline hover:text-primary transition-colors" href="#" style="transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);">자동차보험</a></li>
+                    <li class=""><a class="text-sm text-outline hover:text-primary transition-colors" href="#" style="transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);">실손의료비보험</a></li>
+                    <li class=""><a class="text-sm text-outline hover:text-primary transition-colors" href="#" style="transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);">어린이보험</a></li>
+                    <li class=""><a class="text-sm text-outline hover:text-primary transition-colors" href="#" style="transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);">화재/배책보험</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold text-on-surface mb-6">고객센터</h4>
+                <ul class="space-y-3 text-sm text-outline">
+                    <li class="">1588-0000 (유료)</li>
+                    <li class="">평일 09:00 ~ 18:00</li>
+                    <li class=""><a class="hover:text-primary transition-colors" href="#" style="transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);">1:1 상담 예약</a></li>
+                    <li class=""><a class="hover:text-primary transition-colors" href="#" style="transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);">자주 묻는 질문</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold text-on-surface mb-6">소식 구독</h4>
+                <div class="flex flex-col gap-2">
+                    <input class="bg-surface-container/50 border-outline-variant/30 rounded-full px-4 py-2 text-xs focus:ring-primary focus:border-primary" placeholder="이메일 주소" type="email">
+                    <button class="py-2 bg-primary text-white rounded-full text-xs font-bold hover:bg-on-primary-fixed-variant transition-all" style="transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);">뉴스레터 신청</button>
+                </div>
+            </div>
+        </div>
+        <div class="pt-8 border-t border-outline-variant/20 flex flex-col md:flex-row justify-between items-center gap-4">
+            <span class="text-xs text-outline">© 2024 InsurFlow Enterprise. All rights reserved.</span>
+            <div class="flex gap-6">
+                <a class="text-xs text-outline font-bold hover:text-on-surface" href="#" style="transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);">개인정보처리방침</a>
+                <a class="text-xs text-outline hover:text-on-surface" href="#" style="transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);">이용약관</a>
+                <a class="text-xs text-outline hover:text-on-surface" href="#" style="transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);">전자민원접수</a>
+            </div>
+        </div>
+    </div>
+</footer>
+<script>
+    // Scroll interaction for navigation elevation
+    window.addEventListener('scroll', () => {
+        const nav = document.querySelector('nav');
+        if (window.scrollY > 20) {
+            nav.classList.add('shadow-md');
+        } else {
+            nav.classList.remove('shadow-md');
+        }
+    });
+
+    // Interactive element transition setup
+    const interactiveElements = document.querySelectorAll('button, a, .glass-card-hover');
+    interactiveElements.forEach(el => {
+        el.style.transition = "all 0.4s cubic-bezier(0.16, 1, 0.3, 1)";
+    });
+</script>
+
+
+</body></html>

@@ -1,192 +1,188 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth, isCustomer } from '../../context/AuthContext';
+import Layout from '../../components/layout/Layout';
 import { fetchInsuranceProducts } from '../../api/insuranceProducts';
+import styles from './InsuranceProductPage.module.css';
 
-const CATEGORY_ICON = {
-  '자동차': 'directions_car',
-  '건강': 'favorite',
-  '생명': 'favorite_border',
-  '화재': 'local_fire_department',
-  '여행': 'travel_explore',
-  '운전자': 'person',
-};
+const CATEGORIES = ['전체', '건강', '운전자', '생활', '기업'];
 
-function getIcon(category) {
-  return CATEGORY_ICON[category] ?? 'shield';
-}
+const STATIC_PRODUCTS = [
+  { icon: '🏥', name: '프리미엄 건강보험', desc: '암, 뇌, 심장 3대 질병 진단비부터 수술비, 입원비까지 빈틈없이 보장합니다.', price: '42,500원 ~', tag: '추천 상품', featured: true },
+  { icon: '🚗', name: '안심 운전자보험', desc: '교통사고 처리 지원금은 물론 변호사 선임 비용까지 실속 있게 챙기세요.', price: '12,000원 ~', tag: null, featured: false },
+  { icon: '🏠', name: '홈 실드 주택보험', desc: '화재, 누수는 물론 우리 집 가전제품 수리비까지 일상 속 위험을 대비합니다.', price: '8,900원 ~', tag: null, featured: false },
+];
 
-function formatPrice(n) {
-  return n?.toLocaleString('ko-KR') ?? '—';
-}
-
-function ProductCard({ product, selected, onClick }) {
-  return (
-    <div
-      onClick={() => onClick(product)}
-      className={`card p-6 flex flex-col gap-4 cursor-pointer transition-all duration-200
-                  hover:-translate-y-1 hover:shadow-md
-                  ${selected ? 'ring-2 ring-primary/40' : ''}`}
-    >
-      <div className="flex items-start justify-between">
-        <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
-          <span className="material-symbols-outlined text-primary text-3xl">
-            {getIcon(product.category)}
-          </span>
-        </div>
-        <span className="badge bg-surface-container text-on-surface-variant text-[11px]">
-          {product.category}
-        </span>
-      </div>
-      <div>
-        <h3 className="font-semibold text-on-surface">{product.productName}</h3>
-        <p className="text-sm text-on-surface-variant mt-1 line-clamp-2 leading-relaxed">
-          {product.coverageSummary}
-        </p>
-      </div>
-      <div className="mt-auto pt-4 border-t border-outline-variant/50 flex items-center justify-between">
-        <span className="text-xs text-outline">월 보험료</span>
-        <span className="font-bold text-primary">{formatPrice(product.monthlyPremium)}원</span>
-      </div>
-    </div>
-  );
-}
-
-function DetailPanel({ product, canApply, onApply }) {
-  if (!product) {
-    return (
-      <div className="card h-full flex flex-col items-center justify-center gap-3 text-on-surface-variant p-8">
-        <span className="material-symbols-outlined text-4xl text-outline">shield</span>
-        <p className="text-sm">상품을 선택하면 상세 정보가 표시됩니다.</p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="card flex flex-col overflow-hidden">
-      <div className="p-6 border-b border-outline-variant/50 bg-primary/5">
-        <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
-          <span className="material-symbols-outlined text-primary text-3xl">
-            {getIcon(product.category)}
-          </span>
-        </div>
-        <span className="badge bg-surface-container text-on-surface-variant text-xs mb-2">
-          {product.category}
-        </span>
-        <h3 className="font-bold text-lg text-on-surface">{product.productName}</h3>
-        <p className="text-sm text-primary font-semibold mt-1">
-          월 {formatPrice(product.monthlyPremium)}원
-        </p>
-      </div>
-
-      <div className="p-5 border-b border-outline-variant/50">
-        <p className="text-xs font-semibold text-on-surface-variant uppercase tracking-wide mb-3 flex items-center gap-1">
-          <span className="material-symbols-outlined text-primary text-[14px]">check_circle</span>
-          보장 내용
-        </p>
-        <p className="text-sm text-on-surface leading-relaxed">{product.coverageSummary}</p>
-      </div>
-
-      {product.exclusionSummary && (
-        <div className="p-5 border-b border-outline-variant/50 bg-error-container/10">
-          <p className="text-xs font-semibold text-on-surface-variant uppercase tracking-wide mb-3 flex items-center gap-1">
-            <span className="material-symbols-outlined text-error text-[14px]">cancel</span>
-            면책 사항
-          </p>
-          <p className="text-sm text-on-surface-variant leading-relaxed">{product.exclusionSummary}</p>
-        </div>
-      )}
-
-      {canApply && (
-        <div className="p-5">
-          <button onClick={() => onApply(product)} className="btn-primary w-full py-3">
-            이 상품 신청하기
-          </button>
-        </div>
-      )}
-    </div>
-  );
-}
+const ENTERPRISE_PLANS = [
+  { name: '글로벌 임원 케어', target: 'C-Level 경영진', maxCoverage: '50억원', feature: '해외 긴급구조 포함' },
+  { name: '스타트업 단체보험', target: '50인 미만 중소기업', maxCoverage: '12억원', feature: '간편 가입 프로세스' },
+];
 
 export default function InsuranceProductPage() {
-  const { user } = useAuth();
-  const navigate = useNavigate();
-  const customer = isCustomer(user?.role);
-
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [selected, setSelected] = useState(null);
-  const [categoryFilter, setCategoryFilter] = useState('전체');
+  const [loading, setLoading] = useState(true);
+  const [activeCategory, setActiveCategory] = useState('전체');
 
   useEffect(() => {
-    setLoading(true);
     fetchInsuranceProducts()
-      .then((data) => setProducts(data.items ?? []))
-      .catch(() => {})
+      .then((data) => setProducts(Array.isArray(data) ? data : (data?.items ?? data?.content ?? [])))
+      .catch(() => setProducts([]))
       .finally(() => setLoading(false));
   }, []);
 
-  const categories = ['전체', ...new Set(products.map((p) => p.category).filter(Boolean))];
-  const filtered = categoryFilter === '전체' ? products : products.filter((p) => p.category === categoryFilter);
+  const displayProducts = products.length > 0 ? products : STATIC_PRODUCTS;
+  const filteredProducts = activeCategory === '전체'
+    ? displayProducts
+    : displayProducts.filter((p) => (p.category ?? '') === activeCategory);
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-bold text-on-surface">보험상품</h1>
-        <p className="text-sm text-on-surface-variant mt-0.5">
-          총 {products.length}개 상품
-          {customer ? ' · 원하는 상품을 선택해 신청하세요.' : ''}
-        </p>
-      </div>
+    <Layout title="보험상품 포털">
+      <div className={styles.page}>
+        {/* Hero Section */}
+        <header className={styles.hero}>
+          <div className={styles.heroLeft}>
+            <div className={styles.heroPill}>
+              <span className={styles.heroPillDot} />
+              인슈플로우와 함께하는 똑똑한 보험 관리
+            </div>
+            <h1 className={styles.heroTitle}>
+              당신의 일상이<br /><span className={styles.heroTitleAccent}>더욱 안전해지도록</span>
+            </h1>
+            <p className={styles.heroSub}>
+              라이프스타일에 맞춘 최적의 보험 솔루션을 만나보세요.
+              복잡한 보험도 인슈플로우라면 투명하고 간편합니다.
+            </p>
+          </div>
+          <div className={styles.heroCard}>
+            <div className={styles.heroCardTop}>
+              <div className={styles.heroCardIconWrap}>🛡️</div>
+              <div>
+                <p className={styles.heroCardMeta}>나의 보험 요약</p>
+                <p className={styles.heroCardTitle}>총 4건 가입 중</p>
+              </div>
+            </div>
+            <div className={styles.heroCardBody}>
+              <div className={styles.heroCardRow}>
+                <span>이번 달 보험료</span>
+                <span className={styles.heroCardPrice}>245,000원</span>
+              </div>
+              <div className={styles.heroProgressBar}>
+                <div className={styles.heroProgressFill} style={{ width: '75%' }} />
+              </div>
+              <button className={styles.heroCardBtn}>보장 분석 받기</button>
+            </div>
+          </div>
+        </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <div className="lg:col-span-7 flex flex-col gap-4">
-          <div className="flex gap-1 flex-wrap">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setCategoryFilter(cat)}
-                className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-colors
-                  ${categoryFilter === cat
-                    ? 'bg-primary text-on-primary'
-                    : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'}`}
-              >
-                {cat}
-              </button>
-            ))}
+        {/* Quick Menu */}
+        <section className={styles.quickMenu}>
+          {[
+            { icon: '🧮', label: '보험료 계산' },
+            { icon: '🚨', label: '사고 접수' },
+            { icon: '📋', label: '보험금 청구' },
+            { icon: '📄', label: '계약 조회' },
+          ].map((item) => (
+            <button key={item.label} className={styles.quickBtn}>
+              <div className={styles.quickIconWrap}>{item.icon}</div>
+              <span className={styles.quickLabel}>{item.label}</span>
+            </button>
+          ))}
+        </section>
+
+        {/* Category Filter + Products */}
+        <section className={styles.productsSection}>
+          <div className={styles.productsHeader}>
+            <h2 className={styles.sectionTitle}>맞춤형 추천 상품</h2>
+            <div className={styles.categoryFilter}>
+              {CATEGORIES.map((cat) => (
+                <button
+                  key={cat}
+                  className={`${styles.catBtn} ${activeCategory === cat ? styles.catBtnActive : ''}`}
+                  onClick={() => setActiveCategory(cat)}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
           </div>
 
           {loading ? (
-            <div className="flex justify-center py-16">
-              <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-            </div>
-          ) : filtered.length === 0 ? (
-            <div className="card flex flex-col items-center justify-center py-16 gap-3 text-on-surface-variant">
-              <span className="material-symbols-outlined text-4xl text-outline">search_off</span>
-              <p className="text-sm">해당 카테고리의 상품이 없습니다.</p>
-            </div>
+            <div className={styles.loadingMsg}>상품 불러오는 중…</div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {filtered.map((product) => (
-                <ProductCard
-                  key={product.productName}
-                  product={product}
-                  selected={selected?.productName === product.productName}
-                  onClick={setSelected}
-                />
+            <div className={styles.productsGrid}>
+              {(filteredProducts.length > 0 ? filteredProducts : STATIC_PRODUCTS).map((p, i) => (
+                <div key={p.productNo ?? p.name ?? i} className={`${styles.productCard} ${p.featured ? styles.productCardFeatured : ''}`}>
+                  <div className={styles.productTop}>
+                    <div className={styles.productIconWrap}>{p.icon ?? '📦'}</div>
+                    {p.tag && <span className={styles.productTag}>{p.tag}</span>}
+                  </div>
+                  <h3 className={styles.productName}>{p.name ?? p.productName ?? '-'}</h3>
+                  <p className={styles.productDesc}>{p.desc ?? p.description ?? '-'}</p>
+                  <div className={styles.productFooter}>
+                    <div className={styles.productPriceRow}>
+                      <span className={styles.productPriceLabel}>월 예상 보험료</span>
+                      <span className={styles.productPrice}>{p.price ?? p.monthlyPremium ?? '-'}</span>
+                    </div>
+                    <button className={`${styles.productBtn} ${p.featured ? styles.productBtnFeatured : ''}`}>자세히 보기</button>
+                  </div>
+                </div>
               ))}
             </div>
           )}
-        </div>
+        </section>
 
-        <div className="lg:col-span-5 lg:sticky lg:top-24 self-start">
-          <DetailPanel
-            product={selected}
-            canApply={customer}
-            onApply={(p) => navigate('/my/insurance-applications/new', { state: { product: p } })}
-          />
-        </div>
+        {/* Enterprise Plans */}
+        <section className={styles.enterpriseSection}>
+          <div className={styles.enterpriseHeader}>
+            <div>
+              <h2 className={styles.sectionTitle}>법인 전용 플랜</h2>
+              <p className={styles.enterpriseSub}>기업을 위한 최적의 리스크 관리 솔루션</p>
+            </div>
+            <button className={styles.compareBtn}>상품 비교하기 →</button>
+          </div>
+          <div className={styles.enterpriseTableWrap}>
+            <table className={styles.table}>
+              <thead>
+                <tr>
+                  <th>상품명</th>
+                  <th>대상</th>
+                  <th className={styles.thRight}>최대 보장</th>
+                  <th>특징</th>
+                  <th className={styles.thCenter}>신청</th>
+                </tr>
+              </thead>
+              <tbody>
+                {ENTERPRISE_PLANS.map((plan) => (
+                  <tr key={plan.name} className={styles.tableRow}>
+                    <td>
+                      <div className={styles.planNameCell}>
+                        <div className={styles.planIconWrap}>🏢</div>
+                        <span className={styles.planName}>{plan.name}</span>
+                      </div>
+                    </td>
+                    <td className={styles.tdSmall}>{plan.target}</td>
+                    <td className={`${styles.tdRight} ${styles.tdBoldGreen}`}>{plan.maxCoverage}</td>
+                    <td>
+                      <span className={styles.featureBadge}>{plan.feature}</span>
+                    </td>
+                    <td className={styles.tdCenter}>
+                      <button className={styles.applyBtn}>→</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* Promo Banner */}
+        <section className={styles.promoBanner}>
+          <div className={styles.promoContent}>
+            <h2 className={styles.promoTitle}>지금 갈아타면 <span className={styles.promoAccent}>최대 25%</span> 할인</h2>
+            <p className={styles.promoSub}>기존 보험보다 더 넓은 보장, 더 저렴한 보험료를 확인하세요.</p>
+            <button className={styles.promoBtn}>내 절약 금액 계산하기</button>
+          </div>
+          <div className={styles.promoEmoji}>💰</div>
+        </section>
       </div>
-    </div>
+    </Layout>
   );
 }

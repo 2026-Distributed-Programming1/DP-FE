@@ -1,7 +1,7 @@
 import client from './client';
 
-export function fetchChannelRecruitments({ page = 1, size = 20 } = {}) {
-  return client.get('/api/channel-recruitments', { params: { page, size } }).then((r) => r.data);
+export function fetchChannelRecruitments() {
+  return client.get('/api/channel-recruitments').then((r) => r.data);
 }
 
 export function createChannelRecruitment(data) {

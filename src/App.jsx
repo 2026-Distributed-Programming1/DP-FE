@@ -7,6 +7,14 @@ import EducationPlanListPage from './pages/educationPlans/EducationPlanListPage'
 import InquiryListPage from './pages/inquiries/InquiryListPage';
 import ChannelScreeningListPage from './pages/channelScreenings/ChannelScreeningListPage';
 import SalesOrgEvaluationListPage from './pages/salesOrgEvaluations/SalesOrgEvaluationListPage';
+import AccidentPage from './pages/accidents/AccidentPage';
+import ClaimPaymentPage from './pages/claimPayments/ClaimPaymentPage';
+import ConsultationPage from './pages/consultations/ConsultationPage';
+import UnderwritingListPage from './pages/underwriting/UnderwritingListPage';
+import UnderwritingDashboardPage from './pages/underwriting/UnderwritingDashboardPage';
+import InterviewSchedulePage from './pages/interviewSchedules/InterviewSchedulePage';
+import ChannelRecruitmentPage from './pages/channelRecruitments/ChannelRecruitmentPage';
+import InsuranceProductPage from './pages/insuranceProducts/InsuranceProductPage';
 import LoginPage from './pages/auth/LoginPage';
 
 function PrivateRoute({ user, children }) {
@@ -49,6 +57,38 @@ export default function App() {
         <Route
           path="/sales-org-evaluations"
           element={<PrivateRoute user={user}><SalesOrgEvaluationListPage /></PrivateRoute>}
+        />
+        <Route
+          path="/accidents"
+          element={<PrivateRoute user={user}><AccidentPage /></PrivateRoute>}
+        />
+        <Route
+          path="/claim-payments"
+          element={<PrivateRoute user={user}><ClaimPaymentPage /></PrivateRoute>}
+        />
+        <Route
+          path="/consultations"
+          element={<PrivateRoute user={user}><ConsultationPage /></PrivateRoute>}
+        />
+        <Route
+          path="/underwriting"
+          element={<PrivateRoute user={user}><UnderwritingListPage /></PrivateRoute>}
+        />
+        <Route
+          path="/underwriting-dashboard"
+          element={<PrivateRoute user={user}><UnderwritingDashboardPage /></PrivateRoute>}
+        />
+        <Route
+          path="/interview-schedules"
+          element={<PrivateRoute user={user}><InterviewSchedulePage /></PrivateRoute>}
+        />
+        <Route
+          path="/channel-recruitments"
+          element={<PrivateRoute user={user}><ChannelRecruitmentPage /></PrivateRoute>}
+        />
+        <Route
+          path="/insurance-products"
+          element={<PrivateRoute user={user}><InsuranceProductPage /></PrivateRoute>}
         />
       </Routes>
     </BrowserRouter>

@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+
+<html lang="ko"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed": "#002117",
+                        "outline-variant": "#bbcabf",
+                        "surface-tint": "#006c49",
+                        "error": "#ba1a1a",
+                        "tertiary-fixed-dim": "#4edea3",
+                        "surface-container-highest": "#e0e3e5",
+                        "primary-container": "#006c49",
+                        "surface-dim": "#d8dadc",
+                        "surface-container-high": "#e6e8ea",
+                        "primary-fixed-dim": "#81d8ad",
+                        "on-secondary-fixed-variant": "#0b513d",
+                        "tertiary": "#005136",
+                        "on-tertiary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "on-background": "#191c1e",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-fixed-variant": "#005236",
+                        "surface-bright": "#f7f9fb",
+                        "on-tertiary-container": "#63f1b4",
+                        "on-surface-variant": "#3f4943",
+                        "background": "#f7f9fb",
+                        "on-tertiary-fixed": "#002113",
+                        "inverse-primary": "#81d8ad",
+                        "secondary": "#2b6954",
+                        "surface-container": "#eceef0",
+                        "secondary-fixed": "#b0f0d5",
+                        "on-primary-container": "#93eabe",
+                        "glass-border": "rgba(0, 108, 73, 0.08)",
+                        "surface-container-low": "#f2f4f6",
+                        "on-primary-fixed-variant": "#005236",
+                        "surface-variant": "#e0e3e5",
+                        "glass-bg": "rgba(255, 255, 255, 0.75)",
+                        "on-surface": "#191c1e",
+                        "outline": "#6f7a72",
+                        "on-error-container": "#93000a",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-container": "#326f5a",
+                        "on-primary-fixed": "#002113",
+                        "inverse-surface": "#2d3133",
+                        "tertiary-fixed": "#6ffbbe",
+                        "primary-fixed": "#9df4c8",
+                        "surface": "#f7f9fb",
+                        "on-primary": "#ffffff",
+                        "inverse-on-surface": "#eff1f3",
+                        "primary": "#005136",
+                        "secondary-container": "#b0f0d5",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-container": "#006c49",
+                        "secondary-fixed-dim": "#95d3ba"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "40px",
+                        "container-max-width": "1280px",
+                        "gutter": "24px",
+                        "nav-height": "80px",
+                        "margin-mobile": "16px",
+                        "unit": "8px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "caption": ["Inter"],
+                        "headline-lg-mobile": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "letterSpacing": "0.01em", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "letterSpacing": "0.01em", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "0em", "fontWeight": "500"}],
+                        "caption": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        body { background-color: #f7f9fb; font-family: 'Inter', sans-serif; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 108, 73, 0.08);
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .slide-over {
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .slide-over.active {
+            transform: translateX(0);
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e0e3e5; border-radius: 10px; }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 w-full z-50 bg-glass-bg backdrop-blur-md border-b border-glass-border shadow-sm h-nav-height">
+    <div class="flex items-center justify-between px-margin-desktop h-full max-w-container-max-width mx-auto">
+        <div class="flex items-center gap-8">
+            <span class="font-headline-md text-headline-md font-bold text-primary">Kindred Assurance</span>
+            <nav class="hidden md:flex items-center gap-6">
+                <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Dashboard</a>
+                <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Policies</a>
+                <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Claims</a>
+                <a class="font-body-md text-body-md text-primary font-bold border-b-2 border-primary pb-1" href="#">Sales</a>
+                <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Support</a>
+            </nav>
+        </div>
+        <div class="flex items-center gap-4">
+            <button class="p-2 hover:bg-surface-container-low rounded-lg transition-all">
+                <span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+            </button>
+            <button class="p-2 hover:bg-surface-container-low rounded-lg transition-all">
+                <span class="material-symbols-outlined text-on-surface-variant">settings</span>
+            </button>
+            <div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center overflow-hidden border-2 border-white">
+                <img alt="Administrator Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJNKG0kkh31ADNH92AMolE0ywi6d3FhPmkp0F-8tC5wpBWFeDmNi7OJO8-TDgwCYPlhvmZIYD8HYRYSN6bjJ9i3r8VFKsu0O-pv9onTxui_nuikMZ_f8i-Bk5nhaxrOaSTgFMNYLYLAYaK-5D97LtiaUGcFX4zAGD_bTAGQiH-fh_idh42XK455tT2Ex_rqHM-uVqUNdIHWDwZoX91EJz4fxprPkUCK8Xz7uTAQCt1QNA5PvZO62y70QKR5HUNwLm5XDJ5o-vf_-I"/>
+            </div>
+        </div>
+    </div>
+</header>
+<!-- Sidebar -->
+<aside class="h-screen w-64 fixed left-0 top-nav-height bg-surface border-r border-glass-border flex flex-col py-gutter gap-2 z-40">
+    <div class="px-6 mb-4">
+        <h3 class="font-label-md text-label-md text-outline uppercase tracking-wider">Admin Tools</h3>
+        <p class="text-[11px] text-on-surface-variant/60">Management Console</p>
+    </div>
+    <div class="flex-1 flex flex-col gap-1">
+        <a class="flex items-center gap-3 py-3 px-4 mx-2 text-on-surface-variant hover:bg-surface-container-highest rounded-lg transition-transform hover:translate-x-1" href="#">
+            <span class="material-symbols-outlined">group</span>
+            <span class="font-label-md text-label-md">User Management</span>
+        </a>
+        <a class="flex items-center gap-3 py-3 px-4 mx-2 bg-secondary-container text-on-secondary-container rounded-lg transition-transform" href="#">
+            <span class="material-symbols-outlined">history_edu</span>
+            <span class="font-label-md text-label-md">판매채널 채용 심사</span>
+        </a>
+        <a class="flex items-center gap-3 py-3 px-4 mx-2 text-on-surface-variant hover:bg-surface-container-highest rounded-lg transition-transform hover:translate-x-1" href="#">
+            <span class="material-symbols-outlined">security</span>
+            <span class="font-label-md text-label-md">Risk Engine</span>
+        </a>
+        <a class="flex items-center gap-3 py-3 px-4 mx-2 text-on-surface-variant hover:bg-surface-container-highest rounded-lg transition-transform hover:translate-x-1" href="#">
+            <span class="material-symbols-outlined">edit_note</span>
+            <span class="font-label-md text-label-md">Template Editor</span>
+        </a>
+        <a class="flex items-center gap-3 py-3 px-4 mx-2 text-on-surface-variant hover:bg-surface-container-highest rounded-lg transition-transform hover:translate-x-1" href="#">
+            <span class="material-symbols-outlined">monitor_heart</span>
+            <span class="font-label-md text-label-md">System Health</span>
+        </a>
+    </div>
+    <div class="mt-auto border-t border-glass-border pt-4">
+        <a class="flex items-center gap-3 py-3 px-4 mx-2 text-error hover:bg-error-container/20 rounded-lg transition-transform" href="#">
+            <span class="material-symbols-outlined">logout</span>
+            <span class="font-label-md text-label-md">Logout</span>
+        </a>
+    </div>
+</aside>
+<!-- Main Content -->
+<main class="ml-64 pt-nav-height min-h-screen">
+    <div class="max-w-container-max-width mx-auto px-margin-desktop py-gutter">
+        <!-- Header Section with Bento Style Hero -->
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h1 class="font-headline-lg text-headline-lg text-on-surface">판매채널 채용 심사</h1>
+                <p class="font-body-md text-body-md text-on-surface-variant">새로운 판매 채널 파트너의 역량을 심사하고 승인 프로세스를 관리합니다.</p>
+            </div>
+            <div class="hidden lg:block w-32 h-32 opacity-90 hover:scale-105 transition-transform cursor-pointer">
+                <img alt="Recruitment Icon" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida/AP1WRLt6AwsqasGjViiVO1-bBtyBlnF-O91hhKRfDxnFrn5oMAfQaOF61bjx8BSaNPm5kSp312bUvThc0OoYTka65O5BRMWvRMegszPS2DfJk2xOC-YFCHT6k8dPUlM1VrbSrLbXwL0kVCIGc5e9Glm8wQqM8uAZODuVwkquBnkmMwpqNed8mN_E-VUw0x9_KurPTTSKfmR9D84EcxUMiQ2CrBlr0Tr6RBrDV_EtXDW0gWVRPZZvphMsJ986O5A"/>
+            </div>
+        </div>
+        <!-- Search Filters -->
+        <div class="glass-panel p-6 rounded-lg mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
+                <div class="space-y-2">
+                    <label class="font-label-md text-label-md text-on-surface-variant">모집 기간 (시작 ~ 종료)</label>
+                    <div class="flex items-center gap-2">
+                        <input class="w-full rounded-full border-outline-variant bg-surface-container-low text-on-surface px-4 py-2 focus:ring-primary focus:border-primary" type="date"/>
+                        <span class="text-on-surface-variant">~</span>
+                        <input class="w-full rounded-full border-outline-variant bg-surface-container-low text-on-surface px-4 py-2 focus:ring-primary focus:border-primary" type="date"/>
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <label class="font-label-md text-label-md text-on-surface-variant">채널 유형</label>
+                    <select class="w-full rounded-full border-outline-variant bg-surface-container-low text-on-surface px-4 py-2 focus:ring-primary focus:border-primary">
+                        <option>전체</option>
+                        <option>Agent (전속)</option>
+                        <option>Agency (대리점)</option>
+                    </select>
+                </div>
+                <div class="space-y-2">
+                    <label class="font-label-md text-label-md text-on-surface-variant">심사 상태</label>
+                    <select class="w-full rounded-full border-outline-variant bg-surface-container-low text-on-surface px-4 py-2 focus:ring-primary focus:border-primary">
+                        <option>전체</option>
+                        <option>Pending (대기)</option>
+                        <option>Approved (승인)</option>
+                        <option>Rejected (거절)</option>
+                    </select>
+                </div>
+                <div>
+                    <button class="w-full bg-primary text-white font-label-md text-label-md py-3 rounded-full hover:shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-[20px]">search</span>
+                        조회하기
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Applicant List Table -->
+        <div class="glass-panel rounded-lg overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-surface-container-low border-b border-glass-border">
+                    <tr>
+                        <th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase">지원자명</th>
+                        <th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase">채널 유형</th>
+                        <th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase">신청 일자</th>
+                        <th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase">경력사항</th>
+                        <th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase">보유 자격증</th>
+                        <th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase text-center">심사 상태</th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y divide-glass-border">
+                    <!-- Row 1 -->
+                    <tr class="hover:bg-primary/5 transition-colors cursor-pointer group" onclick="togglePanel('김서윤')">
+                        <td class="px-6 py-5">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container font-bold text-xs">김</div>
+                                <span class="font-body-md text-body-md text-on-surface font-semibold group-hover:text-primary transition-colors">김서윤</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-5 font-body-md text-body-md text-on-surface-variant">Agent (전속)</td>
+                        <td class="px-6 py-5 font-body-md text-body-md text-on-surface-variant">2023.10.24</td>
+                        <td class="px-6 py-5 font-body-md text-body-md text-on-surface-variant">생명보험 5년</td>
+                        <td class="px-6 py-5">
+                            <div class="flex flex-wrap gap-1">
+                                <span class="px-2 py-0.5 bg-tertiary-fixed text-on-tertiary-fixed rounded-full text-[10px] font-bold">AFPK</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-5 text-center">
+                            <span class="px-3 py-1 bg-surface-container-highest text-on-surface-variant rounded-full text-caption font-bold">Pending</span>
+                        </td>
+                    </tr>
+                    <!-- Row 2 -->
+                    <tr class="hover:bg-primary/5 transition-colors cursor-pointer group" onclick="togglePanel('이진우')">
+                        <td class="px-6 py-5">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-bold text-xs">이</div>
+                                <span class="font-body-md text-body-md text-on-surface font-semibold group-hover:text-primary">이진우</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-5 font-body-md text-body-md text-on-surface-variant">Agency (대리점)</td>
+                        <td class="px-6 py-5 font-body-md text-body-md text-on-surface-variant">2023.10.22</td>
+                        <td class="px-6 py-5 font-body-md text-body-md text-on-surface-variant">GA 8년</td>
+                        <td class="px-6 py-5">
+                            <div class="flex flex-wrap gap-1">
+                                <span class="px-2 py-0.5 bg-tertiary-fixed text-on-tertiary-fixed rounded-full text-[10px] font-bold">CFP</span>
+                                <span class="px-2 py-0.5 bg-tertiary-fixed text-on-tertiary-fixed rounded-full text-[10px] font-bold">손해보험</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-5 text-center">
+                            <span class="px-3 py-1 bg-primary text-white rounded-full text-caption font-bold shadow-sm shadow-primary/20">Approved</span>
+                        </td>
+                    </tr>
+                    <!-- Row 3 -->
+                    <tr class="hover:bg-primary/5 transition-colors cursor-pointer group" onclick="togglePanel('박민수')">
+                        <td class="px-6 py-5">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-error-container flex items-center justify-center text-on-error-container font-bold text-xs">박</div>
+                                <span class="font-body-md text-body-md text-on-surface font-semibold group-hover:text-primary">박민수</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-5 font-body-md text-body-md text-on-surface-variant">Agent (전속)</td>
+                        <td class="px-6 py-5 font-body-md text-body-md text-on-surface-variant">2023.10.20</td>
+                        <td class="px-6 py-5 font-body-md text-body-md text-on-surface-variant">신입</td>
+                        <td class="px-6 py-5 font-body-md text-body-md text-on-surface-variant">해당없음</td>
+                        <td class="px-6 py-5 text-center">
+                            <span class="px-3 py-1 bg-error text-white rounded-full text-caption font-bold">Rejected</span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="p-6 border-t border-glass-border flex justify-between items-center bg-surface-container-lowest">
+                <p class="text-caption text-on-surface-variant">Showing 1-3 of 42 applicants</p>
+                <div class="flex gap-2">
+                    <button class="p-2 border border-outline-variant rounded-lg hover:bg-surface-container-low"><span class="material-symbols-outlined text-[18px]">chevron_left</span></button>
+                    <button class="px-4 py-2 bg-primary text-white rounded-lg font-bold">1</button>
+                    <button class="px-4 py-2 border border-outline-variant rounded-lg hover:bg-surface-container-low">2</button>
+                    <button class="px-4 py-2 border border-outline-variant rounded-lg hover:bg-surface-container-low">3</button>
+                    <button class="p-2 border border-outline-variant rounded-lg hover:bg-surface-container-low"><span class="material-symbols-outlined text-[18px]">chevron_right</span></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<!-- Detailed Evaluation Slide-over Panel -->
+<div class="fixed inset-0 bg-inverse-surface/40 backdrop-blur-sm z-[60] hidden opacity-0 transition-opacity duration-300" id="overlay" onclick="togglePanel()"></div>
+<div class="fixed top-0 right-0 h-full w-full md:w-[480px] bg-surface shadow-2xl z-[70] slide-over custom-scrollbar overflow-y-auto" id="evaluationPanel">
+    <div class="p-8 space-y-8">
+        <!-- Panel Header -->
+        <div class="flex items-start justify-between">
+            <div>
+                <span class="text-primary font-bold text-[12px] uppercase tracking-widest mb-1 block">Applicant Review</span>
+                <h2 class="font-headline-md text-headline-md text-on-surface" id="panelName">김서윤</h2>
+                <p class="font-body-md text-body-md text-on-surface-variant">심사 대기중인 지원자 상세 정보입니다.</p>
+            </div>
+            <div class="flex gap-2">
+                <button class="p-2 rounded-full hover:bg-surface-container-high transition-colors" onclick="togglePanel()">
+                    <span class="material-symbols-outlined text-on-surface">close</span>
+                </button>
+            </div>
+        </div>
+        <!-- Quick Action Bar -->
+        <div class="flex gap-3 sticky top-0 bg-surface/95 backdrop-blur-sm py-4 z-10 border-b border-glass-border">
+            <button class="flex-1 bg-primary text-white py-3 rounded-full font-label-md text-label-md shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all">
+                심사 승인
+            </button>
+            <button class="flex-1 bg-surface-container-highest text-error py-3 rounded-full font-label-md text-label-md border border-error/20 hover:bg-error/10 transition-all">
+                심사 거절
+            </button>
+        </div>
+        <!-- Basic Info Card -->
+        <div class="grid grid-cols-2 gap-4">
+            <div class="p-4 bg-surface-container-low rounded-lg">
+                <p class="text-caption text-on-surface-variant mb-1">채널 유형</p>
+                <p class="font-label-md text-label-md text-on-surface">Agent (전속)</p>
+            </div>
+            <div class="p-4 bg-surface-container-low rounded-lg">
+                <p class="text-caption text-on-surface-variant mb-1">신청 일자</p>
+                <p class="font-label-md text-label-md text-on-surface">2023.10.24</p>
+            </div>
+        </div>
+        <!-- Detailed Content -->
+        <section class="space-y-4">
+            <h3 class="font-label-md text-label-md text-primary flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px]">work_history</span>
+                상세 경력 사항
+            </h3>
+            <div class="space-y-3">
+                <div class="flex gap-4 items-start border-l-2 border-primary-container pl-4 py-1">
+                    <div class="min-w-[80px] font-bold text-on-surface text-body-md">2018 - 2023</div>
+                    <div>
+                        <p class="font-label-md text-label-md text-on-surface">대한생명 보험영업본부</p>
+                        <p class="text-caption text-on-surface-variant">개인영업 및 VIP 자산관리 (5년 2개월)</p>
+                    </div>
+                </div>
+                <div class="flex gap-4 items-start border-l-2 border-outline-variant pl-4 py-1">
+                    <div class="min-w-[80px] font-bold text-on-surface-variant text-body-md">2015 - 2018</div>
+                    <div>
+                        <p class="font-label-md text-label-md text-on-surface">글로벌 에셋 관리</p>
+                        <p class="text-caption text-on-surface-variant">손해보험 채널 관리자 (2년 8개월)</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="space-y-4">
+            <h3 class="font-label-md text-label-md text-primary flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px]">workspace_premium</span>
+                보유 전문 자격증
+            </h3>
+            <div class="flex flex-wrap gap-2">
+                <div class="px-4 py-3 bg-surface-container-high rounded-lg flex items-center gap-3">
+                    <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">verified</span>
+                    <div>
+                        <p class="font-label-md text-label-md text-on-surface">AFPK</p>
+                        <p class="text-[10px] text-on-surface-variant">한국재무설계학회</p>
+                    </div>
+                </div>
+                <div class="px-4 py-3 bg-surface-container-high rounded-lg flex items-center gap-3">
+                    <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">verified</span>
+                    <div>
+                        <p class="font-label-md text-label-md text-on-surface">생명보험설계사</p>
+                        <p class="text-[10px] text-on-surface-variant">생명보험협회</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="space-y-4">
+            <h3 class="font-label-md text-label-md text-on-surface">첨부 서류 확인</h3>
+            <div class="space-y-2">
+                <div class="flex items-center justify-between p-3 border border-outline-variant rounded-lg hover:bg-surface-container-low transition-colors cursor-pointer">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-primary">description</span>
+                        <span class="font-body-md text-body-md">경력증명서_김서윤.pdf</span>
+                    </div>
+                    <span class="material-symbols-outlined text-on-surface-variant">download</span>
+                </div>
+                <div class="flex items-center justify-between p-3 border border-outline-variant rounded-lg hover:bg-surface-container-low transition-colors cursor-pointer">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-primary">badge</span>
+                        <span class="font-body-md text-body-md">자격증_증빙파일.zip</span>
+                    </div>
+                    <span class="material-symbols-outlined text-on-surface-variant">download</span>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+<script>
+    function togglePanel(name) {
+        const panel = document.getElementById('evaluationPanel');
+        const overlay = document.getElementById('overlay');
+        const panelName = document.getElementById('panelName');
+
+        if (name) {
+            panelName.innerText = name;
+            panel.classList.add('active');
+            overlay.classList.remove('hidden');
+            setTimeout(() => overlay.classList.add('opacity-100'), 10);
+            document.body.style.overflow = 'hidden';
+        } else {
+            panel.classList.remove('active');
+            overlay.classList.remove('opacity-100');
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }, 300);
+        }
+    }
+
+    // Add a subtle atmospheric hover effect to glass panels
+    document.querySelectorAll('.glass-panel').forEach(panel => {
+        panel.addEventListener('mousemove', (e) => {
+            const { left, top, width, height } = panel.getBoundingClientRect();
+            const x = ((e.clientX - left) / width) * 100;
+            const y = ((e.clientY - top) / height) * 100;
+            panel.style.background = `radial-gradient(circle at ${x}% ${y}%, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%)`;
+        });
+        panel.addEventListener('mouseleave', () => {
+            panel.style.background = `rgba(255, 255, 255, 0.85)`;
+        });
+    });
+</script>
+</body></html>

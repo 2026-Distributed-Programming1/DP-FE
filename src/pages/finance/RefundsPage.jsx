@@ -67,7 +67,7 @@ export default function RefundsPage() {
     } catch { setError('지급 실행에 실패했습니다.'); } finally { setSubmitting(false); }
   };
 
-  const Pagination = () => totalPages > 1 ? (
+  const pagination = totalPages > 1 ? (
     <div className="flex items-center justify-center gap-1">
       <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="btn-ghost p-1.5 disabled:opacity-30"><span className="material-symbols-outlined text-[18px]">chevron_left</span></button>
       {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
@@ -131,7 +131,7 @@ export default function RefundsPage() {
             </div>
           )}
           {error && <p className="text-xs text-error">{error}</p>}
-          <Pagination />
+          {pagination}
         </div>
       ) : (
         <div className="space-y-4">
@@ -181,7 +181,7 @@ export default function RefundsPage() {
             </div>
           )}
           {error && <p className="text-xs text-error">{error}</p>}
-          <Pagination />
+          {pagination}
         </div>
       )}
     </div>

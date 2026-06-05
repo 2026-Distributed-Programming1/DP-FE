@@ -18,6 +18,16 @@ function AchievementBadge({ rate }) {
   return <span className="badge bg-primary-container/20 text-primary">{pct}%</span>;
 }
 
+// 컴포넌트 바깥에 정의 (렌더링마다 새 타입으로 취급되어 포커스가 풀리는 문제 방지)
+function Field({ label, type = 'text', placeholder, value, onChange, required }) {
+  return (
+    <div className="space-y-1.5">
+      <label className="text-xs font-semibold text-on-surface-variant">{label}</label>
+      <input type={type} className="input text-sm" placeholder={placeholder} value={value} onChange={onChange} required={required} />
+    </div>
+  );
+}
+
 // ── 신규 등록 모달 ────────────────────────────────────────────────
 function NewActivityModal({ onClose, onCreated }) {
   const [form, setForm] = useState({
@@ -50,12 +60,7 @@ function NewActivityModal({ onClose, onCreated }) {
     }
   };
 
-  const Field = ({ label, k, type = 'text', placeholder }) => (
-    <div className="space-y-1.5">
-      <label className="text-xs font-semibold text-on-surface-variant">{label}</label>
-      <input type={type} className="input text-sm" placeholder={placeholder} value={form[k]} onChange={set(k)} required={['managerName','channelName','startDate','endDate','visitCount','contractCount','achievementRate'].includes(k)} />
-    </div>
-  );
+  const required = (k) => ['managerName','channelName','startDate','endDate','visitCount','contractCount','achievementRate'].includes(k);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm px-4">
@@ -65,20 +70,20 @@ function NewActivityModal({ onClose, onCreated }) {
           <button onClick={onClose} className="btn-ghost p-1"><span className="material-symbols-outlined text-[20px]">close</span></button>
         </div>
         <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-3">
-          <Field label="담당자명 *" k="managerName" />
-          <Field label="채널명 *" k="channelName" />
+          <Field label="담당자명 *" value={form.managerName} onChange={set('managerName')} required={required('managerName')} />
+          <Field label="채널명 *" value={form.channelName} onChange={set('channelName')} required={required('channelName')} />
           <div className="space-y-1.5 col-span-2">
             <label className="text-xs font-semibold text-on-surface-variant">채널 유형 *</label>
             <select className="input text-sm" value={form.channelType} onChange={set('channelType')}>
               {CHANNEL_TYPE_OPTIONS.filter(o => o.value).map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
           </div>
-          <Field label="시작일 *" k="startDate" type="date" />
-          <Field label="종료일 *" k="endDate" type="date" />
-          <Field label="방문건수 *" k="visitCount" type="number" placeholder="0" />
-          <Field label="계약건수 *" k="contractCount" type="number" placeholder="0" />
-          <Field label="목표달성률(%) *" k="achievementRate" type="number" placeholder="0" />
-          <Field label="수정 목표" k="revisedTarget" type="number" placeholder="선택" />
+          <Field label="시작일 *" value={form.startDate} onChange={set('startDate')} type="date" required={required('startDate')} />
+          <Field label="종료일 *" value={form.endDate} onChange={set('endDate')} type="date" required={required('endDate')} />
+          <Field label="방문건수 *" value={form.visitCount} onChange={set('visitCount')} type="number" placeholder="0" required={required('visitCount')} />
+          <Field label="계약건수 *" value={form.contractCount} onChange={set('contractCount')} type="number" placeholder="0" required={required('contractCount')} />
+          <Field label="목표달성률(%) *" value={form.achievementRate} onChange={set('achievementRate')} type="number" placeholder="0" required={required('achievementRate')} />
+          <Field label="수정 목표" value={form.revisedTarget} onChange={set('revisedTarget')} type="number" placeholder="선택" />
           <div className="space-y-1.5 col-span-2">
             <label className="text-xs font-semibold text-on-surface-variant">개선 내용</label>
             <textarea className="input resize-none text-sm" rows={2} value={form.improvementContent} onChange={set('improvementContent')} />

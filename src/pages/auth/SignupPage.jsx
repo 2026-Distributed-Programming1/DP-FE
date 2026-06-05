@@ -8,6 +8,26 @@ const INITIAL = {
   address: '', birthDate: '',
 };
 
+// 컴포넌트 바깥에 정의해야 렌더링마다 새 타입으로 취급되지 않음
+function Field({ label, type = 'text', placeholder, required = true, value, onChange, error }) {
+  return (
+    <div className="space-y-1.5">
+      <label className="text-xs font-semibold text-on-surface-variant uppercase tracking-wide">
+        {label} {required && '*'}
+      </label>
+      <input
+        type={type}
+        className={`input ${error ? 'border-error ring-error/20' : ''}`}
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+        required={required}
+      />
+      {error && <p className="text-xs text-error">{error}</p>}
+    </div>
+  );
+}
+
 export default function SignupPage() {
   const navigate = useNavigate();
   const [form, setForm] = useState(INITIAL);
@@ -47,22 +67,6 @@ export default function SignupPage() {
     }
   };
 
-  const Field = ({ label, k, type = 'text', placeholder, required = true }) => (
-    <div className="space-y-1.5">
-      <label className="text-xs font-semibold text-on-surface-variant uppercase tracking-wide">
-        {label} {required && '*'}
-      </label>
-      <input
-        type={type}
-        className={`input ${errors[k] ? 'border-error ring-error/20' : ''}`}
-        placeholder={placeholder}
-        value={form[k]}
-        onChange={set(k)}
-      />
-      {errors[k] && <p className="text-xs text-error">{errors[k]}</p>}
-    </div>
-  );
-
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-md">
@@ -76,20 +80,20 @@ export default function SignupPage() {
             {/* 로그인 정보 */}
             <div className="space-y-3 pb-4 border-b border-outline-variant/50">
               <p className="text-xs font-bold text-primary uppercase tracking-wide">로그인 정보</p>
-              <Field label="아이디" k="username" placeholder="영문/숫자 조합" />
-              <Field label="비밀번호" k="password" type="password" placeholder="8자 이상" />
-              <Field label="비밀번호 확인" k="passwordConfirm" type="password" placeholder="동일하게 입력" />
+              <Field label="아이디"       value={form.username}      onChange={set('username')}      error={errors.username}      placeholder="영문/숫자 조합" />
+              <Field label="비밀번호"     value={form.password}      onChange={set('password')}      error={errors.password}      type="password" placeholder="8자 이상" />
+              <Field label="비밀번호 확인" value={form.passwordConfirm} onChange={set('passwordConfirm')} error={errors.passwordConfirm} type="password" placeholder="동일하게 입력" />
             </div>
 
             {/* 개인 정보 */}
             <div className="space-y-3">
               <p className="text-xs font-bold text-primary uppercase tracking-wide">개인 정보</p>
-              <Field label="이름" k="name" />
-              <Field label="주민등록번호" k="residentNo" placeholder="000000-0000000" />
-              <Field label="생년월일" k="birthDate" type="date" />
-              <Field label="연락처" k="phone" placeholder="010-0000-0000" />
-              <Field label="이메일" k="email" type="email" required={false} placeholder="선택 사항" />
-              <Field label="주소" k="address" placeholder="도로명 주소" />
+              <Field label="이름"         value={form.name}       onChange={set('name')}       error={errors.name} />
+              <Field label="주민등록번호" value={form.residentNo} onChange={set('residentNo')} error={errors.residentNo} placeholder="000000-0000000" />
+              <Field label="생년월일"     value={form.birthDate}  onChange={set('birthDate')}  error={errors.birthDate} type="date" />
+              <Field label="연락처"       value={form.phone}      onChange={set('phone')}      error={errors.phone} placeholder="010-0000-0000" />
+              <Field label="이메일"       value={form.email}      onChange={set('email')}      error={errors.email} type="email" required={false} placeholder="선택 사항" />
+              <Field label="주소"         value={form.address}    onChange={set('address')}    error={errors.address} placeholder="도로명 주소" />
             </div>
 
             {serverError && (

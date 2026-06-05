@@ -1,351 +1,189 @@
-import { useState, useEffect } from 'react';
-import Layout from '../../components/layout/Layout';
-import { fetchInterviewSchedules, createInterviewSchedule } from '../../api/interviewSchedules';
-import styles from './InterviewSchedulePage.module.css';
+import { useState, useEffect, useCallback } from 'react';
+import {
+  fetchInterviewSchedules,
+  createInterviewSchedule,
+  cancelInterviewSchedule,
+} from '../../api/interviewSchedules';
 
-const STATUS_LABEL = {
-  SCHEDULED: '예정',
-  COMPLETED: '완료',
-  CANCELLED: '취소',
-};
-
-const STATUS_CLASS = {
-  SCHEDULED: 'statusScheduled',
-  COMPLETED: 'statusCompleted',
-  CANCELLED: 'statusCancelled',
-};
-
-const DOW = ['일', '월', '화', '수', '목', '금', '토'];
-
-function buildCalendar(year, month) {
-  const firstDay = new Date(year, month, 1).getDay();
-  const lastDate = new Date(year, month + 1, 0).getDate();
-  const prevLastDate = new Date(year, month, 0).getDate();
-
-  const cells = [];
-  for (let i = firstDay - 1; i >= 0; i--) {
-    cells.push({ date: prevLastDate - i, current: false });
-  }
-  for (let d = 1; d <= lastDate; d++) {
-    cells.push({ date: d, current: true });
-  }
-  while (cells.length % 7 !== 0) {
-    cells.push({ date: cells.length - firstDay - lastDate + 1, current: false });
-  }
-  return cells;
+function formatDt(iso) {
+  return iso ? new Date(iso).toLocaleString('ko-KR', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : '—';
 }
 
-function formatDate(iso) {
-  if (!iso) return '';
-  const d = new Date(iso);
-  const today = new Date();
-  const isToday =
-    d.getFullYear() === today.getFullYear() &&
-    d.getMonth() === today.getMonth() &&
-    d.getDate() === today.getDate();
-  const yesterday = new Date(today);
-  yesterday.setDate(today.getDate() - 1);
-  const isYesterday =
-    d.getFullYear() === yesterday.getFullYear() &&
-    d.getMonth() === yesterday.getMonth() &&
-    d.getDate() === yesterday.getDate();
+const STATUS_CLS = { 예정: 'bg-primary-container/20 text-primary', 완료: 'bg-surface-container text-outline', 취소: 'bg-error-container/30 text-error' };
 
-  const timeStr = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-  if (isToday) return `오늘 ${timeStr}`;
-  if (isYesterday) return `어제 ${timeStr}`;
-  return `${d.getMonth() + 1}/${d.getDate()} ${timeStr}`;
+function NewModal({ onClose, onCreated }) {
+  const [form, setForm] = useState({ customerName: '', designerName: '', interviewType: '초회면담', scheduledAt: '', location: '', preparation: '' });
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
+  const set = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.value }));
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    try { await createInterviewSchedule(form); onCreated(); }
+    catch { setError('등록에 실패했습니다.'); } finally { setSubmitting(false); }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm px-4">
+      <div className="card w-full max-w-md p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="font-semibold text-on-surface">면담 일정 등록</h3>
+          <button onClick={onClose} className="btn-ghost p-1"><span className="material-symbols-outlined text-[20px]">close</span></button>
+        </div>
+        <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-3">
+          {[['고객명', 'customerName', '', 'text'], ['설계사명', 'designerName', '', 'text'], ['면담 장소', 'location', 'col-span-2', 'text'], ['준비사항', 'preparation', 'col-span-2', 'text']].map(([label, key, span, type]) => (
+            <div key={key} className={`space-y-1.5 ${span}`}>
+              <label className="text-xs font-semibold text-on-surface-variant">{label}</label>
+              <input type={type} className="input text-sm" value={form[key]} onChange={set(key)} required={['customerName', 'designerName'].includes(key)} />
+            </div>
+          ))}
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-on-surface-variant">면담 유형</label>
+            <select className="input text-sm" value={form.interviewType} onChange={set('interviewType')}>
+              {['초회면담', '2차면담', '계약면담', '사후면담'].map(t => <option key={t}>{t}</option>)}
+            </select>
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-on-surface-variant">면담 일시 *</label>
+            <input type="datetime-local" className="input text-sm" value={form.scheduledAt} onChange={set('scheduledAt')} required />
+          </div>
+          {error && <p className="col-span-2 text-xs text-error">{error}</p>}
+          <button type="button" className="btn-secondary" onClick={onClose}>취소</button>
+          <button type="submit" className="btn-primary" disabled={submitting}>{submitting ? '등록 중...' : '등록'}</button>
+        </form>
+      </div>
+    </div>
+  );
 }
 
 export default function InterviewSchedulePage() {
-  const [schedules, setSchedules] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
+  const [items, setItems] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [selected, setSelected] = useState(null);
+  const [showNew, setShowNew] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
 
-  const today = new Date();
-  const [calYear, setCalYear] = useState(today.getFullYear());
-  const [calMonth, setCalMonth] = useState(today.getMonth());
-
-  const [form, setForm] = useState({
-    customerName: '',
-    topic: '',
-    scheduledAt: '',
-    notes: '',
-  });
-
-  useEffect(() => {
-    fetchInterviewSchedules()
-      .then((data) => setSchedules(Array.isArray(data) ? data : (data?.items ?? data?.content ?? [])))
-      .catch(() => setSchedules([]))
-      .finally(() => setLoading(false));
-  }, []);
-
-  function handleChange(field) {
-    return (e) => setForm((prev) => ({ ...prev, [field]: e.target.value }));
-  }
-
-  async function handleSubmit(e) {
-    e.preventDefault();
-    setSubmitting(true);
+  const load = useCallback(async () => {
+    setLoading(true);
     try {
-      const created = await createInterviewSchedule(form);
-      setSchedules((prev) => [created, ...prev]);
-      setShowModal(false);
-      setForm({ customerName: '', topic: '', scheduledAt: '', notes: '' });
-    } catch {
-      alert('일정 등록 중 오류가 발생했습니다.');
-    } finally {
-      setSubmitting(false);
-    }
-  }
+      const data = await fetchInterviewSchedules({ page, size: 20 });
+      setItems(data.items ?? []);
+      setTotal(data.total ?? 0);
+    } catch { } finally { setLoading(false); }
+  }, [page]);
 
-  const todayCount = schedules.filter((s) => {
-    if (!s.scheduledAt) return false;
-    const d = new Date(s.scheduledAt);
-    return (
-      d.getFullYear() === today.getFullYear() &&
-      d.getMonth() === today.getMonth() &&
-      d.getDate() === today.getDate()
-    );
-  }).length;
+  useEffect(() => { load(); }, [load]);
 
-  const completedCount = schedules.filter((s) => s.status === 'COMPLETED').length;
-  const achievementRate =
-    schedules.length > 0 ? Math.round((completedCount / schedules.length) * 100) : 0;
+  const handleCancel = async (scheduleNo) => {
+    if (!confirm('면담을 취소하시겠습니까?')) return;
+    setCancelling(true);
+    try { await cancelInterviewSchedule(scheduleNo); setSelected(null); load(); }
+    catch { } finally { setCancelling(false); }
+  };
 
-  const calCells = buildCalendar(calYear, calMonth);
-
-  const eventsByDate = {};
-  schedules.forEach((s) => {
-    if (!s.scheduledAt) return;
-    const d = new Date(s.scheduledAt);
-    if (d.getFullYear() === calYear && d.getMonth() === calMonth) {
-      const key = d.getDate();
-      if (!eventsByDate[key]) eventsByDate[key] = [];
-      eventsByDate[key].push(s);
-    }
-  });
-
-  function prevMonth() {
-    if (calMonth === 0) { setCalYear((y) => y - 1); setCalMonth(11); }
-    else setCalMonth((m) => m - 1);
-  }
-  function nextMonth() {
-    if (calMonth === 11) { setCalYear((y) => y + 1); setCalMonth(0); }
-    else setCalMonth((m) => m + 1);
-  }
+  const totalPages = Math.max(1, Math.ceil(total / 20));
 
   return (
-    <Layout title="면담 일정">
-      <div className={styles.page}>
-        {/* Hero */}
-        <section className={styles.hero}>
-          <div className={styles.heroLeft}>
-            <div className={styles.heroTitleRow}>
-              <span className={styles.heroIcon}>📅</span>
-              <div>
-                <h1 className={styles.heroTitle}>영업 활동 허브</h1>
-                <p className={styles.heroSub}>오늘의 일정과 성과를 한눈에 확인하세요.</p>
-              </div>
-            </div>
-          </div>
-          <div className={styles.heroStats}>
-            <div className={styles.statCard}>
-              <span className={styles.statLabel}>오늘의 미팅</span>
-              <span className={styles.statValue}>{todayCount} 건</span>
-            </div>
-            <div className={styles.statCard}>
-              <span className={styles.statLabel}>달성률</span>
-              <span className={`${styles.statValue} ${styles.statSecondary}`}>{achievementRate}%</span>
-            </div>
-          </div>
-        </section>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-bold text-on-surface">면담 일정</h1>
+          <p className="text-sm text-on-surface-variant mt-0.5">총 {total}건</p>
+        </div>
+        <button onClick={() => setShowNew(true)} className="btn-primary flex items-center gap-1.5">
+          <span className="material-symbols-outlined text-[16px]">add</span>면담 등록
+        </button>
+      </div>
 
-        {/* Bento Grid */}
-        <div className={styles.bento}>
-          {/* Calendar */}
-          <div className={styles.calCard}>
-            <div className={styles.calHeader}>
-              <h3 className={styles.cardTitle}>
-                <span className={styles.cardIcon}>🗓️</span> 개인 일정
-              </h3>
-              <div className={styles.calNav}>
-                <button className={styles.navBtn} onClick={prevMonth}>‹</button>
-                <span className={styles.calMonth}>{calYear}년 {calMonth + 1}월</span>
-                <button className={styles.navBtn} onClick={nextMonth}>›</button>
-              </div>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="lg:col-span-7 flex flex-col gap-3">
+          {loading ? (
+            <div className="flex justify-center py-16"><div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" /></div>
+          ) : items.length === 0 ? (
+            <div className="card flex flex-col items-center justify-center py-16 gap-3 text-on-surface-variant">
+              <span className="material-symbols-outlined text-4xl text-outline">calendar_month</span>
+              <p className="text-sm">면담 일정이 없습니다.</p>
             </div>
-
-            <div className={styles.calGrid7}>
-              {DOW.map((d) => (
-                <div key={d} className={styles.calDow}>{d}</div>
+          ) : (
+            <div className="space-y-3">
+              {items.map(item => (
+                <div key={item.scheduleNo} onClick={() => setSelected(item.scheduleNo === selected ? null : item.scheduleNo)}
+                  className={`card p-4 cursor-pointer transition-all hover:shadow-md ${selected === item.scheduleNo ? 'ring-2 ring-primary/30' : ''}`}>
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className={`badge text-[11px] ${STATUS_CLS[item.status] ?? 'bg-surface-container text-outline'}`}>{item.status}</span>
+                      <span className="font-semibold text-on-surface text-sm">{item.customerName}</span>
+                    </div>
+                    <span className="text-xs text-outline shrink-0">{formatDt(item.scheduledAt)}</span>
+                  </div>
+                  <div className="mt-2 flex items-center gap-3 text-xs text-on-surface-variant">
+                    <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[13px]">person</span>{item.designerName}</span>
+                    <span>{item.interviewType}</span>
+                    {item.location && <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[13px]">location_on</span>{item.location}</span>}
+                  </div>
+                </div>
               ))}
             </div>
-            <div className={styles.calGrid7}>
-              {calCells.map((cell, idx) => {
-                const isToday =
-                  cell.current &&
-                  cell.date === today.getDate() &&
-                  calYear === today.getFullYear() &&
-                  calMonth === today.getMonth();
-                const events = cell.current ? (eventsByDate[cell.date] || []) : [];
-                return (
-                  <div
-                    key={idx}
-                    className={`${styles.calCell} ${!cell.current ? styles.calCellOther : ''} ${isToday ? styles.calCellToday : ''}`}
-                  >
-                    <span className={`${styles.calDate} ${isToday ? styles.calDateToday : ''} ${cell.date % 7 === 0 ? styles.calDateSun : ''}`}>
-                      {cell.date}
-                    </span>
-                    <div className={styles.calEvents}>
-                      {events.slice(0, 2).map((ev, i) => (
-                        <div key={i} className={styles.calEvent}>
-                          {new Date(ev.scheduledAt).getHours().toString().padStart(2,'0')}:{new Date(ev.scheduledAt).getMinutes().toString().padStart(2,'0')} {ev.customerName || ev.topic || ''}
-                        </div>
-                      ))}
-                      {events.length > 2 && (
-                        <div className={styles.calEventMore}>+{events.length - 2}</div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
+          )}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-1">
+              <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="btn-ghost p-1.5 disabled:opacity-30"><span className="material-symbols-outlined text-[18px]">chevron_left</span></button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
+                <button key={p} onClick={() => setPage(p)} className={`w-8 h-8 rounded-lg text-sm font-medium ${p === page ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:bg-surface-container'}`}>{p}</button>
+              ))}
+              <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="btn-ghost p-1.5 disabled:opacity-30"><span className="material-symbols-outlined text-[18px]">chevron_right</span></button>
             </div>
-          </div>
+          )}
+        </div>
 
-          {/* Right Column */}
-          <div className={styles.rightCol}>
-            {/* Quick Tools */}
-            <div className={styles.glassCard}>
-              <h3 className={styles.cardTitle}>
-                <span className={styles.cardIcon}>⚡</span> 빠른 도구
-              </h3>
-              <div className={styles.toolList}>
-                {[
-                  { icon: '📄', label: '신규 상품 제안서', color: styles.toolIconGreen },
-                  { icon: '🧮', label: '보험료 간편 계산', color: styles.toolIconBlue },
-                  { icon: '🔍', label: '고객 분석 리포트', color: styles.toolIconTeal },
-                ].map((tool) => (
-                  <button key={tool.label} className={styles.toolBtn}>
-                    <div className={styles.toolBtnLeft}>
-                      <div className={`${styles.toolIconWrap} ${tool.color}`}>
-                        <span>{tool.icon}</span>
-                      </div>
-                      <span className={styles.toolLabel}>{tool.label}</span>
-                    </div>
-                    <span className={styles.toolArrow}>›</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Performance */}
-            <div className={styles.perfCard}>
-              <h3 className={styles.cardTitle}>
-                <span className={styles.cardIcon}>📊</span> 실적 현황
-              </h3>
-              <div className={styles.perfList}>
-                <div className={styles.perfItem}>
-                  <div className={styles.perfRow}>
-                    <span className={styles.perfLabel}>월간 매출 목표</span>
-                    <span className={styles.perfVal}>₩42,000,000 / ₩50,000,000</span>
-                  </div>
-                  <div className={styles.progressBar}>
-                    <div className={styles.progressFill} style={{ width: '84%' }} />
-                  </div>
+        <div className="lg:col-span-5 lg:sticky lg:top-24 self-start">
+          {selected ? (() => {
+            const item = items.find(i => i.scheduleNo === selected);
+            if (!item) return null;
+            return (
+              <div className="card overflow-hidden">
+                <div className="p-5 border-b border-outline-variant/50 bg-surface-container-low">
+                  <span className={`badge ${STATUS_CLS[item.status] ?? 'bg-surface-container text-outline'}`}>{item.status}</span>
+                  <h3 className="font-bold text-on-surface mt-1">{item.customerName}</h3>
+                  <p className="text-xs text-outline">{item.scheduleNo}</p>
                 </div>
-                <div className={styles.perfItem}>
-                  <div className={styles.perfRow}>
-                    <span className={styles.perfLabel}>신규 계약 건수</span>
-                    <span className={styles.perfVal}>12 / 15</span>
-                  </div>
-                  <div className={styles.progressBar}>
-                    <div className={`${styles.progressFill} ${styles.progressSecondary}`} style={{ width: '80%' }} />
-                  </div>
+                <div className="p-5 space-y-3">
+                  {[
+                    { label: '설계사', value: item.designerName },
+                    { label: '면담 유형', value: item.interviewType },
+                    { label: '면담 일시', value: formatDt(item.scheduledAt) },
+                    { label: '장소', value: item.location || '—' },
+                    { label: '준비사항', value: item.preparation || '—' },
+                  ].map(({ label, value }) => (
+                    <div key={label} className="flex justify-between text-sm">
+                      <span className="text-on-surface-variant">{label}</span>
+                      <span className="font-medium text-on-surface">{value}</span>
+                    </div>
+                  ))}
                 </div>
+                {item.status === '예정' && (
+                  <div className="p-5">
+                    <button onClick={() => handleCancel(item.scheduleNo)} disabled={cancelling}
+                      className="w-full bg-error/10 text-error py-2 rounded-lg text-sm font-semibold hover:bg-error/20 transition-colors">
+                      {cancelling ? '처리 중...' : '면담 취소'}
+                    </button>
+                  </div>
+                )}
               </div>
+            );
+          })() : (
+            <div className="card h-full flex flex-col items-center justify-center gap-3 text-on-surface-variant p-8">
+              <span className="material-symbols-outlined text-4xl text-outline">calendar_month</span>
+              <p className="text-sm">면담을 선택하면 상세 정보가 표시됩니다.</p>
             </div>
-          </div>
-
-          {/* Meeting Log Table */}
-          <div className={`${styles.glassCard} ${styles.fullWidth}`}>
-            <div className={styles.tableHeader}>
-              <h3 className={styles.cardTitle}>
-                <span className={styles.cardIcon}>📋</span> 최근 고객 미팅 기록
-              </h3>
-              <button className={styles.addBtn} onClick={() => setShowModal(true)}>
-                기록 추가
-              </button>
-            </div>
-
-            {loading ? (
-              <div className={styles.empty}>불러오는 중…</div>
-            ) : schedules.length === 0 ? (
-              <div className={styles.empty}>등록된 면담 일정이 없습니다.</div>
-            ) : (
-              <div className={styles.tableWrap}>
-                <table className={styles.table}>
-                  <thead>
-                    <tr>
-                      <th>날짜/시간</th>
-                      <th>고객명</th>
-                      <th>상담 주제</th>
-                      <th>상태</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {schedules.map((s, i) => (
-                      <tr key={s.scheduleNo ?? i}>
-                        <td className={styles.tdBold}>{formatDate(s.scheduledAt)}</td>
-                        <td>{s.customerName ?? '-'}</td>
-                        <td>{s.topic ?? s.consultationType ?? '-'}</td>
-                        <td>
-                          <span className={`${styles.badge} ${styles[STATUS_CLASS[s.status] ?? 'statusScheduled']}`}>
-                            {STATUS_LABEL[s.status] ?? s.status ?? '예정'}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
+          )}
         </div>
       </div>
 
-      {/* Add Modal */}
-      {showModal && (
-        <div className={styles.overlay} onClick={() => setShowModal(false)}>
-          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.modalHeader}>
-              <h2 className={styles.modalTitle}>면담 일정 등록</h2>
-              <button className={styles.closeBtn} onClick={() => setShowModal(false)}>✕</button>
-            </div>
-            <form className={styles.modalForm} onSubmit={handleSubmit}>
-              <div className={styles.field}>
-                <label className={styles.label}>고객명</label>
-                <input className={styles.input} type="text" placeholder="고객 이름" value={form.customerName} onChange={handleChange('customerName')} required />
-              </div>
-              <div className={styles.field}>
-                <label className={styles.label}>상담 주제</label>
-                <input className={styles.input} type="text" placeholder="상담 주제를 입력하세요" value={form.topic} onChange={handleChange('topic')} required />
-              </div>
-              <div className={styles.field}>
-                <label className={styles.label}>일정 일시</label>
-                <input className={styles.input} type="datetime-local" value={form.scheduledAt} onChange={handleChange('scheduledAt')} required />
-              </div>
-              <div className={styles.field}>
-                <label className={styles.label}>메모</label>
-                <textarea className={styles.textarea} rows={3} placeholder="추가 메모" value={form.notes} onChange={handleChange('notes')} />
-              </div>
-              <button className={styles.submitBtn} type="submit" disabled={submitting}>
-                {submitting ? '등록 중…' : '일정 등록'}
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
-    </Layout>
+      {showNew && <NewModal onClose={() => setShowNew(false)} onCreated={() => { setShowNew(false); load(); }} />}
+    </div>
   );
 }
